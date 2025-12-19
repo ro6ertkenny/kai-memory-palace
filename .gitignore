@@ -1,0 +1,17 @@
+# OS / editor files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+*.bak
+
+# Logs
+*.log
+
+# Secrets
+.env
+*.key
+*.pem
+kubeconfig
+*.kubeconfig
