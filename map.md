@@ -1,145 +1,152 @@
-# 🗺️ Kai Memory Palace — Map
+# 🗺️ kai-memory-palace — Knowledge Map
 
-This document is the **navigation map** for the Kai Memory Palace.
-
-Think of this as the floor plan you consult before walking into a wing.  
-It explains *where things live* and *why they live there*.
+This document is the **authoritative map** of the kai-memory-palace repository.  
+It explains how knowledge is organized and where to put new material.
 
 ---
 
-## 🏛️ Entrance Hall
+## 🧠 Core Principle
 
-- **[`README.md`](README.md)**  
-  The front door of the repository.  
-  Explains purpose, philosophy, structure, and audience.
+Content is organized by **mental mode**, not by tool or trend.
 
----
-
-## 🐧 Linux Wing
-
-**Path:** `linux/`
-
-Focus:
-- System administration fundamentals
-- Filesystems, users, permissions
-- Services, processes, systemd
-- Package management and OS behavior
-
-This wing answers:  
-**“How does the operating system actually work?”**
+If the thinking mode changes, it belongs in a different Wing.
 
 ---
 
-## ☸️ Kubernetes Wing
+## ☸️ Kubernetes (Domain: `k8s/`)
 
-**Path:** `kubernetes/`
+Kubernetes content is organized into **five Wings**, each with a clear purpose.
 
-Focus:
-- Cluster architecture and components
-- kubeadm-based operations
-- Workloads, YAML, scheduling
-- Debugging and failure modes
+### 🧭 `k8s/general/`
+Cross-cutting Kubernetes notes that don’t belong to a single Wing.
 
-This wing answers:  
-**“How are distributed systems orchestrated?”**
-
----
-
-## ✍️ Vim Wing
-
-**Path:** `vim/`
-
-Focus:
-- Editing mechanics
-- Muscle memory and speed
-- Modal thinking
-- Practical usage for ops and exams
-
-This wing answers:  
-**“How do I move and think efficiently inside files?”**
+- Conventions
+- Shared references
+- “Inbox” notes awaiting classification
+- Cross-Wing troubleshooting patterns
 
 ---
 
-## 🌐 Networking Wing
+### 🧱 `k8s/foundations/`
+Core Kubernetes concepts and primitives.
+
+- Control plane vs workers
+- Pods, Deployments, Services
+- Declarative YAML
+- `kubectl` fundamentals
+
+Use this Wing to **understand how Kubernetes works**.
+
+---
+
+### 🛠️ `k8s/ops+provisioning/`
+Cluster build, operation, and maintenance.
+
+- kubeadm workflows
+- Container runtimes (CRI / containerd)
+- Node lifecycle (join/reset/upgrade)
+- OS prep and system tuning
+
+Use this Wing to **run Kubernetes reliably**.
+
+---
+
+### 🌐 `k8s/networking/`
+Kubernetes-specific networking abstractions.
+
+- CNI concepts
+- Pod-to-Pod and Service networking
+- Cluster DNS
+- Ingress and NetworkPolicies
+
+Linux networking fundamentals belong **outside** Kubernetes.
+
+---
+
+### 🧩 `k8s/ecosystem/`
+Tools and patterns that extend Kubernetes.
+
+- Helm
+- Operators
+- Observability (Prometheus / Grafana)
+- GitOps (Argo CD / Flux)
+- Security tooling (RBAC / OPA)
+
+Only populate this Wing after foundations and ops feel solid.
+
+---
+
+## 🌐 Networking (General)
 
 **Path:** `networking/`
 
-Focus:
-- IP addressing and routing
-- DNS and name resolution
-- Local networks vs cluster networks
-- Troubleshooting connectivity
+Linux and infrastructure networking fundamentals used by everything else.
 
-This wing answers:  
-**“How do packets actually move?”**
+- TCP/IP
+- Routing and subnets
+- Interfaces and bridges
+- iptables / nftables
+- DNS at the OS level
 
----
-
-## 🧰 Snippets Wing
-
-**Path:** `snippets/`
-
-Focus:
-- Reusable commands
-- One-liners and patterns
-- Frequently needed operations
-
-This wing answers:  
-**“What do I need *right now*?”**
+Kubernetes networking builds on this knowledge but is tracked separately.
 
 ---
 
-## 🤙 Kai Wing
+## 🐧 Linux
 
-**Path:** `kai/`
+**Path:** `linux/`
 
-Focus:
-- Mental models
-- Decision-making frameworks
-- Checklists and heuristics
-- Troubleshooting approaches
-- Learning discipline
+Linux operating system knowledge.
 
-This wing answers:  
-**“How should I think about problems?”**
+- Debian-specific notes
+- Bash usage
+- System administration fundamentals
+- Package management and services
 
----
-
-## 🧱 Templates Wing
-
-**Path:** `templates/`
-
-Focus:
-- Reusable Markdown structures
-- Standardized note formats
-- Consistency across the palace
-
-This wing answers:  
-**“How do I capture knowledge consistently?”**
+This Wing supports Kubernetes, not the other way around.
 
 ---
 
-## 🧭 How to Use the Palace
+## ✍️ Editor Knowledge
 
-1. Start at the **Entrance Hall**
-2. Use this map to choose a wing
-3. Navigate within a wing via its `README.md`
-4. Add new artifacts where they *belong*
-5. Refine structure as understanding grows
+### `vim/`
+Vim usage patterns, workflows, and references.
 
 ---
 
-## 🧠 Design Principle
+## 🧩 Reusable Knowledge Libraries
 
-> Knowledge should be easier to **retrieve** than to **recreate**.
+### `snippets/`
+Small, atomic, copy/paste-ready fragments.
 
-If you have to search, re-learn, or guess — the palace needs refinement.
+- Commands
+- YAML fragments
+- Bash one-liners
+- Markdown patterns
+
+### `templates/`
+Opinionated starting structures.
+
+- README skeletons
+- Runbook templates
+- Learning logs
+- Documentation scaffolds
+
+Snippets and templates are **general-purpose**, not Kubernetes-specific.
 
 ---
 
-## 🏁 Status
+## 🧭 Meta & Assets
 
-🚧 Active and evolving
+- `README.md` — repository entry point and navigation
+- `map.md` — this document (mental index)
+- `images/` — diagrams and screenshots used by notes
 
-The map evolves as the palace grows, but its purpose remains constant:
-**fast recall through intentional structure**.
+---
+
+## ✅ Placement Rules (Summary)
+
+- Organize by **mental mode**
+- Avoid duplication
+- Prefer one canonical location
+- Split Wings only when pressure exists
