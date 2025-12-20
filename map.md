@@ -72,7 +72,9 @@ Tools and patterns that extend Kubernetes.
 - GitOps (Argo CD / Flux)
 - Security tooling (RBAC / OPA)
 
-Only populate this Wing after foundations and ops feel solid.
+- 🤖 AI-on-Kubernetes workloads (tracked via a placeholder in `k8s/ecosystem/`)
+
+*Only populate this Wing after foundations and ops feel solid.*
 
 ---
 
