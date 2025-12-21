@@ -59,6 +59,23 @@ A few guiding principles shape everything in this wing:
 
 ---
 
+## Git Authority Rules
+
+This wing is the **authoritative source** for all Git and version-control practices
+in the kai-memory-palace repository.
+
+Rules:
+
+- Git behavior, commit standards, and history discipline are defined **only** here
+- Other wings may reference Git practices, but must not redefine them
+- If guidance elsewhere conflicts with this wing, **this wing wins**
+- Canonical rules live in dedicated documents and are linked, not duplicated
+
+This structure prevents drift, keeps history clean, and ensures changes remain
+reviewable as the repository grows.
+
+---
+
 ## Commit Message Standard   
 
 All commits in this repository must follow the commit message rules defined in:
