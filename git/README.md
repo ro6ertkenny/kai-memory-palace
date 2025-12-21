@@ -59,6 +59,14 @@ A few guiding principles shape everything in this wing:
 
 ---
 
+## Commit Message Standard   
+
+All commits in this repository must follow the commit message rules defined in:
+
+- `commit-message-standard.md`
+
+---
+
 ## 🔁 Relationship to Other Wings
 
 Git workflows documented here are used by:
