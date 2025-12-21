@@ -4,6 +4,13 @@ A structured knowledge base for repeatable learning, operations, and reference n
 
 ## 🗺️ Navigation
 
+### 🤙 Core Thinking
+- `kai/` — decision-making, principles, and mental models that guide all other wings
+
+### 🔀 Version Control
+- `git/` — Git and version-control practices used throughout the repository  
+  *Single source of truth for commits, history, and change discipline*
+
 ### ☸️ Kubernetes
 - `k8s/README.md` — Kubernetes hub (5 Wings)
   - `k8s/general/`
