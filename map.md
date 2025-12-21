@@ -13,6 +13,23 @@ If the thinking mode changes, it belongs in a different Wing.
 
 ---
 
+## 🔀 Version Control
+
+**Path:** `git/`
+
+Git and version-control discipline used throughout the repository.
+
+- Commit scope and message standards
+- History hygiene (amend, revert, rebase vs merge)
+- Branching strategy (when needed)
+- Change safety patterns (reviewable diffs, small commits)
+- Repository structure conventions
+
+Other Wings may reference this Wing for **how to ship changes**, but this Wing owns the
+**how and why of version control**.
+
+---
+
 ## ☸️ Kubernetes (Domain: `k8s/`)
 
 Kubernetes content is organized into **five Wings**, each with a clear purpose.
