@@ -1,114 +1,175 @@
-# ✍️ Vim Wing
-
-Welcome to the **Vim Wing** of the Kai Memory Palace.
-
-This wing exists to build **editing speed, precision, and confidence** using Vim
-as a primary tool for Linux system administration and Kubernetes operations.
-
-Vim is treated here not as an editor to “get through,” but as a **force multiplier**
-for thinking and working inside text-based systems.
-
----
+# 🪽 Vim Wing — README
 
 ## 🎯 Purpose
+This wing exists to make **Vim invisible**.
 
-The Vim Wing exists to:
-
-- Develop muscle memory for efficient text editing
-- Reduce friction when working with configs, YAML, and logs
-- Prepare for real-world ops work and certification environments
-- Shift editing from conscious effort to instinctive action
-
-Vim proficiency is not optional for serious Linux and Kubernetes work.
+Vim is not learned here — it is **conditioned**.  
+The goal is to edit files **without conscious thought**, so attention stays on Linux and Kubernetes problems, not on the editor.
 
 ---
 
-## 🧠 Scope
+## 🧠 Mental Mode
+**Editing without thinking**
 
-Topics in this wing include, but are not limited to:
+- hands move automatically  
+- eyes track structure  
+- mind stays on intent  
 
-- Modal editing fundamentals
-- Movement and navigation
-- Editing, deleting, and changing text
-- Visual mode and selections
-- Searching and substitution
-- Working with multiple files and buffers
-- Editing YAML safely and efficiently
-- Vim configuration basics
-- Exam-oriented workflows (CKA-style environments)
+Vim becomes an extension of the keyboard, not a subject of study.
+
+---
+
+## 🧩 Why Vim Comes First
+Every Linux / Kubernetes task touches text:
+
+- configuration files
+- YAML manifests
+- logs
+- scripts
+- documentation
+
+If Vim is frictionless, **everything else accelerates**.
+
+Mental model:
+- **Vim** → the hands  
+- **Linux / Bash** → the environment  
+- **Kubernetes** → the system  
+
+Slow hands slow the system.
+
+---
+
+## 🧭 Scope
+This wing focuses only on **core, durable Vim skills** that compound daily.
+
+Included:
+- movement
+- editing primitives
+- search and replace
+- visual mode
+- buffers and splits
+- working safely with configs and logs
+
+Excluded:
+- history or philosophy
+- plugin ecosystems
+- theming
+- novelty commands
+- editor debates
+
+If it does not improve daily speed and safety, it does not belong here.
 
 ---
 
 ## 🧭 How This Wing Is Organized
-
 Content in this wing is organized as **small, repeatable practice artifacts**.
 
-Examples:
+Each file is:
+- narrow in scope
+- drillable in isolation
+- durable over time
 
-- `modes-and-movement.md`
-- `editing-basics.md`
-- `search-and-replace.md`
-- `visual-mode.md`
-- `vim-for-yaml.md`
-- `common-mistakes.md`
-- `exam-survival-tips.md`
-
-Each artifact should:
-- Focus on one skill or concept
-- Include short, repeatable exercises
-- Emphasize muscle memory over theory
-- Be usable without plugins or IDE features
+No file tries to teach Vim end-to-end.
 
 ---
 
-## 🧰 Practice Philosophy
+## ⚙️ How This Wing Is Used
+This wing is **not** read sequentially.
 
-Learning Vim here follows these principles:
+It is used as:
+- a drill reference
+- a muscle-memory checklist
+- a corrective tool when friction appears
 
-- Practice daily, briefly, and deliberately
-- Prefer repetition over memorization
-- Learn commands in context, not in isolation
-- Accept temporary slowdown as part of mastery
-- Use Vim for real work as early as possible
-
-Games, tutorials, and drills are used **to build instinct**, not replace real usage.
+Repetition > coverage.
 
 ---
 
-## 🧠 Relationship to Other Wings
+## ⏱️ Practice Discipline
+Daily practice is short and deliberate.
 
-| Wing            | Relationship to Vim |
-|-----------------|---------------------|
-| 🐧 Linux         | Vim is the primary editor for Linux systems |
-| ☸️ Kubernetes    | YAML and manifests are edited in Vim |
-| 🌐 Networking   | Config files and diagnostics are edited in Vim |
-| 🧰 Snippets     | Snippets are authored and refined in Vim |
-| 🤙 Kai          | Mental discipline and focus during editing |
+- ~20 minutes per session
+- one focus topic at a time
+- no jumping ahead
+- no mouse
+- no arrow keys
 
-Vim is the interface between thought and system state.
-
----
-
-## 📌 Intended Audience
-
-- Linux learners committing to Vim
-- Kubernetes practitioners preparing for CKA
-- Engineers seeking editing fluency under pressure
-- Anyone replacing mouse-driven workflows with intent
-
-The tone is **clear, neutral, and instructional**.
+Speed comes from **constraint**, not exploration.
 
 ---
 
-## 🏁 Status
+## 📁 File Index
 
-🚧 Active and evolving
-
-This wing grows as editing speed increases and friction decreases.
+### `movement.md`
+Navigation fundamentals:
+- words, lines, paragraphs, screens
+- reaching text without thinking
 
 ---
 
-## 🧭 Navigation
+### `editing.md`
+Core editing mechanics:
+- insert vs normal
+- delete, change, yank, paste
+- visual mode (line and block)
+- indentation
 
-- 🗺️ **[Palace Map](../map.md)**
-- 🏛️ **[Entrance Hall](../README.md)**
+---
+
+### `search-and-replace.md`
+Targeting text precisely:
+- forward/backward search
+- repetition
+- substitution (line vs file)
+- safe confirmation
+
+---
+
+### `buffers-windows-tabs.md`
+Situational awareness:
+- buffers vs files
+- splits for comparison
+- moving efficiently between views
+- avoiding unnecessary tabs
+
+---
+
+### `vim-for-configs.md`
+Structured text safety:
+- YAML discipline
+- indentation integrity
+- multi-line edits
+- avoiding invisible breakage
+
+---
+
+### `vim-for-logs.md`
+Read-only efficiency:
+- scanning large files
+- jumping between patterns
+- extracting signal from noise
+
+---
+
+### `mistakes.md`
+Only recurring failures:
+- mode confusion
+- accidental deletes
+- recovery techniques
+
+This file stays short by design.
+
+---
+
+## 🧪 Operating Rule
+If an action requires thought, it belongs in a drill.
+
+If it becomes automatic, it graduates into muscle memory.
+
+---
+
+## ✅ Outcome
+Vim fades into the background.
+
+Your hands move.  
+Your mind stays on the system.
