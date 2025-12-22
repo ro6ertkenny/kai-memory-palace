@@ -1,114 +1,128 @@
 # 🧠 Kubernetes Control Plane
-*Provisioning, operation, and lifecycle management*
+*Authority, stability, and lifecycle management*
 
 ---
 
 ## 📌 Purpose
 
-This directory documents **control plane responsibilities** within the
-`k8s/ops+provisioning` wing.
+This directory documents **control plane–specific operational knowledge**
+within the `k8s/ops+provisioning` wing.
 
 The control plane is responsible for:
+- defining and enforcing cluster state
+- serving and validating all API interactions
+- coordinating scheduling and reconciliation
+- establishing and maintaining cluster trust
+- surviving upgrades, failures, and recovery events
 
-- cluster initialization and identity
-- API availability and state consistency
-- scheduling, admission, and reconciliation
-- certificate authority and trust
-- lifecycle operations across upgrades and failures
+This directory focuses on **ongoing control plane ownership** —
+not general cluster bootstrap and not application workloads.
 
-This documentation focuses on **how operators think about and manage
-the control plane**, not on application workloads.
+---
+
+## 🧭 Relationship to Bootstrap
+
+Initial cluster creation is documented in:
+
+bootstrap/
+
+Specifically:
+- preflight and invariants
+- kubeadm init / join workflows
+- post-bootstrap validation
+- reset and recovery
+
+Once bootstrap is complete and validated, **control plane responsibility
+moves here**.
+
+Think of the boundary as:
+
+Bootstrap → control plane exists  
+This directory → control plane must remain correct
 
 ---
 
 ## 🔁 Lifecycle Focus
 
-### 🚀 Day-1 Control Plane Operations (Provisioning)
+### 🚀 Day-1 (Control Plane Establishment)
 
-Day-1 begins when a cluster is first brought into existence.
+After successful bootstrap, operators must ensure:
 
-Responsibilities include:
+- API server stability and reachability
+- etcd health and persistence
+- scheduler and controller-manager correctness
+- baseline security and trust configuration
+- observability into control plane health
 
-- validating OS prerequisites on the control-plane node
-- installing and configuring the container runtime (containerd)
-- installing kubelet, kubeadm, and kubectl
-- initializing the cluster with kubeadm
-- generating and distributing certificates
-- establishing the initial API endpoint
-- installing a CNI
-- verifying control-plane health
-
-The goal of Day-1 is **a clean, trustworthy control plane**.
+Day-1 success is not “kubeadm finished” — it is **stable authority**.
 
 ---
 
-### 🔧 Day-2 Control Plane Operations (Maintenance)
+### 🔧 Day-2 (Control Plane Maintenance)
 
-Day-2 begins once the control plane is live.
+Most real-world control plane work happens here.
 
 Responsibilities include:
 
 - Kubernetes version upgrades
-- kubeadm config and certificate rotation
-- API server availability and performance
-- etcd health and recovery considerations
+- certificate rotation and trust continuity
+- API performance and availability
+- etcd backup, restore, and recovery
 - node maintenance impacting the control plane
-- disaster recovery scenarios
-- understanding failure domains
+- failure-domain isolation and incident response
 
-Day-2 work dominates real-world Kubernetes operations.
+Day-2 errors in the control plane have **cluster-wide impact**.
 
 ---
 
-## 🧠 Control Plane Components (Conceptual)
+## 🧠 Core Control Plane Components
 
-The control plane is composed of:
+Operators must understand the behavior and failure modes of:
 
-- **kube-apiserver**  
-  The front door to the cluster; all state flows through it
+- kube-apiserver  
+  The single source of truth for all cluster interaction
 
-- **etcd**  
-  The authoritative data store for cluster state
+- etcd  
+  Durable storage for desired and actual state
 
-- **kube-scheduler**  
-  Assigns Pods to Nodes based on constraints and policy
+- kube-scheduler  
+  Placement decisions based on constraints and policy
 
-- **kube-controller-manager**  
-  Runs reconciliation loops to maintain desired state
+- kube-controller-manager  
+  Reconciliation loops enforcing desired state
 
-Operators must understand how these components interact,
-restart, fail, and recover.
+Control plane operations require understanding **interaction**, not just components in isolation.
 
 ---
 
 ## 🔐 Certificates and Trust
 
-The control plane establishes the **root of trust** for the cluster.
+The control plane establishes and enforces **cluster trust**.
 
-Key concepts include:
+Key areas of ownership include:
 
-- certificate authority ownership
-- kubeadm-managed cert lifecycles
-- API server client authentication
+- certificate authority lifecycle
+- kubeadm-managed certificate rotation
+- API server authentication and authorization
 - kubelet and component trust relationships
-- expiration timelines and rotation strategy
+- detecting and responding to expiration-related failures
 
-Certificate issues are among the **most common control-plane failures**.
+Certificate issues are a **primary cause of control plane outages**.
 
 ---
 
-## 🧭 Reference Implementation
+## 🧭 Reference Context
 
-Control-plane concepts in this directory are grounded using the
-**Raspberry Pi Kubernetes cluster** documented here:
+Control-plane practices in this directory are grounded using the
+**Raspberry Pi Kubernetes cluster** reference implementation.
 
-rpi-cluster/  
-├─ pi-cluster-hardware.md  
-├─ pi-cluster-environment.md  
-└─ pi-cluster-snapshot.md  
+That cluster provides:
+- constrained resources
+- clear failure signals
+- realistic recovery scenarios
 
-That cluster serves as a **concrete reference**, but the material here
-is intended to be portable across environments.
+The principles documented here remain portable
+across environments.
 
 ---
 
@@ -116,15 +130,15 @@ is intended to be portable across environments.
 
 This directory will contain:
 
-- control-plane provisioning notes
-- kubeadm lifecycle explanations
-- upgrade and rollback procedures
-- certificate management guidance
-- recovery and failure scenarios
-- operator checklists
+- control-plane operational invariants
+- certificate management and rotation guidance
+- upgrade sequencing and validation
+- etcd health, backup, and recovery notes
+- failure scenarios and operator playbooks
 
 Exact commands and chronological build steps live in the
-implementation repository; this wing documents **understanding and intent**.
+implementation repository; this directory documents
+**authority, intent, and lifecycle discipline**.
 
 ---
 
@@ -132,11 +146,11 @@ implementation repository; this wing documents **understanding and intent**.
 
 If you are new to control-plane operations:
 
-1. Understand the lifecycle split (Day-1 vs Day-2)
-2. Review control-plane component responsibilities
-3. Study certificate and trust relationships
-4. Reference the rpi-cluster for concrete examples
+1. Understand the bootstrap → control-plane boundary
+2. Study control plane component responsibilities
+3. Learn certificate and trust ownership
+4. Review upgrade and failure implications
 
-This directory assumes familiarity with basic Kubernetes primitives.
+The control plane is where Kubernetes becomes **authoritative**.
 
 ---
