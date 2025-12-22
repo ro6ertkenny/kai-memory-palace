@@ -1,32 +1,45 @@
 # 🧩 Kubernetes Worker Nodes
-*Node lifecycle, operations, and recovery*
+*Execution, capacity, and lifecycle management*
 
 ---
 
 ## 📌 Purpose
 
-This directory documents **worker node responsibilities** within the
-`k8s/ops+provisioning` wing.
+This directory documents **worker-node–specific operational knowledge**
+within the `k8s/ops+provisioning` wing.
 
 Worker nodes are responsible for:
-- running application workloads
+- executing application workloads
 - maintaining kubelet and container runtime health
 - participating in scheduling decisions
 - enforcing networking and storage behavior
-- absorbing most operational churn in a cluster
+- absorbing the majority of operational churn in a cluster
 
-This documentation focuses on **how operators manage worker nodes**
-through their entire lifecycle, not on application configuration.
+This directory focuses on **how operators manage worker nodes as disposable,
+replaceable execution units**, not on application configuration.
+
+---
+
+## 🧭 Relationship to Other Directories
+
+- `bootstrap/`  
+  Covers how nodes are initially prepared and joined
+
+- `control-plane/`  
+  Covers authority, state, and decision-making components
+
+This directory begins **after a worker successfully joins**
+and owns the node’s **entire operational lifespan**.
 
 ---
 
 ## 🔁 Lifecycle Focus
 
-Worker node operations span both **Day-1** and **Day-2** phases.
+Worker-node operations span both **Day-1** and **Day-2** phases.
 
 ---
 
-### 🚀 Day-1 Worker Node Operations (Joining the Cluster)
+### 🚀 Day-1 (Worker Node Entry)
 
 Day-1 begins when a node is prepared to join a cluster.
 
@@ -40,54 +53,54 @@ Responsibilities include:
 
 The goal of Day-1 is a **clean, predictable node join**.
 
-A worker node that joins incorrectly becomes a long-term liability.
+A worker that joins incorrectly becomes a long-term operational liability.
 
 ---
 
-### 🔧 Day-2 Worker Node Operations (Ongoing Maintenance)
+### 🔧 Day-2 (Worker Node Operations)
 
-Day-2 begins once the node is active in the cluster.
+Day-2 begins once the node is actively running workloads.
 
 Responsibilities include:
 
 - monitoring kubelet and node health
 - cordoning and draining nodes safely
 - performing OS and Kubernetes upgrades
+- managing node labels, taints, and capacity
 - replacing failed or degraded nodes
-- managing node labels and taints
 - understanding workload impact during maintenance
 
-In real systems, **most operational effort happens here**.
+In real systems, **most Kubernetes operational effort happens here**.
 
 ---
 
-## 🧠 Worker Node Components (Conceptual)
+## 🧠 Core Worker Node Components
 
-Key components running on every worker node include:
+Every worker node runs a small but critical set of components:
 
 - **kubelet**  
-  The primary agent responsible for Pod lifecycle and reporting node state
+  The primary node agent responsible for Pod lifecycle and status reporting
 
 - **container runtime (containerd)**  
   Executes containers and manages images
 
 - **CNI plugins**  
-  Configure Pod networking and connectivity
+  Provide Pod networking and connectivity
 
 - **kube-proxy (or equivalent)**  
   Implements Service routing behavior
 
 Operators must understand how failures in any of these
-surface as node-level symptoms.
+surface as **node-level symptoms**.
 
 ---
 
-## 🔁 Node Lifecycle Patterns
+## 🔁 Worker Node Lifecycle Patterns
 
-Common worker-node lifecycle patterns include:
+Common operational patterns include:
 
 - **Add node**  
-  Prepare OS → join → validate → schedule workloads
+  Prepare → join → validate → schedule workloads
 
 - **Maintain node**  
   Cordon → drain → update → uncordon
@@ -96,15 +109,17 @@ Common worker-node lifecycle patterns include:
   Drain → remove → rebuild → rejoin
 
 - **Recover node**  
-  Diagnose → repair → validate or replace
+  Diagnose → repair → validate *or* replace
 
-Healthy clusters assume that **worker nodes are disposable**.
+Healthy clusters assume **worker nodes are disposable**.
+
+Repair is optional; replacement is always valid.
 
 ---
 
 ## ⚠️ Common Failure Domains
 
-Worker-node issues often originate from:
+Worker-node failures frequently originate from:
 
 - kubelet crashes or misconfiguration
 - container runtime failures
@@ -114,25 +129,25 @@ Worker-node issues often originate from:
 - kernel or OS updates
 
 Symptoms often appear as:
-- Pods stuck in Pending or CrashLoopBackOff
-- Nodes flapping between Ready and NotReady
-- Scheduling failures without obvious errors
+- Pods stuck Pending or CrashLoopBackOff
+- Nodes flapping Ready / NotReady
+- Scheduling failures without clear errors
 
-Understanding **where to look first** is critical.
+Correct diagnosis starts with understanding **which layer failed first**.
 
 ---
 
 ## 🧭 Reference Context
 
 Worker-node concepts in this directory are grounded using the
-**Raspberry Pi Kubernetes cluster** as a reference implementation.
+**Raspberry Pi Kubernetes cluster** reference implementation.
 
 That cluster provides:
 - concrete hardware constraints
-- real networking limitations
-- realistic failure scenarios
+- realistic networking limitations
+- visible failure modes
 
-The operational principles documented here remain portable
+The principles documented here remain portable
 across environments.
 
 ---
@@ -141,15 +156,16 @@ across environments.
 
 This directory will contain:
 
-- worker-node provisioning notes
-- kubeadm join and reset guidance
-- node maintenance checklists
-- failure analysis and recovery procedures
-- operator decision frameworks
+- kubelet behavior and node-agent responsibilities
+- node join and removal lifecycle details
+- draining and maintenance playbooks
+- runtime and resource management guidance
+- node upgrade and replacement strategies
+- worker-node failure and recovery scenarios
 
-Exact commands and build chronology live in the
+Exact commands and chronological build steps live in the
 implementation repository; this directory documents
-**understanding, intent, and lifecycle thinking**.
+**intent, lifecycle discipline, and operator judgment**.
 
 ---
 
@@ -159,9 +175,9 @@ If you are new to worker-node operations:
 
 1. Understand the Day-1 vs Day-2 distinction
 2. Learn the kubelet’s role and failure modes
-3. Study node drain and replacement workflows
-4. Reference the cluster context when needed
+3. Study drain, replacement, and recovery patterns
+4. Treat workers as disposable execution capacity
 
-Worker nodes are where Kubernetes becomes operationally real.
+Worker nodes are where Kubernetes becomes **operationally real**.
 
 ---
