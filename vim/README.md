@@ -49,6 +49,7 @@ Included:
 - visual mode
 - buffers and splits
 - working safely with configs and logs
+- operating under time pressure
 
 Excluded:
 - history or philosophy
@@ -69,7 +70,7 @@ Each file is:
 - drillable in isolation
 - durable over time
 
-No file tries to teach Vim end-to-end.
+No file attempts to teach Vim end-to-end.
 
 ---
 
@@ -80,6 +81,7 @@ It is used as:
 - a drill reference
 - a muscle-memory checklist
 - a corrective tool when friction appears
+- a pre-exam confidence stabilizer
 
 Repetition > coverage.
 
@@ -98,7 +100,7 @@ Speed comes from **constraint**, not exploration.
 
 ---
 
-## 📁 File Index
+## 📁 File Index (LOCKED)
 
 ### `movement.md`
 Navigation fundamentals:
@@ -158,6 +160,17 @@ Only recurring failures:
 - recovery techniques
 
 This file stays short by design.
+
+---
+
+### `exam-survival-tips.md`
+Time-pressure operation:
+- fastest safe workflows
+- recovery under stress
+- bare-bones Vim tactics
+- checklist mentality
+
+This file introduces **no new skills**.
 
 ---
 
