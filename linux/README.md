@@ -1,118 +1,189 @@
-# 🐧 Linux Wing
-
-Welcome to the **Linux Wing** of the Kai Memory Palace.
-
-This wing documents **Linux system administration fundamentals** with a focus on
-clarity, repeatability, and operational understanding. It prioritizes how the
-operating system actually behaves over distribution-specific trivia.
-
-If Kubernetes runs on top of Linux, then Linux **must be understood first**.
-
----
+# 🐧 Linux Wing — README
 
 ## 🎯 Purpose
+Build **operational fluency** with Linux.
 
-The Linux Wing exists to:
+This wing exists to make the system feel **controllable**, predictable, and observable — not mysterious.
 
-- Build a solid mental model of the Linux operating system
-- Document commands, workflows, and behaviors used in real systems
-- Serve as a durable reference for day-to-day administration
-- Support Kubernetes operations by strengthening the underlying foundation
-
-This wing is **Linux-first**, not cloud-first and not tool-first.
+Linux is not studied here.  
+Linux is **operated**.
 
 ---
 
-## 🧠 Scope
+## 🧠 Mental Mode
+**Controlling the system**
 
-Topics in this wing include, but are not limited to:
+- observe state
+- issue commands deliberately
+- verify results immediately
 
-- Filesystems and directory structure
-- Users, groups, and permissions
-- Processes, signals, and job control
-- systemd units and service management
-- Networking fundamentals at the OS level
-- Package management (`apt`)
-- Logs, troubleshooting, and observability
-- Boot process and system state
-- Disk usage, mounts, and storage
-- Environment variables and shells
+You should feel in command, not exploratory.
 
 ---
 
-## 🧭 How This Wing Is Organized
+## 🧩 Relationship to Other Wings
+This wing sits between Vim and Kubernetes.
 
-Content in this wing is organized as **focused Markdown artifacts**, typically one
-concept or workflow per file.
+Mental stack:
+- **Vim** → the hands (editing without thinking)
+- **Bash** → the interface (issuing intent)
+- **Linux** → the system (what actually changes)
+- **Kubernetes** → orchestrated systems at scale
 
-Examples:
-
-- `filesystem-layout.md`
-- `users-and-permissions.md`
-- `processes-and-signals.md`
-- `systemd-basics.md`
-- `package-management.md`
-- `networking-basics.md`
-- `troubleshooting-checklist.md`
-
-Each artifact should be:
-- Self-contained
-- Clearly titled
-- Easy to scan
-- Written for retrieval, not narration
+If Linux feels fuzzy, Kubernetes will feel fragile.
 
 ---
 
-## 🧰 Command Philosophy
+## 🧭 Scope
+This wing focuses on **daily, durable Linux skills** needed for:
+- servers
+- containers
+- Kubernetes nodes
+- exams (LFCS, CKA)
 
-Commands documented here follow these principles:
+Included:
+- Bash usage and pipelines
+- filesystem and permissions
+- processes and services
+- networking basics
+- system inspection
+- package management
+- recovery from common mistakes
 
-- Explicit over implicit
-- Readability over cleverness
-- Repeatability over shortcuts
-- Safety over speed
+Excluded:
+- distro history
+- kernel internals
+- desktop tooling
+- GUI workflows
+- advanced scripting theory
 
-Where applicable:
-- Commands are shown exactly as run
-- Output is included when it adds clarity
-- Side effects are explained
-
----
-
-## 🧠 Relationship to Other Wings
-
-| Wing            | Relationship to Linux |
-|-----------------|----------------------|
-| ☸️ Kubernetes    | Runs *on top of* Linux |
-| 🌐 Networking   | Extends Linux networking concepts |
-| ✍️ Vim           | Editing tool used heavily in Linux workflows |
-| 🧰 Snippets     | Extracted commands from Linux workflows |
-| 🤙 Kai          | Mental models applied while administering Linux |
-
-Linux is the **substrate** that everything else depends on.
+If it doesn’t help you operate a Linux system today, it doesn’t belong here.
 
 ---
 
-## 📌 Intended Audience
+## 🧰 Bash Lives Here (Explicitly)
+Bash is the **primary control surface** for Linux.
 
-- The future version of yourself
-- Engineers building Linux confidence
-- Kubernetes practitioners strengthening fundamentals
-- Recruiters evaluating system-level competence
+This wing treats Bash as:
+- how commands are issued
+- how output is shaped
+- how systems are inspected
+- how tasks are chained
 
-The tone is **clear, neutral, and instructional**.
-
----
-
-## 🏁 Status
-
-🚧 Active and evolving
-
-This wing grows as real systems are built, operated, broken, and repaired.
+Bash is not separate from Linux.  
+It is how Linux is used.
 
 ---
 
-## 🧭 Navigation
+## 📁 Wing Layout
 
-- 🗺️ **[Palace Map](../map.md)**
-- 🏛️ **[Entrance Hall](../README.md)**
+### `linux/README.md`
+This file.
+- scope
+- mental model
+- file map
+- practice discipline
+
+---
+
+### `linux/bash/`
+Bash-specific operational fluency.
+
+Files in this directory train:
+- issuing commands correctly
+- chaining commands
+- controlling execution
+- understanding shell behavior
+
+---
+
+### `linux/filesystem-and-perms.md`
+Working with:
+- directories and files
+- ownership
+- permissions
+- safe modification
+
+---
+
+### `linux/processes-and-services.md`
+Understanding:
+- running processes
+- signals
+- services
+- system state over time
+
+---
+
+### `linux/networking-basics.md`
+Core networking visibility:
+- interfaces
+- ports
+- connections
+- name resolution
+
+This ties directly into the Kubernetes networking wing.
+
+---
+
+### `linux/system-inspection.md`
+Seeing what the system is doing:
+- disk
+- memory
+- CPU
+- load
+- logs (at the system level)
+
+---
+
+### `linux/package-management.md`
+Managing software intentionally:
+- installing
+- upgrading
+- removing
+- verifying
+
+This wing standardizes on apt-based systems.
+
+---
+
+### `linux/mistakes.md`
+Fast recovery from common Linux errors:
+- permissions issues
+- wrong paths
+- runaway commands
+- broken assumptions
+
+This file stays short.
+
+---
+
+## ⏱️ Practice Discipline
+Practice mirrors the Vim wing.
+
+- short sessions (20–30 minutes)
+- real system interaction
+- no copy/paste habits
+- verify every command
+
+Commands are not memorized.  
+They are **used**.
+
+---
+
+## 🧪 Operating Rule
+If you cannot explain:
+- what a command will do
+- what it will output
+- what state it will change
+
+You should not run it yet.
+
+---
+
+## ✅ Outcome
+Linux becomes predictable.
+
+You issue commands.  
+The system responds.  
+You verify and move on.
