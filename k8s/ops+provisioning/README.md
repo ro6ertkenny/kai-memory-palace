@@ -1,18 +1,25 @@
-# 🛠️ k8s / ops + provisioning
-*Cluster lifecycle: build → operate → maintain*
+# 🛠️ Kubernetes Ops & Provisioning
+## Cluster lifecycle: build → operate → maintain
+
+Mental mode: Owning the lifecycle.
+
+This wing focuses on the **operational reality of Kubernetes**:
+bringing clusters into existence, keeping them healthy, and recovering them when they fail.
+
+This is where theory meets failure.
 
 ---
 
-## 📌 Purpose
+## 🎯 Purpose
 
-This wing documents **Kubernetes operational knowledge** required to:
+This wing documents **Kubernetes operator knowledge** required to:
 
 - provision clusters correctly (Day-1)
 - operate and maintain clusters over time (Day-2)
 - manage the boundary between Linux and Kubernetes
 - diagnose and recover from real-world failures
 
-The focus is **operator responsibility**, not application deployment.
+The focus is **cluster ownership**, not application deployment.
 
 ---
 
@@ -20,21 +27,67 @@ The focus is **operator responsibility**, not application deployment.
 
 ### 🚀 Day-1 Operations (Provisioning)
 
-- OS prerequisites and system configuration
+- OS prerequisites and system preparation
 - Container runtime / CRI setup (containerd)
 - kubeadm workflows (`init`, `join`, `reset`)
 - CNI selection and install timing
-- Initial cluster validation
+- Initial cluster validation and sanity checks
 
 ### 🔧 Day-2 Operations (Maintenance)
 
 - Node lifecycle (cordon, drain, replace)
 - Kubernetes and OS upgrades
-- Certificate and token management
+- Certificate and token awareness
 - Failure recovery and troubleshooting
 - Operational decision-making over time
 
-Application workloads are **out of scope**.
+Application workloads are **explicitly out of scope**.
+
+---
+
+## 🧠 Learning Posture
+
+- Assume things will fail
+- Inspect before acting
+- Prefer runbooks over memory
+- Treat nodes as cattle, not pets
+- Respect Linux ↔ Kubernetes boundaries
+
+This wing is unapologetically operational.
+
+---
+
+## 🧭 Scope
+
+This wing covers **cluster lifecycle and node-level operations**, including:
+
+- Cluster bootstrapping
+- Control plane and worker node responsibilities
+- Container runtime boundaries
+- Node joining, draining, and replacement
+- Upgrade sequencing
+- Backup and recovery concepts
+- Cluster-level troubleshooting
+
+This wing assumes **Kubernetes Foundations is complete**.
+
+---
+
+## 🗂️ Canonical Files
+
+k8s/ops-provisioning/
+- README.md
+- bootstrap-overview.md
+- kubeadm-workflow.md
+- control-plane-nodes.md
+- worker-nodes.md
+- container-runtime.md
+- cluster-upgrades.md
+- troubleshooting.md
+- backups-and-recovery.md
+- mistakes.md
+
+Each file represents a **real operational responsibility**.
 
 ---
 
@@ -44,9 +97,9 @@ Application workloads are **out of scope**.
 - Operational patterns and checklists
 - Failure scenarios and recovery paths
 - Cluster-level troubleshooting guides
-- Architecture and lifecycle explanations
+- Lifecycle and architecture explanations
 
-Content here is intended to be **portable across environments**
+Content is intended to be **portable across environments**
 (bare metal, virtualized, cloud-based).
 
 ---
@@ -55,15 +108,14 @@ Content here is intended to be **portable across environments**
 
 Concepts in this wing are grounded using **concrete reference clusters**.
 
-### Primary reference
+### Primary Reference
 
-**Raspberry Pi Kubernetes Cluster (bare-metal)**
+**Raspberry Pi Kubernetes Cluster (bare metal)**
 
-Location:
-rpi-cluster/  
-├─ pi-cluster-hardware.md  
-├─ pi-cluster-environment.md  
-└─ pi-cluster-snapshot.md  
+rpi-cluster/
+- pi-cluster-hardware.md
+- pi-cluster-environment.md
+- pi-cluster-snapshot.md
 
 This cluster serves as:
 - a practical teaching anchor
@@ -74,27 +126,23 @@ Additional reference clusters may be added over time.
 
 ---
 
-## 🧠 Related Wings
+## 🔗 Relationship to Other Wings
 
-- **Kubernetes Foundations** → `../foundations/`  
-  Pods, Services, Deployments, YAML mechanics
+- **Downstream of:** linux, k8s/foundations
+- **Upstream of:** k8s/networking
+- **Feeds into:** k8s/ecosystem
 
-- **Kubernetes Networking** → `../networking/`  
-  CNI behavior, kube-proxy, traffic flow
-
-- **Linux** → `../../linux/`  
-  OS prep, disks, networking, systemd
+This wing teaches **how to operate Kubernetes**.
+Other wings teach how to understand or extend it.
 
 ---
 
-## ▶️ Where to Start
+## 🧠 Core Outcome
 
-If you are new to this wing:
+After completing this wing, you should be able to say:
 
-1. Review the lifecycle focus above
-2. Explore the reference cluster documentation
-3. Proceed into control-plane and worker-node runbooks
+I can bring a Kubernetes cluster online,  
+I can keep it healthy over time,  
+and I can recover it methodically when it breaks.
 
-This wing assumes baseline familiarity with Kubernetes primitives.
-
----
+That is operational ownership.
