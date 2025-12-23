@@ -1,7 +1,7 @@
 # 🐚 Bash
 ## Using the shell as an operational control interface
 
-Mental mode: Controlling the system through precise commands.
+Mental mode: Controlling the system 
 
 This directory treats **Bash as an interface**, not a programming language.
 The focus is operational fluency: speed, accuracy, inspection, and recovery.
@@ -99,6 +99,6 @@ You should be able to say:
 
 I can express intent through Bash,  
 I understand the system’s response,  
-and I can act on it safely.
+and I can verify and act safely.
 
 That is command-line fluency.
