@@ -10,6 +10,11 @@ If you understand this wing, everything else in Kubernetes becomes easier to rea
 
 ---
 
+## How to Use This Wing
+Start with `index.md` to follow the recommended reading order and learning flow.
+
+---
+
 ## Purpose
 This wing answers the question:
 
@@ -52,6 +57,8 @@ This wing covers core Kubernetes concepts only, including:
 - Basic kubectl interaction
 - YAML structure and intent
 
+Operational details intentionally live in `k8s/ops+provisioning`.
+
 No deep ops.
 No ecosystem tools.
 No networking deep dives.
@@ -63,6 +70,7 @@ Planned files for this wing:
 
 k8s/foundations/
 - README.md
+- index.md
 - what-kubernetes-is.md
 - cluster-architecture.md
 - control-plane-components.md
@@ -113,8 +121,8 @@ mistakes.md
 ---
 
 ## Relationship to Other Wings
-- Downstream of: linux
-- Upstream of: k8s/ops-provisioning
+- Downstream of: linux (system fundamentals)
+- Upstream of: k8s/ops+provisioning
 - Feeds into: k8s/networking and k8s/ecosystem
 
 This wing teaches how to think about Kubernetes.
