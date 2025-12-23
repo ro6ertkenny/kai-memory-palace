@@ -1,189 +1,159 @@
-# 🐧 Linux Wing — README
-
-## 🎯 Purpose
-Build **operational fluency** with Linux.
-
-This wing exists to make the system feel **controllable**, predictable, and observable — not mysterious.
-
-Linux is not studied here.  
-Linux is **operated**.
+# 🐧 Linux
+## The operating system foundation for everything else in this repository
 
 ---
 
-## 🧠 Mental Mode
-**Controlling the system**
+## 📌 Purpose
 
-- observe state
-- issue commands deliberately
-- verify results immediately
+The Linux wing exists to build **correct mental models** of how a Linux system
+actually behaves.
 
-You should feel in command, not exploratory.
+Linux is not treated here as:
+- a list of commands
+- a certification topic
+- a prerequisite to rush through
 
----
+Linux is treated as the **substrate** that everything else depends on —
+including containers, Kubernetes, and distributed systems.
 
-## 🧩 Relationship to Other Wings
-This wing sits between Vim and Kubernetes.
-
-Mental stack:
-- **Vim** → the hands (editing without thinking)
-- **Bash** → the interface (issuing intent)
-- **Linux** → the system (what actually changes)
-- **Kubernetes** → orchestrated systems at scale
-
-If Linux feels fuzzy, Kubernetes will feel fragile.
+If Linux behavior surprises you, higher layers will always feel fragile.
 
 ---
 
-## 🧭 Scope
-This wing focuses on **daily, durable Linux skills** needed for:
-- servers
-- containers
-- Kubernetes nodes
-- exams (LFCS, CKA)
+## 🧠 Learning Posture
 
-Included:
-- Bash usage and pipelines
-- filesystem and permissions
+This wing emphasizes:
+
+- understanding before execution
+- observation before change
+- system behavior over tooling
+- durability over memorization
+
+Commands matter, but **reasoning matters more**.
+
+---
+
+## 🧭 How This Wing Is Organized
+
+Linux knowledge is organized into **focused sub-wings**, each with a clear
+mental mode and index for navigation.
+
+### 🧱 Foundations  
+`linux/foundations/`  
+Understand what Linux *is* and how it represents system state.
+
+- kernel vs userspace
 - processes and services
-- networking basics
+- filesystems and permissions
 - system inspection
-- package management
-- recovery from common mistakes
 
-Excluded:
-- distro history
-- kernel internals
-- desktop tooling
-- GUI workflows
-- advanced scripting theory
-
-If it doesn’t help you operate a Linux system today, it doesn’t belong here.
+👉 Start with: `linux/foundations/index.md`
 
 ---
 
-## 🧰 Bash Lives Here (Explicitly)
-Bash is the **primary control surface** for Linux.
+### 🐚 Shell & Bash  
+`linux/shell-and-bash/`  
+Learn how to **control** a Linux system safely and fluently.
 
-This wing treats Bash as:
-- how commands are issued
-- how output is shaped
-- how systems are inspected
-- how tasks are chained
+- shell execution model
+- Bash behavior and pitfalls
+- pipes, redirection, and expansion
+- job control and history
 
-Bash is not separate from Linux.  
-It is how Linux is used.
-
----
-
-## 📁 Wing Layout
-
-### `linux/README.md`
-This file.
-- scope
-- mental model
-- file map
-- practice discipline
+👉 Start with: `linux/shell-and-bash/index.md`
 
 ---
 
-### `linux/bash/`
-Bash-specific operational fluency.
+### 💾 Filesystems & Storage  
+`linux/filesystems-and-storage/`  
+Understand persistence, mounts, and storage failure modes.
 
-Files in this directory train:
-- issuing commands correctly
-- chaining commands
-- controlling execution
-- understanding shell behavior
+- filesystem hierarchy
+- ownership and access
+- disk pressure and limits
 
----
-
-### `linux/filesystem-and-perms.md`
-Working with:
-- directories and files
-- ownership
-- permissions
-- safe modification
+👉 Referenced from the foundations wing
 
 ---
 
-### `linux/processes-and-services.md`
-Understanding:
-- running processes
-- signals
-- services
-- system state over time
+### 🌐 Networking  
+`linux/networking/`  
+Understand how data moves through a Linux system.
+
+- interfaces and addressing
+- routing and name resolution
+- diagnostic flow and failure patterns
+
+👉 Start with: `linux/networking/index.md`
 
 ---
 
-### `linux/networking-basics.md`
-Core networking visibility:
-- interfaces
-- ports
-- connections
-- name resolution
+### ⚙️ Process & Resource Management  
+`linux/process-and-resource-management/`  
+Understand CPU, memory, and lifecycle pressure.
 
-This ties directly into the Kubernetes networking wing.
-
----
-
-### `linux/system-inspection.md`
-Seeing what the system is doing:
-- disk
-- memory
-- CPU
-- load
-- logs (at the system level)
+- scheduling and limits
+- signals and process states
+- early container concepts (cgroups, namespaces)
 
 ---
 
-### `linux/package-management.md`
-Managing software intentionally:
-- installing
-- upgrading
-- removing
-- verifying
+### 🧰 Package Management  
+`linux/package-management/`  
+Understand how software enters the system.
 
-This wing standardizes on apt-based systems.
-
----
-
-### `linux/mistakes.md`
-Fast recovery from common Linux errors:
-- permissions issues
-- wrong paths
-- runaway commands
-- broken assumptions
-
-This file stays short.
+- repositories and trust
+- versions and dependencies
+- safe upgrade practices
 
 ---
 
-## ⏱️ Practice Discipline
-Practice mirrors the Vim wing.
+### 🛠️ Troubleshooting  
+`linux/troubleshooting/`  
+Capture high-signal mistakes and recovery lessons.
 
-- short sessions (20–30 minutes)
-- real system interaction
-- no copy/paste habits
-- verify every command
-
-Commands are not memorized.  
-They are **used**.
+- common conceptual errors
+- failure patterns worth remembering
 
 ---
 
-## 🧪 Operating Rule
-If you cannot explain:
-- what a command will do
-- what it will output
-- what state it will change
+## 🔁 Relationship to Kubernetes
 
-You should not run it yet.
+Linux is **upstream of all Kubernetes behavior**.
+
+Kubernetes does not replace Linux — it orchestrates it.
+
+If you understand:
+- Linux processes → Pods make sense
+- Linux networking → Services make sense
+- Linux permissions → container security makes sense
+
+Linux understanding makes Kubernetes predictable.
 
 ---
 
-## ✅ Outcome
-Linux becomes predictable.
+## ▶️ Where to Start
 
-You issue commands.  
-The system responds.  
-You verify and move on.
+If you are new or rusty:
+
+1. `linux/foundations/index.md`
+2. `linux/shell-and-bash/index.md`
+3. `linux/networking/index.md`
+
+Do not rush.
+This foundation compounds.
+
+---
+
+## 🎯 Outcome
+
+After completing the Linux wing, you should be able to say:
+
+I understand how Linux represents state,  
+how it executes processes,  
+how it moves data,  
+and how higher-level systems build on top of it.
+
+That understanding unlocks everything downstream.
+
+---
