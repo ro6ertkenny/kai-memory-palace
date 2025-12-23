@@ -1,159 +1,149 @@
-# 🐧 Linux
-## The operating system foundation for everything else in this repository
+# 🐧 Linux — Index
+
+## 🎯 Purpose
+This index is the **navigation and practice map** for the Linux wing.
+
+It answers one question:
+
+What should I practice next to operate Linux confidently and pass a Linux sysadmin exam?
+
+This wing is operational.  
+It is built for speed, accuracy, inspection, and safe recovery.
 
 ---
 
-## 📌 Purpose
+## 🧠 Mental Model
+Linux operation is a loop:
 
-The Linux wing exists to build **correct mental models** of how a Linux system
-actually behaves.
+Inspect → Explain → Act → Verify
 
-Linux is not treated here as:
-- a list of commands
-- a certification topic
-- a prerequisite to rush through
-
-Linux is treated as the **substrate** that everything else depends on —
-including containers, Kubernetes, and distributed systems.
-
-If Linux behavior surprises you, higher layers will always feel fragile.
+If you cannot inspect and explain, you should not act.
 
 ---
 
-## 🧠 Learning Posture
+## 🪜 Recommended Practice Order (Authoritative)
 
-This wing emphasizes:
+### 1) Foundations (always first)
+Location:
+linux/foundations/
 
-- understanding before execution
-- observation before change
-- system behavior over tooling
-- durability over memorization
+Start here to establish reality:
+- system-inspection.md
 
-Commands matter, but **reasoning matters more**.
-
----
-
-## 🧭 How This Wing Is Organized
-
-Linux knowledge is organized into **focused sub-wings**, each with a clear
-mental mode and index for navigation.
-
-### 🧱 Foundations  
-`linux/foundations/`  
-Understand what Linux *is* and how it represents system state.
-
-- kernel vs userspace
-- processes and services
-- filesystems and permissions
-- system inspection
-
-👉 Start with: `linux/foundations/index.md`
+Outcome:
+You can quickly determine whether a system is healthy, constrained, or failing.
 
 ---
 
-### 🐚 Shell & Bash  
-`linux/shell-and-bash/`  
-Learn how to **control** a Linux system safely and fluently.
+### 2) Shell & Bash (control interface)
+Location:
+linux/shell-and-bash/
 
-- shell execution model
-- Bash behavior and pitfalls
-- pipes, redirection, and expansion
-- job control and history
+Use this to issue intent precisely:
+- README.md
+- index.md
+- bash/ (subtree)
 
-👉 Start with: `linux/shell-and-bash/index.md`
-
----
-
-### 💾 Filesystems & Storage  
-`linux/filesystems-and-storage/`  
-Understand persistence, mounts, and storage failure modes.
-
-- filesystem hierarchy
-- ownership and access
-- disk pressure and limits
-
-👉 Referenced from the foundations wing
+Outcome:
+You can compose commands, pipelines, and inspections without guesswork.
 
 ---
 
-### 🌐 Networking  
-`linux/networking/`  
-Understand how data moves through a Linux system.
+### 3) Filesystems & Storage (paths and access)
+Location:
+linux/filesystems-and-storage/
 
-- interfaces and addressing
-- routing and name resolution
-- diagnostic flow and failure patterns
+Core file:
+- filesystem-and-perms.md
 
-👉 Start with: `linux/networking/index.md`
-
----
-
-### ⚙️ Process & Resource Management  
-`linux/process-and-resource-management/`  
-Understand CPU, memory, and lifecycle pressure.
-
-- scheduling and limits
-- signals and process states
-- early container concepts (cgroups, namespaces)
+Outcome:
+Permission and path failures are explainable and fixable.
 
 ---
 
-### 🧰 Package Management  
-`linux/package-management/`  
-Understand how software enters the system.
+### 4) Processes & Resource Management (runtime behavior)
+Location:
+linux/process-and-resource-management/
 
-- repositories and trust
-- versions and dependencies
-- safe upgrade practices
+Core file:
+- processes-and-services.md
 
----
-
-### 🛠️ Troubleshooting  
-`linux/troubleshooting/`  
-Capture high-signal mistakes and recovery lessons.
-
-- common conceptual errors
-- failure patterns worth remembering
+Outcome:
+You can identify what is running, who controls it, and how to change state safely.
 
 ---
 
-## 🔁 Relationship to Kubernetes
+### 5) Networking (traffic flow diagnostics)
+Location:
+linux/networking/
 
-Linux is **upstream of all Kubernetes behavior**.
+Start with the domain anchor:
+- README.md
 
-Kubernetes does not replace Linux — it orchestrates it.
+Then practice the ladder:
+- interface-and-addressing.md
+- routes-and-reachability.md
+- ports-and-listeners.md
+- dns-and-name-resolution.md
+- mistakes.md
 
-If you understand:
-- Linux processes → Pods make sense
-- Linux networking → Services make sense
-- Linux permissions → container security makes sense
-
-Linux understanding makes Kubernetes predictable.
-
----
-
-## ▶️ Where to Start
-
-If you are new or rusty:
-
-1. `linux/foundations/index.md`
-2. `linux/shell-and-bash/index.md`
-3. `linux/networking/index.md`
-
-Do not rush.
-This foundation compounds.
+Outcome:
+Connectivity failures stop being mysterious.
 
 ---
 
-## 🎯 Outcome
+### 6) Package Management (software state control)
+Location:
+linux/package-management/
 
-After completing the Linux wing, you should be able to say:
+Core file:
+- package-management.md
 
-I understand how Linux represents state,  
-how it executes processes,  
-how it moves data,  
-and how higher-level systems build on top of it.
-
-That understanding unlocks everything downstream.
+Outcome:
+You can inspect, install, remove, upgrade, and recover safely using apt-get.
 
 ---
+
+### 7) Troubleshooting (recovery mindset)
+Location:
+linux/troubleshooting/
+
+Use this when something breaks.
+This is the “reduce panic” domain.
+
+Outcome:
+You recover quickly without blind changes.
+
+---
+
+## ⏱️ Daily Practice Template (20–30 minutes)
+- 5 min → Foundations inspection (system-inspection)
+- 10 min → One domain focus (rotate)
+- 5–10 min → Applied task (edit a config, inspect a service, diagnose a failure)
+
+Rules:
+- no copy/paste dependence
+- verify every command outcome
+- change one variable at a time
+
+---
+
+## 🧭 Operating Rule
+If unsure where to start, start here:
+
+linux/foundations/system-inspection.md
+
+Reality first.
+
+---
+
+## ✅ Outcome
+Linux becomes predictable.
+
+You can:
+- inspect confidently
+- diagnose methodically
+- act deliberately
+- verify results
+
+That is Linux operational fluency.
