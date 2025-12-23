@@ -189,4 +189,10 @@ If you can explain that, you control package state.
 
 ## Outcome
 
-Y
+You should be able to say:
+
+I know what software is installed,  
+I know where it came from,  
+and I know how to change it safely.
+
+That is package discipline.
