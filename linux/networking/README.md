@@ -1,117 +1,132 @@
-# 🌐 Networking Wing
-
-Welcome to the **Networking Wing** of the Kai Memory Palace.
-
-This wing documents **how data moves** — from packets on a wire to name resolution
-and routing decisions — with an emphasis on practical troubleshooting and
-cause-and-effect understanding.
-
-Networking is treated here as a **foundational skill** for Linux and Kubernetes,
-not an abstract theory exercise.
-
----
+# 🌐 Networking — README
 
 ## 🎯 Purpose
+Build **operational clarity** around how data moves into, out of, and within a Linux system.
 
-The Networking Wing exists to:
+This domain exists to make networking behavior:
+- observable
+- explainable
+- diagnosable
 
-- Build a clear mental model of packet flow
-- Understand how Linux networking actually behaves
-- Reduce “it must be DNS” guesswork through structured diagnosis
-- Support Kubernetes networking by strengthening fundamentals
-- Make connectivity problems predictable and solvable
-
-If you cannot reason about networking, you cannot reliably operate distributed systems.
+Most “it’s not working” failures ultimately reduce to **connectivity, routing, or name resolution**.
 
 ---
 
-## 🧠 Scope
+## 🧠 Mental Mode
+**Tracing how traffic flows**
 
-Topics in this wing include, but are not limited to:
+- know where traffic originates
+- know how it is addressed
+- know how it is routed
+- know where it terminates
+- know why it fails or succeeds
 
-- IPv4 and IPv6 fundamentals
-- Subnets, CIDR, and routing tables
-- Gateways and default routes
-- DNS resolution and name services
-- Network interfaces and link states
-- ARP, neighbor discovery, and MAC addressing
-- Local vs remote traffic flow
-- Firewalls and basic filtering concepts
-- Common Linux networking tools (`ip`, `ss`, `ping`, `traceroute`, `nmcli`)
-- Kubernetes networking foundations (CNI at a conceptual level)
+Networking is not magic.  
+It is state, paths, and decisions.
 
 ---
 
-## 🧭 How This Wing Is Organized
+## 🧭 Scope
+This domain focuses on **day-to-day operational networking** required to understand and diagnose connectivity issues on Linux systems.
 
-Content in this wing is organized as **focused diagnostic artifacts**.
+Included:
+- network interfaces and link state
+- IP addressing and reachability
+- routing and default gateways
+- ports, listeners, and connections
+- name resolution and DNS behavior
+- local vs remote traffic flow
+- common networking failure patterns
 
-Examples:
+Excluded:
+- protocol internals
+- performance tuning
+- packet capture and deep inspection
+- firewall policy design
+- Kubernetes networking implementation details
 
-- `ip-addressing.md`
-- `routing-and-gateways.md`
-- `dns-resolution.md`
-- `interface-states.md`
-- `troubleshooting-flow.md`
-- `common-failure-patterns.md`
-- `kubernetes-networking-primer.md`
-
-Each artifact should:
-- Start with observable symptoms
-- Describe what to check and why
-- Show commands and expected output
-- Explain what conclusions can be drawn
-
----
-
-## 🧰 Troubleshooting Philosophy
-
-Networking documentation here follows these principles:
-
-- Observe before acting
-- Check link → address → route → name → service
-- Prefer deterministic tools over assumptions
-- Isolate layers before changing configuration
-- Document what failed *and why*
-
-Blind changes are avoided in favor of structured diagnosis.
+If it does not help explain *why traffic does or does not flow*, it does not belong here.
 
 ---
 
-## 🧠 Relationship to Other Wings
+## 📁 Directory Layout
 
-| Wing            | Relationship to Networking |
-|-----------------|----------------------------|
-| 🐧 Linux         | Networking is implemented by the OS |
-| ☸️ Kubernetes    | Kubernetes networking builds on Linux |
-| ✍️ Vim           | Configs and diagnostics are edited in Vim |
-| 🧰 Snippets     | Networking one-liners live there |
-| 🤙 Kai          | Mental models guide troubleshooting |
-
-Networking is the connective tissue of all systems.
+### `networking/README.md`
+This file.
+- defines scope
+- sets mental model
+- explains how to use this domain
 
 ---
 
-## 📌 Intended Audience
+### Networking content files
+This domain will contain focused, diagnostic files such as:
+- interface and address inspection
+- routing and reachability
+- ports and listening services
+- DNS and name resolution
+- common failure patterns
 
-- Linux admins strengthening networking intuition
-- Kubernetes practitioners debugging cluster connectivity
-- Engineers tired of trial-and-error fixes
-- Recruiters evaluating systems thinking depth
-
-The tone is **clear, neutral, and instructional**.
-
----
-
-## 🏁 Status
-
-🚧 Active and evolving
-
-This wing grows as networks are built, broken, and understood.
+Each file should answer:
+- what symptom is visible
+- what to inspect
+- what conclusions can be drawn
 
 ---
 
-## 🧭 Navigation
+## 🧪 How to Use This Domain
+Use this directory when:
+- a service is running but unreachable
+- a port is open but nothing responds
+- name resolution behaves unexpectedly
+- traffic works locally but not remotely
+- connectivity breaks after configuration changes
 
-- 🗺️ **[Palace Map](../map.md)**
-- 🏛️ **[Entrance Hall](../README.md)**
+Inspect before changing state.
+
+---
+
+## 🔎 Diagnostic First Principle
+Before fixing anything, you should be able to explain:
+- which interface is involved
+- which address is being used
+- which route is selected
+- which port or service is targeted
+- whether name resolution is correct
+
+If you cannot explain the path, do not change it.
+
+---
+
+## 🔗 Relationship to Other Linux Domains
+- **Shell & Bash**  
+  Networking state is inspected and tested from the shell
+
+- **Processes & Resource Management**  
+  Network listeners and connections are owned by processes
+
+- **Filesystems & Storage**  
+  Network services depend on configuration files and permissions
+
+Networking ties system components together.
+
+---
+
+## ⚠️ Operational Guardrails
+- avoid blind configuration changes
+- isolate layers before acting
+- verify reachability step by step
+- change one variable at a time
+
+Networking errors compound quickly when assumptions replace observation.
+
+---
+
+## ✅ Outcome
+You should be able to say:
+
+I know where traffic is going,  
+I know why it succeeds or fails,  
+and I know exactly what to check next.
+
+That is networking fluency.
