@@ -1,112 +1,49 @@
-# 🧠 Git & Version Control
-*Intentional workflows, clean history, safe recovery*
+# 🧬 Git Wing
+
+This directory defines the **authoritative Git discipline** used throughout
+**kai-memory-palace**.
+
+It encodes:
+- how changes are made
+- how forks are maintained
+- how updates are integrated safely
+- how history is preserved intentionally
 
 ---
 
-## 📌 Purpose
+## 🧠 What Lives Here
 
-This wing documents **Git and version-control practices** used throughout
-`kai-memory-palace`.
+This wing focuses on **judgment**, not just commands.
 
-Git is treated as a **first-class engineering discipline**, not a collection
-of memorized commands.
-
-This wing exists to capture:
-
-- how to think about changes
-- how to group work intentionally
-- how to build readable commit history
-- how to recover safely from mistakes
-- how to work confidently under pressure
-
-The focus is on **judgment and workflow**, not tooling trivia.
+Included topics:
+- Change workflows and review discipline
+- Fork hygiene (`origin` vs `upstream`)
+- Safe update strategies (merge vs rebase)
+- Explicit decision-making before modifying history
 
 ---
 
-## 🧭 Scope
+## 🧭 How to Use This Wing
 
-This wing covers:
+- Start with `index.md` for navigation
+- Treat each document as a **canon**
+- Follow rules exactly; do not improvise under pressure
 
-- core Git mental models
-- staging and commit strategy
-- repository refactors and restructuring
-- multi-repo coordination
-- safe undo and recovery techniques
-- reusable workflows for real projects
-
-It does **not** cover:
-- hosting platform features
-- CI/CD pipelines
-- advanced branching strategies (yet)
+This wing exists to eliminate:
+- panic merges
+- accidental history rewrites
+- unclear Git states
+- guesswork during updates
 
 ---
 
-## 🧠 Philosophy
+## 🚦 Scope Boundary
 
-A few guiding principles shape everything in this wing:
+This wing owns **Git thinking and discipline**.
 
-- **Commits are communication**  
-  They should explain *why* something changed, not just *what*.
+It does not contain:
+- project-specific workflows
+- CI/CD configuration
+- tooling beyond Git itself
 
-- **History should tell a story**  
-  A clean commit log is a form of documentation.
-
-- **Small, intentional changes beat large, vague ones**  
-  Precision reduces risk.
-
-- **Mistakes are expected**  
-  Recovery skills matter more than perfection.
-
----
-
-## Git Authority Rules
-
-This wing is the **authoritative source** for all Git and version-control practices
-in the kai-memory-palace repository.
-
-Rules:
-
-- Git behavior, commit standards, and history discipline are defined **only** here
-- Other wings may reference Git practices, but must not redefine them
-- If guidance elsewhere conflicts with this wing, **this wing wins**
-- Canonical rules live in dedicated documents and are linked, not duplicated
-
-This structure prevents drift, keeps history clean, and ensures changes remain
-reviewable as the repository grows.
-
----
-
-## Commit Message Standard   
-
-All commits in this repository must follow the commit message rules defined in:
-
-- `commit-message-standard.md`
-
----
-
-## 🔁 Relationship to Other Wings
-
-Git workflows documented here are used by:
-
-- Kubernetes wings (cluster and ops documentation)
-- Linux system work
-- refactors and structural changes
-- long-lived documentation systems
-
-Other wings may reference this wing for **how to execute changes**, but
-this wing owns the **how and why of version control**.
-
----
-
-## ▶️ Where to Start
-
-If you are new to this wing:
-
-1. Read the mental models in `index.md`
-2. Learn the standard workflows used in this repository
-3. Practice recovery techniques intentionally
-4. Apply these patterns consistently across wings
-
-This wing exists to make every other wing safer and clearer.
-
----
+Other wings may reference Git rules, but **this wing defines them**.

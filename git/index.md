@@ -1,88 +1,71 @@
-# 🧭 Git Wing — Index
-*How to navigate this wing*
+# 🧭 Git Wing — Master Index
+
+This index is the **authoritative navigation map** for the Git wing of
+**kai-memory-palace**.
+
+It defines the **mental primitives**, rules, and workflows for using Git safely,
+deliberately, and professionally across all domains (Kubernetes, Linux, general development).
 
 ---
 
-## 📌 Purpose
+## 🎯 Purpose
 
-This index provides a **navigation map** for the `git` wing of
-`kai-memory-palace`.
+The Git wing answers:
 
-It explains:
-- how Git knowledge is organized here
-- what problems each section solves
-- where to look under pressure
+- How changes are made safely
+- How history is preserved intentionally
+- How forks are maintained
+- How updates are integrated without guesswork
 
-This is a **working reference**, not a tutorial.
+This wing prioritizes **judgment and discipline** over memorization of commands.
+
+---
+
+## 🧱 Core Canons
+
+### 1️⃣ Change Discipline
+- `change-workflow.md`  
+  Edit → diff → stage → commit discipline
+
+- `review-checklist.md`  
+  What “done” means before pushing
+
+---
+
+### 2️⃣ Fork & Update Discipline
+- `forks-and-upstream.md`  
+  Canonical handling of `origin` vs `upstream` for forked repositories
+
+- `update-decision-tree.md`  
+  Fetch → inspect → integrate judgment  
+  (merge vs rebase vs do nothing)
 
 ---
 
 ## 🧠 Mental Model
 
-Think of Git as three distinct states:
+- Fetching is always safe
+- Inspection precedes action
+- Integration is intentional
+- History is never rewritten casually
 
-Working tree → Staging area → Commit history
-
-Most mistakes come from confusing these states.
-
-This wing is organized to reinforce:
-- clarity between states
-- intentional transitions
-- safe rollback paths
+This wing encodes **how professionals think with Git**, not just what they type.
 
 ---
 
-## 🗂️ Wing Structure
+## 🚦 Scope Rules
 
-This wing will evolve to include:
+- This wing owns **Git fundamentals and discipline**
+- Other wings may reference it
+- Git rules live here, not scattered elsewhere
 
-### 📁 Workflows
-Reusable, step-by-step patterns for real tasks, such as:
-- creating a new wing
-- scaffolding directories
-- refactoring repositories
-- thinning repos safely
-- coordinating changes across repos
-
-### 📁 Commits
-Guidance on:
-- staging strategy
-- grouping related changes
-- writing meaningful commit messages
-- reviewing history for clarity
-
-### 📁 Recovery
-Techniques for:
-- undoing staging mistakes
-- fixing bad commits
-- recovering from failed refactors
-- understanding reset vs revert
+If a question is about *how to safely change history*, it belongs here.
 
 ---
 
-## 🔁 How This Wing Is Used
+## 🗺️ Navigation Rule
 
-Other wings may reference this wing when they need to:
-
-- explain how changes were committed
-- point to a standard workflow
-- link to recovery guidance
-- avoid repeating Git explanations
-
-This wing acts as the **single source of truth for Git usage**.
-
----
-
-## ▶️ Where to Start
-
-Recommended path:
-
-1. Understand the mental model (this file)
-2. Learn core workflows
-3. Practice recovery techniques
-4. Apply consistently across projects
-
-Good Git usage is invisible when things go well—and invaluable when they don’t.
-
----
-
+If you are unsure:
+1. Start here
+2. Follow the canon
+3. Act deliberately
