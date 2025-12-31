@@ -3,218 +3,258 @@
 
 Mental mode: Issuing precise instructions to the system.
 
-This document covers the **core Bash skills** required to function confidently on a Linux system.
-These are the commands you should be able to type **without thinking**.
+This document is the **canonical Bash command and concept reference** you are expected to internalize.
+Every entry explains **what it is** and **why it exists**, in short memory-friendly form.
+
+If something appears in daily usage, it belongs here.
 
 ---
 
 ## Purpose
 You should be able to:
-- move through the filesystem quickly
-- inspect files and directories
-- understand command structure
-- predict command outcomes before running them
+- recognize commands and symbols instantly
+- understand how commands receive input and produce output
+- predict outcomes before execution
+- reduce the need to stop and ask “what is this?”
 
-If you hesitate here, everything else slows down.
+This file converts confusion into recall.
 
 ---
 
-## Command Structure
+## Command Structure (Foundational Concept)
 
-Basic form:
 command [options] [arguments]
 
-Example:
-ls -la /etc
+- **command**: the action to perform  
+- **options**: flags that modify behavior  
+- **arguments**: targets the command operates on  
 
-Rules:
-- options modify behavior
-- arguments are targets
-- order matters
-
-Always read commands left to right.
+Bash evaluates input **left to right**.
 
 ---
 
-## Navigation
+## Core Commands & Concepts (Alphabetical)
 
-Print working directory:
-pwd
-
-List contents:
-ls
-ls -l
-ls -la
-
-Change directory:
-cd /path/to/dir
-cd ..
-cd ~
-
-Return to previous directory:
-cd -
-
-Navigation should become muscle memory.
+### `cat`
+Prints file contents to standard output.  
+Used to quickly inspect small files or feed data into pipelines.
 
 ---
 
-## Files and Directories
+### `cd`
+Changes the current working directory.  
+Used to move around the filesystem.
 
-Create directory:
-mkdir test-dir
-
-Create nested directories:
-mkdir -p a/b/c
-
-Create file:
-touch file.txt
-
-Copy:
-cp file1 file2
-cp -r dir1 dir2
-
-Move or rename:
-mv old new
-
-Remove file:
-rm file.txt
-
-Remove directory:
-rm -r dir
-
-Never use rm -r unless you know exactly what it targets.
+Common forms:
+- `cd /path`
+- `cd ..`
+- `cd ~`
+- `cd -`
 
 ---
 
-## Viewing File Contents
-
-View file:
-cat file.txt
-
-Paged view:
-less file.txt
-
-View beginning:
-head file.txt
-
-View end:
-tail file.txt
-
-Follow updates:
-tail -f logfile
-
-Prefer less over cat for large files.
+### `cp`
+Copies files or directories.  
+Used when you need a duplicate without removing the original.
 
 ---
 
-## Wildcards and Globbing
-
-Common patterns:
-*   → any characters
-?   → single character
-
-Examples:
-ls *.log
-rm temp-?.txt
-
-Globs expand before the command runs.
-Always verify with ls first.
+### `echo`
+Prints text or variable values to standard output.  
+Used to inspect variables and test shell behavior.
 
 ---
 
-## Command Exit Codes
-
-Every command returns an exit code:
-0   → success
-non-zero → failure
-
-Inspect last exit code:
-echo $?
-
-Exit codes drive automation and conditionals.
+### `env`
+Displays the current environment variables.  
+Used to see what configuration the shell passes to programs.
 
 ---
 
-## Environment Variables
-
-View variables:
-env
-
-View specific variable:
-echo $HOME
-
-Set variable (current shell only):
-MYVAR=value
-
-Export variable:
-export MYVAR=value
-
-Variables influence command behavior.
+### `export`
+Marks a variable so child processes can see it.  
+Used when programs need access to variables you define.
 
 ---
 
-## Which and Type
-
-Find command path:
-which ls
-
-Inspect command type:
-type ls
-
-Not everything is a binary.
-Some commands are built into the shell.
+### `head`
+Prints the first lines of a file.  
+Used to quickly inspect file structure or headers.
 
 ---
 
-## Command History
-
-View history:
-history
-
-Run previous command:
-!!
-
-Search history:
-Ctrl+r
-
-History is a productivity multiplier.
+### `history`
+Shows previously run commands.  
+Used to recall and reuse past work efficiently.
 
 ---
 
-## Safety Habits
+### `less`
+Displays file contents one screen at a time.  
+Used for safely viewing large files.
 
-- Always inspect targets before destructive commands
-- Prefer mv over rm when unsure
+---
+
+### `ls`
+Lists directory contents.  
+Used to inspect files, directories, and metadata.
+
+Common options:
+- `-l` long format
+- `-a` include hidden files
+- `-h` human-readable sizes
+
+---
+
+### `mkdir`
+Creates directories.  
+Used to build filesystem structure.
+
+---
+
+### `mv`
+Moves or renames files and directories.  
+Used to reorganize data without copying.
+
+---
+
+### `pwd`
+Prints the current working directory.  
+Used to confirm location before acting.
+
+---
+
+### `rm`
+Deletes files or directories permanently.  
+Used to remove data that is no longer needed.
+
+Use with extreme caution.
+
+---
+
+### `sed`
+Stream editor that transforms text line by line.  
+Used to search, replace, or modify text flowing through a pipeline or file.
+
+Example mental model: *“edit text without opening an editor.”*
+
+---
+
+### `tail`
+Prints the last lines of a file.  
+Used to inspect recent output or logs.
+
+---
+
+### `touch`
+Creates an empty file or updates timestamps.  
+Used to create files quickly or signal file presence.
+
+---
+
+### `type`
+Shows how the shell interprets a command.  
+Used to distinguish builtins, aliases, and binaries.
+
+---
+
+### `which`
+Displays the path of the executable that would run.  
+Used to confirm which binary is actually being invoked.
+
+---
+
+## Input & Output Concepts (Critical)
+
+### `stdin` (standard input)
+The data a command receives by default.  
+Usually comes from the keyboard or another command.
+
+---
+
+### `stdout` (standard output)
+The normal output a command produces.  
+Usually printed to the terminal or piped elsewhere.
+
+---
+
+### `stderr` (standard error)
+Error messages produced by a command.  
+Kept separate so failures can be handled independently.
+
+---
+
+## Pipes & Redirection
+
+### `|`
+Pipe operator that sends stdout from one command into stdin of another.  
+Used to chain commands together.
+
+---
+
+### `>`
+Redirects stdout to a file, overwriting it.  
+Used to save command output.
+
+---
+
+### `>>`
+Redirects stdout to a file, appending to it.  
+Used to add output without deleting existing content.
+
+---
+
+### `2>`
+Redirects stderr to a file.  
+Used to capture error messages separately.
+
+---
+
+## Wildcards (Globbing)
+
+### `*`
+Matches any number of characters.  
+Used to target groups of files.
+
+---
+
+### `?`
+Matches exactly one character.  
+Used for precise filename patterns.
+
+Globs expand **before** the command runs.
+
+---
+
+## Exit Codes
+
+### `$?`
+Holds the exit code of the last command.  
+Used to determine success or failure.
+
+- `0` success  
+- non-zero failure  
+
+Exit codes drive scripting logic.
+
+---
+
+## Safety Rules (Non-Negotiable)
+
+- Inspect before destructive actions
+- Verify glob expansion with `ls`
+- Prefer `mv` over `rm` when unsure
 - Use absolute paths for risky operations
-- Slow down when using wildcards
+- Slow down when deleting
 
-Speed comes from correctness, not haste.
-
----
-
-## Practice
-
-Run:
-pwd
-ls -la
-cd /
-ls
-cd ~
-
-Create a test directory and file.
-Move it.
-Remove it.
-
-Explain each step before executing it.
+Correctness creates speed.
 
 ---
 
 ## Outcome
-
 You should be able to say:
 
-I know where I am,  
-I know what I am touching,  
-and I know what the command will do.
+I understand what commands receive,  
+I understand what they produce,  
+and I understand how data flows between them.
 
-That is Bash control.
