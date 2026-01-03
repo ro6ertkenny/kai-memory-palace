@@ -6,7 +6,7 @@ Mental mode: Issuing precise instructions to the system.
 This document is the **canonical Bash command and concept reference** you are expected to internalize.
 Every entry explains **what it is** and **why it exists**, in short memory-friendly form.
 
-If something appears in daily usage, it belongs here.
+If something appears in daily usage or exams, it belongs here.
 
 ---
 
@@ -15,7 +15,7 @@ You should be able to:
 - recognize commands and symbols instantly
 - understand how commands receive input and produce output
 - predict outcomes before execution
-- reduce the need to stop and ask “what is this?”
+- move through the filesystem quickly and safely under time pressure
 
 This file converts confusion into recall.
 
@@ -134,9 +134,7 @@ Use with extreme caution.
 
 ### `sed`
 Stream editor that transforms text line by line.  
-Used to search, replace, or modify text flowing through a pipeline or file.
-
-Example mental model: *“edit text without opening an editor.”*
+Used to search, replace, or modify text without opening an editor.
 
 ---
 
@@ -239,22 +237,11 @@ Exit codes drive scripting logic.
 
 ---
 
-## Safety Rules (Non-Negotiable)
+## Exam & Exam-Speed Navigation (Critical)
 
-- Inspect before destructive actions
-- Verify glob expansion with `ls`
-- Prefer `mv` over `rm` when unsure
-- Use absolute paths for risky operations
-- Slow down when deleting
-
-Correctness creates speed.
-
----
-
-## Outcome
-You should be able to say:
-
-I understand what commands receive,  
-I understand what they produce,  
-and I understand how data flows between them.
+### Absolute jumps (preferred)
+```bash
+cd /
+cd /etc
+cd ~
 
