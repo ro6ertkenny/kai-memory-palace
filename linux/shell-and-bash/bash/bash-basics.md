@@ -59,6 +59,12 @@ Used when you need a duplicate without removing the original.
 
 ---
 
+### `df`
+Displays disk space usage for mounted filesystems.  
+Used to determine whether a disk is full or running out of space.
+
+---
+
 ### `echo`
 Prints text or variable values to standard output.  
 Used to inspect variables and test shell behavior.
@@ -74,6 +80,12 @@ Used to see what configuration the shell passes to programs.
 ### `export`
 Marks a variable so child processes can see it.  
 Used when programs need access to variables you define.
+
+---
+
+### `findmnt`
+Displays the current mount hierarchy from the kernel’s perspective.  
+Used as the authoritative source of truth for what is actually mounted.
 
 ---
 
@@ -103,6 +115,22 @@ Common options:
 - `-l` long format
 - `-a` include hidden files
 - `-h` human-readable sizes
+
+---
+
+### `lsblk`
+Lists block devices and their mount points in a tree view.  
+Used to safely inspect disk and partition layout before any storage operation.
+
+---
+
+### `mount`
+Attaches a filesystem to the directory tree.  
+Used to make storage available at a specific path.
+
+### `umount`
+Detaches a filesystem from the directory tree.  
+Used to safely remove access to storage before disconnecting it.
 
 ---
 
@@ -244,4 +272,99 @@ Exit codes drive scripting logic.
 cd /
 cd /etc
 cd ~
+
+---
+
+## Flags & Options (Exam-Critical)
+
+Flags modify **how** a command behaves.  
+They do **not** change what the command is.
+
+Never guess flag meanings by letter — learn them by behavior.
+
+---
+
+### `-a`
+Means “all”.  
+Used to include hidden files or normally omitted items.
+
+Common example:
+- `ls -a` → show dotfiles
+
+---
+
+### `-f`
+Means “force”.  
+Used to bypass prompts or ignore warnings.
+
+Dangerous when combined with destructive commands.
+
+---
+
+### `-h`
+Means “human-readable”.  
+Used to display sizes in K, M, G instead of raw bytes.
+
+---
+
+### `-i`
+Means “interactive”.  
+Used to prompt before each action, especially deletions.
+
+---
+
+### `-l`
+Means “long format”.  
+Used to display detailed metadata, not to list.
+
+---
+
+### `-p`
+Means “parents” or “preserve” depending on command.  
+For `mkdir`, it creates parent directories as needed.
+
+---
+
+### `-r`
+Means “recursive”.  
+Used to operate on directories and everything inside them.
+
+---
+
+### `-t`
+Means “sort by time”.  
+Used to order output by modification time.
+
+---
+
+### `-y`
+Means “assume yes”.  
+Used to automatically confirm prompts in non-interactive operations.
+
+---
+
+## Flag Interpretation Rules (Important)
+
+- Flags describe **behavior**, not intent
+- Same flag letter can mean different things for different commands
+- Always read flags in the context of the command
+- When unsure, check the man page immediately
+
+---
+
+## Exam Memory Hooks 🧠
+
+- `-l` → details, not list
+- `-r` → descend into directories
+- `-f` → remove safety nets
+- `-i` → ask before acting
+- `-y` → “I already decided”
+- `-h` → readable sizes
+
+---
+
+## Exam Rule
+> **Never assume a flag means the same thing everywhere.**
+
+Understanding behavior beats memorization.
 
