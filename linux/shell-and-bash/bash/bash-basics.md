@@ -23,6 +23,32 @@ This file converts confusion into recall.
 
 ## Command Structure (Foundational Concept)
 
+##  How to Read a Command Like a Sentence
+
+General form:
+
+```bash
+command [flags] [arguments]
+```
+
+Example:
+
+```bash
+tar -xf input.tar -C extract-here
+```
+
+Read as:
+
+> **Extract the file `input.tar` into the directory `extract-here`.**
+
+Mental mapping:
+
+- command = verb  
+- flags = how  
+- arguments = what / where  
+
+---
+
 command [options] [arguments]
 
 - **command**: the action to perform  
@@ -30,6 +56,100 @@ command [options] [arguments]
 - **arguments**: targets the command operates on  
 
 Bash evaluates input **left to right**.
+
+---
+
+## 🔌 stdin, stdout, stderr (How Commands Talk)
+
+Every command uses three streams:
+
+- **stdin** (0)  → input to the program  
+- **stdout** (1) → normal output  
+- **stderr** (2) → error output  
+
+Pipelines connect **stdout of the left command to stdin of the right command**:
+
+```bash
+ls | grep md
+ps aux | head
+```
+
+Redirection:
+
+```bash
+command > file      # overwrite output
+command >> file     # append output
+```
+
+Mental model:
+
+> **Pipes move data between programs. Redirection sends data to files.**
+
+---
+
+## 🔗 Pipelines and Command Chaining
+
+Common patterns:
+
+```bash
+ps aux | grep chrome
+lsblk | grep sda
+find ~ -type f | grep "\.md$"
+grep -R "chmod" ~/kai-memory-palace | wc -l
+```
+
+Key tools:
+
+- `|` → pipe (stdout → stdin)
+- `grep` → filter text
+- `wc -l` → count lines
+- `head`, `tail` → trim output
+
+Mental model:
+
+> **Small tools, glued together.**
+
+---
+
+## 📚 stdin in the Real World (Why Pipes Work)
+
+Example:
+
+```bash
+ps aux | head
+```
+
+Flow:
+
+- `ps` writes to **stdout**
+- `head` reads from **stdin**
+- The pipe connects them
+
+Another:
+
+```bash
+ls | grep md
+```
+
+> **Programs don’t know about each other. The shell wires them together.**
+
+
+---
+
+## 🏷️ Common Flags (NOT Universal — Per Command!)
+
+Very common patterns:
+
+- `-l` → long format (ls)
+- `-h` → human readable (ls, df, du)
+- `-a` → all (include hidden)
+- `-R` → recursive
+- `-f` → file or force (depends on command)
+- `-C` → change directory (tar)
+
+⚠️ Rule:
+
+> **Flags are command-specific. Always check `man'
 
 ---
 
@@ -252,6 +372,27 @@ Globs expand **before** the command runs.
 
 ---
 
+##  Globs and Shell Expansion (Happens Before the Command Runs)
+
+The shell expands these **before** executing the command:
+
+- `*` → any characters
+- `?` → one character
+- `~` → home directory
+
+Examples:
+
+```bash
+ls *.txt
+ls -lh ~/archive-lab/*.tar*
+```
+
+Important:
+
+> **The command never sees `*`. The shell replaces it first.**
+
+---
+
 ## Exit Codes
 
 ### `$?`
@@ -268,10 +409,17 @@ Exit codes drive scripting logic.
 ## Exam & Exam-Speed Navigation (Critical)
 
 ### Absolute jumps (preferred)
-```bash
-cd /
-cd /etc
-cd ~
+cd /        # go to filesystem root
+cd ~        # go to home directory
+cd -        # go to previous directory
+cd ../../.. # go up multiple levels
+```
+
+Rules:
+
+- `~` always means **your home**
+- `-` always means **where you just were**
+- Prefer **absolute paths** for risky operations
 
 ---
 
