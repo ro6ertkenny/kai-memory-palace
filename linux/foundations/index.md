@@ -41,86 +41,87 @@ Read these documents **in order** to establish correct system intuition.
 
 ---
 
-### 0️⃣ `README.md`
+### 1️⃣ `README.md`
 Defines:
-
-- the scope and posture of the foundations wing
+- scope and posture of the foundations wing
 - what “understanding Linux” actually means
-- how this wing differs from shell, ops, storage, and k8s content
+- how this wing differs from shell or ops content
 
 Start here to align expectations.
 
 ---
 
-### 1️⃣ `system-inspection.md`
+### 2️⃣ `system-inspection.md`
 Defines:
-
 - how to observe a Linux system safely
-- how to build situational awareness
+- what information is always available
 - how to answer “what state is this system in?”
 
 This teaches **observation before action**.
 
 ---
 
-### 2️⃣ `files-and-metadata-inspection.md`
+### 3️⃣ `processes-and-services.md`
 Defines:
-
-- what a file really is (inodes, metadata)
-- hard links vs symlinks
-- how to interpret `ls -l` and `stat`
-- how filenames relate to data and metadata
-
-This teaches **what the filesystem objects actually are**.
-
----
-
-### 3️⃣ `filesystem-access-control.md`
-Defines:
-
-- ownership and groups
-- permission bits and execute semantics
-- directory permission behavior
-- sudo boundaries
-- why commands succeed or fail
-
-This teaches **who is allowed to do what and why**.
-
----
-
-### 4️⃣ `archives-and-compression-tar.md`
-Defines:
-
-- what an archive is vs compression
-- how to package and unpack file trees
-- how metadata is preserved
-- safe inspection-first restore workflows
-
-This teaches **how files are packaged, moved, and restored**.
-
----
-
-### 5️⃣ `processes-and-services.md` (future)
-Will define:
-
 - what a process is
-- PID relationships
-- process lifecycle
-- services vs one-shot programs
+- PID and PPID (who started what)
+- the process tree model (parent/child)
+- services vs one-shot processes
 
 Everything running on Linux is a process.
 
 ---
 
-### 6️⃣ `package-management.md` (future)
-Will define:
+### 4️⃣ `job-control-and-signals.md`
+Defines:
+- foreground/background execution
+- jobs vs processes
+- Ctrl+Z, fg, bg, jobs
+- SIGTERM vs SIGKILL, STOP/CONT
+- nohup and disown (surviving disconnects)
 
-- how software is installed
-- where it comes from
-- dependency resolution
-- trust and signatures
+This teaches **execution control**.
 
-This teaches **where software actually comes from**.
+---
+
+### 5️⃣ `filesystem-access-control.md`
+Defines:
+- filesystem hierarchy and paths
+- ownership and permissions
+- directory semantics and execute bit behavior
+- why “everything is a file” matters
+
+This explains persistence, access, and isolation.
+
+---
+
+### 6️⃣ `advanced-filesystem-permissions.md`
+Defines:
+- SUID / SGID / sticky bit
+- ACLs and the ACL mask
+- filesystem attributes (lsattr/chattr), immutable files
+
+This explains access behaviors that rwx alone cannot explain.
+
+---
+
+### 7️⃣ `files-and-metadata-inspection.md`
+Defines:
+- inodes, links, and file identity
+- reading metadata safely (stat, etc.)
+- disk/filesystem inspection tooling (df, du, lsblk, findmnt)
+
+This teaches **inspection before change** for storage and files.
+
+---
+
+### 8️⃣ `archives-and-compression-tar.md`
+Defines:
+- creating, listing, extracting archives
+- gzip vs xz basics
+- safe archive habits for exams and ops work
+
+This teaches **packaging and recovery workflows**.
 
 ---
 
