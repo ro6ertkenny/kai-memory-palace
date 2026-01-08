@@ -1,133 +1,251 @@
-# 🧭 dns-and-name-resolution.md — Understanding How Names Become Addresses
+# 🌐 dns-and-name-resolution.md — How Names Become Addresses
 
 ## 🎯 Purpose
-Understand **how hostnames are resolved to addresses** and why name lookup fails.
 
-This file trains habits for:
-- inspecting name resolution behavior
-- distinguishing DNS failures from connectivity failures
-- diagnosing “it works by IP but not by name” problems
-- understanding where resolution decisions come from
+Understand **how Linux turns names into IP addresses**.
 
-If names do not resolve, traffic never starts.
+This file trains you to:
 
----
+- read `/etc/resolv.conf`
+- understand what DNS servers are being used
+- use `getent` to test the real resolver path
+- understand **NSS** (Name Service Switch)
+- diagnose “IP works but names don’t” failures
 
-## 🧠 Mental Rule
-**No name, no connection.**
-
-If a hostname cannot be resolved, routing and ports do not matter.
+On the exam: if `ping 8.8.8.8` works but `ping google.com` fails — this is where you debug.
 
 ---
 
-## 🧩 What Name Resolution Is
-Name resolution translates:
-- hostnames → IP addresses
+## 🧠 Mental Model
 
-This process may involve:
-- local files
-- DNS servers
-- system services
-- caches
-
-Resolution happens before any network traffic is sent.
+> Applications do **not** talk to DNS directly.  
+> They talk to **NSS**.  
+> NSS decides **where to look** (files, DNS, etc).
 
 ---
 
-## 🔎 Resolution Order
-Linux resolves names according to configuration.
+## 🔎 Core Commands
 
-Common resolution sources:
-- /etc/hosts
+- `cat /etc/resolv.conf` → see configured DNS servers
+- `getent hosts google.com` → test the **real resolver path**
+- `ping google.com` → test resolution + connectivity
+- `curl https://example.com` → test name + TCP + TLS
+
+---
+
+# 🧱 Part 1 — `/etc/resolv.conf`
+
+Example from your system:
+
+    search attlocal.net
+    nameserver 1.1.1.1
+    nameserver 8.8.8.8
+    nameserver 2600:1700:ff00:5a80::1
+
+Meaning:
+
+- `search` = domain suffix automatically tried
+- `nameserver` = DNS servers to query (in order)
+
+---
+
+## 🧠 Important Truth
+
+> This file controls **which DNS servers** are used.  
+> It does **not** control the whole resolution logic.
+
+That is NSS.
+
+---
+
+# 🧱 Part 2 — What Is `getent` (NT)
+
+`getent` means:
+
+> **get entries**
+
+It queries the **Name Service Switch** exactly the same way real programs do.
+
+Run:
+
+    getent hosts google.com
+
+Example output:
+
+    2607:f8b0:4002:c05::71 google.com
+    2607:f8b0:4002:c05::8a google.com
+    ...
+
+Meaning:
+
+- name resolution is working
+- NSS + DNS path is working
+- IPv6 answers are being returned
+
+---
+
+## 🧠 Why `getent` Is Exam-Gold
+
+> If `getent hosts name` fails, **the system cannot resolve names**.
+
+It tests:
+
+- NSS
+- `/etc/nsswitch.conf`
+- `/etc/hosts`
 - DNS
-- local caches
-- system resolver services
+- resolver config
 
-The order matters.  
-The first match wins.
+All in one.
 
 ---
 
-## 📄 Local Overrides
-The hosts file can override DNS.
+# 🧱 Part 3 — NSS (Name Service Switch) (NT)
 
-Key properties:
-- entries in /etc/hosts take precedence
-- useful for testing
-- dangerous if forgotten
+NSS is configured in:
 
-Always check local overrides when resolution behaves oddly.
+    /etc/nsswitch.conf
 
----
+Look for:
 
-## 🌍 DNS Servers
-DNS queries are sent to configured servers.
+    hosts: files dns
 
-Things to inspect:
-- which servers are configured
-- whether they are reachable
-- whether they respond correctly
+Meaning:
 
-Incorrect DNS configuration causes widespread failure.
+> When resolving hostnames:
+> 1) check `/etc/hosts`
+> 2) then ask DNS
 
----
+Other possible sources:
 
-## 🧪 Testing Name Resolution
-After inspection, test resolution.
-
-Common tools:
-- dig
-- nslookup
-- getent hosts
-
-Use these to answer:
-- does the name resolve
-- which address is returned
-- whether multiple records exist
-
-Test names before testing connectivity.
+- ldap
+- mdns
+- myhostname
+- etc
 
 ---
 
-## 🔁 Caching and Staleness
-Resolution results may be cached.
+## 🧠 The Real Resolution Flow
 
-Common causes of confusion:
-- stale DNS entries
-- local resolver caches
-- application-level caching
+When a program wants to resolve a name:
 
-If results differ over time, caching is likely involved.
-
----
-
-## 🧯 Common Resolution Failures
-- DNS server unreachable
-- incorrect search domains
-- stale cache entries
-- hosts file overrides
-- split-horizon DNS behavior
-
-Always inspect before flushing caches.
+1. It asks NSS
+2. NSS consults `/etc/nsswitch.conf`
+3. NSS tries sources in order:
+   - files (`/etc/hosts`)
+   - dns
+4. DNS servers come from `/etc/resolv.conf`
 
 ---
 
-## 🧪 Daily Drill (5 minutes)
-On a running system:
+# 🧱 Part 4 — `/etc/hosts`
 
-- inspect resolver configuration
-- resolve a known hostname
-- resolve a nonexistent hostname
-- explain where the failure occurs
+This is **local override**.
 
-Do not change configuration.
+Example:
+
+    127.0.0.1 mytest
+
+Now:
+
+    getent hosts mytest
+
+Will resolve **without DNS**.
+
+---
+
+# 🧱 Part 5 — Failure Patterns (Exam Grade)
+
+## Case 1: IP works, names do not
+
+Test:
+
+    ping 1.1.1.1   # works
+    ping google.com # fails
+
+Check:
+
+- `/etc/resolv.conf`
+- `getent hosts google.com`
+
+---
+
+## Case 2: `ping` fails but `getent` works
+
+This means:
+
+> DNS is working. Network or firewall is the problem.
+
+---
+
+## Case 3: `getent` fails immediately
+
+This means:
+
+> NSS / resolver path is broken.
+
+Check:
+
+- `/etc/nsswitch.conf`
+- `/etc/resolv.conf`
+
+---
+
+# 🧱 Part 6 — IPv4 vs IPv6 Surprises
+
+Your system prefers IPv6 if available.
+
+Example:
+
+    ping google.com
+
+Returns:
+
+    PING google.com (2607:f8b0:...)
+
+That is normal.
+
+If IPv6 is broken, you may see:
+
+- name resolves
+- but connections fail
+
+Test IPv4 explicitly:
+
+    ping -4 google.com
+
+---
+
+# 🧪 Exam Debug Flow
+
+1. `ping 1.1.1.1`
+2. `getent hosts google.com`
+3. `ping google.com`
+4. `cat /etc/resolv.conf`
+5. `cat /etc/nsswitch.conf | grep hosts`
+
+---
+
+# 🧪 Practical Drills
+
+Run:
+
+    getent hosts google.com
+    getent hosts localhost
+    cat /etc/resolv.conf
+
+Add a temporary entry to `/etc/hosts` and test resolution.
 
 ---
 
 ## ✅ Exit Criteria
-You are done with this file when:
-- name resolution feels predictable
-- IP vs name failures are obvious
-- DNS issues stop masquerading as network issues
 
-You now understand name resolution.
+You are done with this file when:
+
+- you understand what `getent` really tests
+- you understand NSS
+- you can diagnose name resolution failures **systematically**
+
+You now understand **DNS and name resolution**.
+EOF
+
