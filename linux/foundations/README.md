@@ -18,6 +18,7 @@ This **is**:
 - an explanation of what Linux *is*
 - how the kernel and userspace relate
 - how processes, files, memory, and resources actually behave
+- how the system represents **identity, authentication, and privilege**
 - how to reason about system state before touching it
 
 If you understand this wing, higher-level tools (shell, systemd, containers, Kubernetes) stop feeling magical and start feeling **inevitable**.
@@ -41,6 +42,7 @@ Linux **is**:
   - memory
   - files
   - devices
+  - identity and privilege
   - and the scheduler
 
 This wing teaches you to think in terms of:
@@ -61,6 +63,7 @@ This wing focuses on **conceptual and operational primitives**:
 - what a file really is
 - how metadata, ownership, and permissions work
 - how the system represents and exposes resources
+- how the system represents **users, groups, authentication, and sudo**
 - how to reason about “what is happening” before acting
 
 It intentionally avoids:
@@ -106,7 +109,7 @@ If something feels confusing at a higher level, the answer is almost always **in
 ## ▶️ How To Use This Wing
 
 - New to Linux → read in order, starting from the beginning
-- Rusty fundamentals → focus on inspection and processes
+- Rusty fundamentals → focus on inspection, processes, and identity
 - Debugging weird behavior → come here before touching prod
 
 This wing trains you to:
@@ -131,8 +134,9 @@ After completing this wing, you should be able to say:
 
 - I know what the system *is*
 - I know what state it is in
+- I know who the system thinks I am
+- I know what I am allowed to do and why
 - I know why things behave the way they do
 - I know where to look before I change anything
 
 That is **Linux literacy**.
-
