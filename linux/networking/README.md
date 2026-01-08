@@ -1,132 +1,122 @@
-# 🌐 Networking — README
+# 🌐 Linux Networking
+*Understanding how Linux connects, routes, and exposes services*
+
+---
 
 ## 🎯 Purpose
-Build **operational clarity** around how data moves into, out of, and within a Linux system.
 
-This domain exists to make networking behavior:
-- observable
-- explainable
-- diagnosable
+This directory exists to make Linux networking **predictable, inspectable, and debuggable**.
 
-Most “it’s not working” failures ultimately reduce to **connectivity, routing, or name resolution**.
+Most networking problems feel “mysterious” only because people:
 
----
+- skip layers
+- guess
+- jump to tools instead of state
 
-## 🧠 Mental Mode
-**Tracing how traffic flows**
-
-- know where traffic originates
-- know how it is addressed
-- know how it is routed
-- know where it terminates
-- know why it fails or succeeds
-
-Networking is not magic.  
-It is state, paths, and decisions.
+This wing trains **layered reasoning**.
 
 ---
 
-## 🧭 Scope
-This domain focuses on **day-to-day operational networking** required to understand and diagnose connectivity issues on Linux systems.
+## 🧠 Mental Model
 
-Included:
-- network interfaces and link state
-- IP addressing and reachability
-- routing and default gateways
-- ports, listeners, and connections
-- name resolution and DNS behavior
-- local vs remote traffic flow
-- common networking failure patterns
+Linux networking is a **stack of independent layers**:
 
-Excluded:
-- protocol internals
+1. **Link** — is there a usable interface?
+2. **Address** — does it have an IP?
+3. **Route** — does it know where to send packets?
+4. **Name** — can it resolve hostnames?
+5. **Service** — is something listening?
+6. **Application** — does the protocol work?
+
+> You must debug **from the bottom up**.
+
+If you skip layers, you will misdiagnose the problem.
+
+---
+
+## 🧭 What This Wing Covers
+
+This wing teaches you to:
+
+- inspect interfaces and link state (`ip link`)
+- inspect addresses (`ip a`)
+- read and reason about routes (`ip r`, `ip route get`)
+- understand name resolution (NSS, `getent`, `resolv.conf`)
+- inspect listening services (`ss -tulpen`)
+- debug failures **systematically** instead of guessing
+
+---
+
+## 🧱 What This Wing Does NOT Cover
+
+- advanced routing protocols
+- firewalling and nftables/iptables (separate topic)
 - performance tuning
-- packet capture and deep inspection
-- firewall policy design
-- Kubernetes networking implementation details
+- deep TCP internals
 
-If it does not help explain *why traffic does or does not flow*, it does not belong here.
+This is about **operational correctness**, not optimization.
 
 ---
 
-## 📁 Directory Layout
+## 📚 How the Content Is Organized
 
-### `networking/README.md`
-This file.
-- defines scope
-- sets mental model
-- explains how to use this domain
+The canonical navigation order is in:
 
----
+> `index.md`
 
-### Networking content files
-This domain will contain focused, diagnostic files such as:
-- interface and address inspection
-- routing and reachability
-- ports and listening services
-- DNS and name resolution
-- common failure patterns
+But conceptually, the flow is:
 
-Each file should answer:
-- what symptom is visible
-- what to inspect
-- what conclusions can be drawn
+1. **Basics** → vocabulary and concepts
+2. **Interface & Addressing** → is the host connected?
+3. **Routes** → where will packets go?
+4. **Name Resolution** → how names become IPs
+5. **Ports & Listeners** → is the service reachable?
+6. **Debug Checklist** → the exam-grade playbook
+
+Each file owns **one layer of the stack**.
 
 ---
 
-## 🧪 How to Use This Domain
-Use this directory when:
-- a service is running but unreachable
-- a port is open but nothing responds
-- name resolution behaves unexpectedly
-- traffic works locally but not remotely
-- connectivity breaks after configuration changes
+## 🧪 How to Use This Wing
 
-Inspect before changing state.
+### If you are learning:
 
----
+Read **top to bottom** following `index.md`.
 
-## 🔎 Diagnostic First Principle
-Before fixing anything, you should be able to explain:
-- which interface is involved
-- which address is being used
-- which route is selected
-- which port or service is targeted
-- whether name resolution is correct
+### If something is broken:
 
-If you cannot explain the path, do not change it.
+Jump straight to:
+
+> `network-debugging-checklist.md`
+
+And follow it **line by line**.
 
 ---
 
-## 🔗 Relationship to Other Linux Domains
-- **Shell & Bash**  
-  Networking state is inspected and tested from the shell
+## ⚠️ The One Rule That Matters
 
-- **Processes & Resource Management**  
-  Network listeners and connections are owned by processes
-
-- **Filesystems & Storage**  
-  Network services depend on configuration files and permissions
-
-Networking ties system components together.
-
----
-
-## ⚠️ Operational Guardrails
-- avoid blind configuration changes
-- isolate layers before acting
-- verify reachability step by step
-- change one variable at a time
-
-Networking errors compound quickly when assumptions replace observation.
+> **Never guess. Always inspect. Always follow the layers.**
 
 ---
 
 ## ✅ Outcome
-You should be able to say:
 
-I know where traffic is going,  
-I know why it succeeds or fails,  
-and I know exactly what to check next.
+If you understand this wing:
 
-That is networking fluency.
+- “networking issues” stop being vague
+- failures become **mechanical to locate**
+- the LFCS networking section becomes **free points**
+
+---
+
+## 🧭 Relationship to Other Wings
+
+- `linux/foundations/` → processes, permissions, inspection
+- `linux/shell-and-bash/` → using the tools
+- `k8s/networking/` → builds on all of this
+
+Linux networking understanding is **upstream of everything distributed**.
+
+---
+EOF
+
