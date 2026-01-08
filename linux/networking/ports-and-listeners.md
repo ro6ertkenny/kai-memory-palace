@@ -1,4 +1,3 @@
-cat << 'EOF' > linux/networking/ports-and-listeners.md
 # 🔌 ports-and-listeners.md — Who Is Listening and Who Can Reach It
 
 ## 🎯 Purpose
