@@ -1,155 +1,147 @@
 # 🌐 Linux Networking — Index
-*Reasoning about connectivity, flow, and failure at the operating system level*
+*Understanding how Linux connects, routes, and exposes services*
 
 ---
 
 ## 📌 Purpose
 
-This index provides a **structured navigation map** for the
-`linux/networking` directory.
+This index is the **navigation map** for the `linux/networking` wing.
 
 It answers the question:
 
-> “How does networking actually work on a Linux system,
-and how do I diagnose problems deterministically?”
+> “When networking is broken, where do I look and in what order?”
 
-This wing treats networking as a **system behavior**, not a set of commands.
+This wing is about **systematic reasoning**, not memorizing commands.
 
 ---
 
 ## 🧠 Mental Model
 
-Linux networking is about **packet flow through layers**.
+Linux networking is **layered**:
 
-At a high level, every connectivity problem can be reasoned through:
-
-1. Link (is the interface up?)
+1. Link (is there a usable interface?)
 2. Address (does it have an IP?)
-3. Route (does it know where to send traffic?)
-4. Name (can it resolve destinations?)
+3. Route (does it know where to send packets?)
+4. Name (can it resolve hostnames?)
 5. Service (is something listening?)
+6. Application (does the protocol work?)
 
-This wing reinforces that model repeatedly.
+If you skip layers, you will misdiagnose problems.
 
 ---
 
 ## 🔁 Recommended Reading Order
 
-Read these documents **in order** to build durable intuition.
+Read these **in order**. Each builds on the previous one.
 
 ---
 
-### 1️⃣ `README.md`
+### 1️⃣ `networking-basics.md`
 Defines:
-- scope and diagnostic philosophy
-- how networking is treated in this repository
-- why structured observation matters
+- what a network stack is
+- what interfaces, addresses, routes, ports, and protocols are
+- the vocabulary of networking
 
-Start here to align mindset.
+Start here to align concepts.
 
 ---
 
-### 2️⃣ `networking-basics.md`
+### 2️⃣ `interface-and-addressing.md`
 Defines:
-- IP addressing fundamentals
-- interfaces and link state
-- local vs remote traffic
+- how to inspect interfaces (`ip link`)
+- how to inspect addresses (`ip a`)
+- link state vs address state
+- what makes an interface actually usable
 
-This establishes the vocabulary.
+This answers:
+
+> “Is this host even connected to anything?”
 
 ---
 
-### 3️⃣ `ip-addressing.md` *(planned)*
+### 3️⃣ `routes-and-reachability.md`
 Defines:
-- IPv4 / IPv6 concepts
-- CIDR notation
-- subnet reasoning
+- how to read `ip r`
+- what the default route is
+- how Linux chooses paths
+- how to use `ip route get`
 
-This is about **address meaning**, not memorization.
+This answers:
+
+> “Where will packets go and why?”
 
 ---
 
-### 4️⃣ `routing-and-gateways.md` *(planned)*
+### 4️⃣ `dns-and-name-resolution.md`
 Defines:
-- routing tables
-- default gateways
-- decision-making for packet forwarding
-
-This explains *why traffic goes where it does*.
-
----
-
-### 5️⃣ `dns-resolution.md` *(planned)*
-Defines:
-- name resolution flow
 - `/etc/resolv.conf`
-- local vs remote resolution
+- `getent`
+- NSS (`/etc/nsswitch.conf`)
+- why names sometimes fail but IPs work
 
-DNS is a frequent failure point and must be understood.
+This answers:
+
+> “Why does 8.8.8.8 work but google.com does not?”
 
 ---
 
-### 6️⃣ `interface-states.md` *(planned)*
+### 5️⃣ `ports-and-listeners.md`
 Defines:
-- physical vs logical interfaces
-- link negotiation
-- carrier vs configuration
+- how to read `ss -tulpen`
+- LISTEN vs ESTAB vs TIME-WAIT
+- loopback-only services
+- mapping ports to processes
 
-This is where many “it works sometimes” bugs live.
+This answers:
+
+> “Is the service actually reachable?”
 
 ---
 
-### 7️⃣ `troubleshooting-flow.md` *(planned)*
+### 6️⃣ `network-debugging-checklist.md`
 Defines:
-- a deterministic diagnostic sequence
-- what to check and in what order
-- how to avoid blind changes
+- the **authoritative exam-grade debug order**
+- how to triage any network failure
+- how to never guess and never skip layers
 
-This document turns intuition into discipline.
-
----
-
-### 8️⃣ `common-failure-patterns.md` *(planned)*
-Catalogs:
-- recurring Linux networking failures
-- symptom → cause mappings
-- operator heuristics
-
-Revisit this often.
+This is the **capstone operational playbook**.
 
 ---
 
-### 9️⃣ `kubernetes-networking-primer.md` *(planned)*
-Bridges:
-- Linux networking fundamentals
-- Kubernetes networking abstractions
+## 📚 Supporting Files
 
-This document explains **why Kubernetes networking behaves the way it does**.
+- `mistakes.md`  
+  Common conceptual and operational mistakes.
 
----
-
-## 🔗 Relationship to Other Wings
-
-- `linux/foundations/`  
-  Provides process, filesystem, and system context
-
-- `linux/shell-and-bash/`  
-  Provides the tools used to observe networking state
-
-- `k8s/networking/`  
-  Builds Kubernetes abstractions on top of Linux networking
-
-Linux networking knowledge is **upstream of all distributed systems work**.
+- `README.md`  
+  Scope, philosophy, and how this wing fits into the palace.
 
 ---
 
-## ▶️ How to Use This Index
+## ⚠️ Common Failure Pattern
 
-- New to networking → read top to bottom
-- Debugging an issue → follow the layer model
-- Confused in Kubernetes → return here
+> **Jumping to DNS, firewall, or services before checking link and address.**
 
-If you can reason about Linux networking,
-higher-level abstractions stop feeling mysterious.
+Always start at the bottom of the stack.
 
 ---
+
+## ▶️ How to Use This Wing
+
+- New to Linux networking → read top to bottom
+- Debugging a real issue → jump straight to `network-debugging-checklist.md`
+- Something “mysterious” → trace it layer by layer
+
+---
+
+## ✅ Outcome
+
+If you understand this wing:
+
+- networking stops feeling random
+- failures become **mechanical to diagnose**
+- the LFCS networking section becomes **free points**
+
+---
+EOF
+
