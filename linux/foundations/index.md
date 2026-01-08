@@ -125,6 +125,30 @@ This teaches **packaging and recovery workflows**.
 
 ---
 
+### 9️⃣ Accounts, Identity, and Privilege (Day 6)
+
+Defines:
+- what a user and group actually are (UID/GID vs names)
+- how identity is resolved (NSS, getent, passwd/group databases)
+- how authentication works (/etc/shadow, hashes, locking)
+- how accounts are created, deleted, and recovered
+- how sudo and privilege delegation really works
+- how login shells initialize environments
+- how to systematically debug account and access problems
+
+Read in this order:
+
+- `users-and-groups.md`
+- `passwords-and-shadow.md`
+- `user-lifecycle-management.md`
+- `sudo-and-privilege-delegation.md`
+- `login-shell-and-environment.md`
+- `accounts-debugging-checklist.md`
+
+This section teaches **who you are, how the system knows, and what you are allowed to do**.
+
+---
+
 ## ⚠️ Common Conceptual Mistakes
 
 > **⚠️ Mistake:** Treating Linux as “the terminal”  
@@ -165,4 +189,3 @@ Linux foundations are **upstream of everything**.
 If you understand Linux foundations, higher-level systems stop feeling magical.
 
 ---
-
