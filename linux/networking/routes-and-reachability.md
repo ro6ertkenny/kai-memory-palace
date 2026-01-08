@@ -1,4 +1,3 @@
-cat << 'EOF' > linux/networking/routes-and-reachability.md
 # 🧭 routes-and-reachability.md — Where Packets Go and Why
 
 ## 🎯 Purpose
