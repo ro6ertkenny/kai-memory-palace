@@ -19,6 +19,7 @@ Most Linux failures reduce to **paths, ownership, permissions, or storage state*
 - know who owns it
 - know who can act on it
 - know why access succeeds or fails
+- know how filesystems are attached and detached at runtime
 
 If you understand the filesystem, you can recover from most system issues.
 
@@ -34,14 +35,20 @@ Included:
 - execute bit behavior
 - diagnosing access failures
 - safe corrective actions
+- mounting and unmounting filesystems
+- bind mounts and namespace grafting
+- /etc/fstab and persistent mounts
+- fsck and offline recovery basics
 
 Excluded:
-- advanced filesystems internals
+- advanced filesystem internals
 - performance tuning
 - storage hardware specifics
 - kernel-level VFS theory
 
-If it does not explain *why a command can or cannot access data*, it does not belong here.
+If it does not explain *why a command can or cannot access data*,  
+or *why data is or is not visible at a path*,  
+it does not belong here.
 
 ---
 
@@ -67,7 +74,41 @@ Covers:
 - sudo boundaries
 - diagnosing permission failures
 
-This is the **primary reference** for filesystem-related errors.
+This is the **primary reference** for filesystem-related access errors.
+
+---
+
+### Runtime & Recovery (Day 7)
+
+This wing also covers **how filesystems are attached to the live system** and how to recover them safely:
+
+- `mounting-and-unmounting.md`
+  - the live mount tree
+  - loop mounts
+  - “target is busy”
+  - lazy unmount
+  - why Linux is a tree of mountpoints
+
+- `bind-mounts-and-namespace-grafting.md`
+  - making one directory appear at another path
+  - stacked mounts
+  - namespace composition
+
+- `fstab-and-persistent-mounts.md`
+  - /etc/fstab as the boot-time mount plan
+  - UUIDs
+  - pass and dump fields
+  - verifying before reboot
+
+- `fsck-and-recovery-basics.md`
+  - what fsck is
+  - why it must not run on mounted filesystems
+  - offline consistency checking
+
+- `filesystem-debugging-checklist.md`
+  - systematic workflow for storage problems
+
+These documents explain **why data sometimes “disappears”, why paths change meaning, and how to recover safely**.
 
 ---
 
@@ -78,6 +119,9 @@ Use this directory when:
 - a file exists but cannot be accessed
 - permissions feel confusing
 - ownership changes are required
+- data is “missing” or a path does not show what you expect
+- a mount or unmount fails
+- a system dropped into recovery because of storage
 
 Start with inspection, not action.
 
@@ -89,6 +133,7 @@ Before fixing anything, you should be able to answer:
 - which path is being resolved
 - who owns the target
 - what permissions apply
+- what filesystem is mounted there (if any)
 
 If you cannot answer those, you are not ready to change state.
 
@@ -99,6 +144,7 @@ If you cannot answer those, you are not ready to change state.
 - prefer fixing ownership over loosening permissions
 - never use broad permissions as a shortcut
 - inspect parent directories, not just the target
+- never run fsck on a mounted filesystem
 
 Filesystem mistakes propagate quickly.
 
@@ -107,8 +153,10 @@ Filesystem mistakes propagate quickly.
 ## ✅ Outcome
 You should be able to say:
 
-I know why access failed,  
-I know what the filesystem state is,  
-and I know exactly how to fix it.
+I know why access failed.  
+I know what the filesystem state is.  
+I know what is mounted where and why.  
+And I know exactly how to fix it.
 
 That is filesystem fluency.
+
