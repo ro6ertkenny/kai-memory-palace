@@ -15,3 +15,8 @@ Thumbs.db
 *.pem
 kubeconfig
 *.kubeconfig
+
+# vim
+*.swp
+*.swo
+*.swn
