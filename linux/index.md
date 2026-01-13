@@ -85,6 +85,9 @@ This wing establishes:
 - permissions and ownership
 - disk pressure and failure modes
 
+Day 9 wiring:
+- `linux/filesystems-and-storage/df-command.md` (filesystem pressure mental model)
+
 Start here if:
 - storage failures confuse you
 - containers feel “ephemeral”
@@ -116,17 +119,29 @@ This wing builds clarity.
 **Mental mode:** System pressure and limits
 
 This wing establishes:
-- CPU scheduling
-- memory management
-- cgroups and namespaces
-- signals and process lifecycle
+- process inspection and process states
+- job control (foreground/background)
+- signals and termination strategy
+- CPU, memory, and disk pressure triage
+- services and long-running daemons (systemd)
+- safe troubleshooting patterns
+
+Day 9 capstone doctrine:
+- `linux/process-and-resource-management/operator-decision-tree.md`
+- `linux/process-and-resource-management/operator-readiness-checklist.md`
+
+Day 9 fundamentals:
+- `linux/process-and-resource-management/shell-vs-system.md`
+- `linux/process-and-resource-management/signals-and-sigkill.md`
+- `linux/process-and-resource-management/ps-and-process-states.md`
+
+See:
+- `linux/process-and-resource-management/index.md`
 
 Start here if:
 - systems slow down unexpectedly
 - containers behave oddly
 - resource limits cause outages
-
-see: linux/processes-and-resource-management/index.md
 
 This wing builds intuition.
 
@@ -150,14 +165,22 @@ This wing builds safety.
 
 ---
 
-### 7 'linux/troubleshooting/'
-**Mental mode:** linux-wide troubleshooting wing
+### 7️⃣ `linux/troubleshooting/`
+**Mental mode:** Restoring control under uncertainty
 
 This wing establishes:
-- 
+- symptom-first diagnosis
+- evidence-based decisions
+- minimal safe actions
+- verification discipline
+
+Day 9 first-response doctrine:
+- `linux/troubleshooting/triage-playbook.md`
 
 Start here if:
--
+- you do not know what to check first
+- multiple symptoms appear at once
+- you need a stable incident response loop
 
 This wing builds troubleshooting thought processes and skills.
 
@@ -205,5 +228,5 @@ handles networking and storage,
 and enforces security boundaries.
 
 That understanding makes Kubernetes predictable.
+EOF
 
----
