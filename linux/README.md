@@ -111,6 +111,8 @@ linux/troubleshooting/
 Use this when something breaks.
 This is the “reduce panic” domain.
 
+Linux-wide recovery discipline, common mistakes, and operator playbooks
+
 Outcome:
 You recover quickly without blind changes.
 
