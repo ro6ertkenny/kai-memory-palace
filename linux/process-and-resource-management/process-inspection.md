@@ -2,23 +2,21 @@
 
 Mental mode: **Observe before acting**
 
-This document covers how to **inspect running processes**, identify resource usage, and understand process state before taking any action.  
-These skills are **core LFCS exam material** and are required for real-world troubleshooting.
+This document covers how to **inspect running processes**, identify resource usage, and understand process state before taking any action.
+
+Rule: Never kill what you haven’t inspected.
 
 ---
 
 ## 🎯 Goals
 
 You must be able to:
-
 - list running processes
 - find a specific process
 - sort by CPU or memory
 - understand basic process states
 - extract a PID for further action
 - verify whether a process exists or is gone
-
-**Rule:** Never kill what you haven’t inspected.
 
 ---
 
@@ -32,12 +30,9 @@ It shows a **snapshot** of processes at the moment you run it (not a live view l
 
 ## 📋 The One Command You Must Know
 
-```bash
-ps aux
-```
+    ps aux
 
 Meaning:
-
 - `a` = show processes for **all users**
 - `u` = show in **user-oriented format**
 - `x` = include processes **without a terminal**
@@ -48,16 +43,13 @@ This shows **almost everything running** on the system.
 
 ## 📊 Understanding the Columns
 
-Example header:
+Typical header:
 
-```
-USER   PID %CPU %MEM VSZ   RSS TTY  STAT START TIME COMMAND
-```
+    USER   PID %CPU %MEM VSZ   RSS TTY  STAT START TIME COMMAND
 
-Important ones:
-
+Important columns:
 - `USER` → who owns the process
-- `PID` → process ID (used for kill, etc)
+- `PID` → process ID (used for signals)
 - `%CPU` → CPU usage
 - `%MEM` → memory usage
 - `VSZ` → virtual memory size
@@ -71,121 +63,79 @@ Important ones:
 ## 🧩 Process States (STAT)
 
 Common ones you will see:
-
 - `R` = Running
 - `S` = Sleeping
 - `T` = Stopped (job control or SIGSTOP)
 - `Z` = Zombie (dead but not reaped)
-- `I` = Idle kernel thread
-- `Sl`, `Ssl`, etc = sleeping + multithreaded or session leader
+- `D` = Uninterruptible sleep (often I/O)
 
-**Exam gold:**  
-If you see `T` → the process is **stopped**, not dead.
+Operator rule:
+- `T` means stopped, not dead
+- `Z` means a parent reaping problem
+- `D` can indicate storage/network I/O problems and may not respond to kills
 
 ---
 
 ## 🔎 Finding Specific Processes
 
-### By name:
+By name:
 
-```bash
-ps aux | grep spotify
-```
+    ps aux | grep spotify
 
-### By PID:
+By PID:
 
-```bash
-ps -p 12345
-```
+    ps -p 12345
 
-### Custom output (very useful):
+Custom output (high-signal):
 
-```bash
-ps -o pid,user,%cpu,%mem,stat,etime,cmd -p 12345
-```
+    ps -o pid,user,%cpu,%mem,stat,etime,cmd -p 12345
 
 ---
 
 ## 🔢 Sorting by Resource Usage
 
-### Highest CPU:
+Highest CPU:
 
-```bash
-ps aux --sort=-%cpu | head
-```
+    ps aux --sort=-%cpu | head
 
-### Highest memory:
+Highest memory:
 
-```bash
-ps aux --sort=-%mem | head
-```
-
-This is **exactly how you found Spotify and Chrome hogs**.
+    ps aux --sort=-%mem | head
 
 ---
 
 ## ✅ Verifying If a Process Exists
 
-```bash
-ps -p 12345 || echo "gone"
-```
+    ps -p 12345 || echo "gone"
 
-If it prints `gone`, the process is **truly dead**.
+If it prints `gone`, the process is truly dead.
 
 ---
 
 ## 🧪 Practical Inspection Workflow (Exam Style)
 
-1. List everything:
-```bash
-ps aux
-```
+1) List everything:
 
-2. Sort by CPU or memory:
-```bash
-ps aux --sort=-%cpu | head
-ps aux --sort=-%mem | head
-```
+    ps aux
 
-3. Pick a suspicious PID
+2) Sort by CPU and memory:
 
-4. Inspect it:
-```bash
-ps -o pid,user,%cpu,%mem,stat,etime,cmd -p PID
-```
+    ps aux --sort=-%cpu | head
+    ps aux --sort=-%mem | head
 
-5. Decide what to do **only after inspection**
+3) Pick a suspicious PID
 
----
+4) Inspect it:
 
-## ⚠️ Important Distinctions
+    ps -o pid,user,%cpu,%mem,stat,etime,cmd -p PID
 
-- `ps` shows a **snapshot**, not live updates
-- High CPU ≠ broken (could be doing work)
-- Always check:
-  - owner
-  - runtime
-  - command
-  - state
-
----
-
-## 🧠 LFCS What You Must Be Able To Do
-
-- List processes
-- Sort by CPU and memory
-- Identify a PID
-- Recognize `R`, `S`, `T`, `Z` states
-- Verify whether a process is running or gone
-- Extract info before killing anything
+5) Decide what to do only after inspection
 
 ---
 
 ## 🏁 Mental Model
 
-> **Inspect → Understand → Decide → Act → Verify**
+Inspect → Understand → Decide → Act → Verify
 
-Never skip the inspection step.
-
----
+EOF
 
