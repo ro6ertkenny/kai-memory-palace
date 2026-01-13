@@ -2,19 +2,17 @@
 
 Mental mode: **Act deliberately and reversibly**
 
-This document covers how to **control processes**: stopping them, resuming them, terminating them, and mass-managing them using signals and job control.  
-These skills are **core LFCS exam material** and are required for real-world recovery and remediation.
+This document covers how to **control processes**: stopping them, resuming them, terminating them, and mass-managing them using signals and job control.
 
 ---
 
 ## 🎯 Goals
 
 You must be able to:
-
 - stop and resume foreground and background jobs
 - send signals to processes by PID and by name
-- terminate runaway processes
-- understand the difference between graceful and forced termination
+- terminate runaway processes safely
+- understand graceful vs forced termination
 - verify whether a process is truly gone
 
 ---
@@ -23,264 +21,139 @@ You must be able to:
 
 Linux controls processes using **signals**.
 
-A signal is a **message sent to a process** telling it to do something.
+A signal is a message sent to a process telling it to do something.
 
 Common signals:
-
 - `SIGTERM` (15) → polite request to terminate (default)
 - `SIGKILL` (9) → force kill, cannot be ignored
-- `SIGSTOP` (19) → stop (pause) a process
-- `SIGCONT` (18) → continue a stopped process
+- `SIGSTOP` → stop (pause) a process
+- `SIGCONT` → continue a stopped process
 
 ---
 
 ## 🗡️ kill — Control by PID
 
-### Graceful stop (default = SIGTERM):
+Graceful stop (default = SIGTERM):
 
-```bash
-kill 12345
-```
+    kill 12345
 
 Same as:
 
-```bash
-kill -15 12345
-```
+    kill -15 12345
 
-### Force kill (last resort):
+Force kill (last resort):
 
-```bash
-kill -9 12345
-```
+    kill -9 12345
 
-### Stop (pause) a process:
+Stop (pause) a process:
 
-```bash
-kill -STOP 12345
-```
+    kill -STOP 12345
 
-### Continue a stopped process:
+Continue a stopped process:
 
-```bash
-kill -CONT 12345
-```
+    kill -CONT 12345
 
 ---
 
-## 🧨 Verifying a Kill
+## 🧨 Verify After You Signal
 
-Always verify:
+    ps -p 12345 || echo "gone"
 
-```bash
-ps -p 12345 || echo "gone"
-```
-
-If it prints `gone`, the process is truly dead.
+Verification is not optional.
 
 ---
 
 ## 🧹 pgrep / pkill — Control by Name
 
-### Find PIDs by name:
+Find PIDs by name:
 
-```bash
-pgrep spotify
-```
+    pgrep spotify
 
-### Show PID + command:
+Show PID + command:
 
-```bash
-pgrep -a spotify
-```
+    pgrep -a spotify
 
-### Kill all matching processes:
+Kill all matching processes:
 
-```bash
-pkill spotify
-```
+    pkill spotify
 
-### Force kill all:
+Force kill all:
 
-```bash
-pkill -9 spotify
-```
-
-**This is exactly how you killed all Spotify processes at once.**
+    pkill -9 spotify
 
 ---
 
-## 🧯 killall — Another Name-Based Killer
+## 🧯 killall — Name-based killer (use carefully)
 
-```bash
-killall spotify
-```
+    killall spotify
 
 Force:
 
-```bash
-killall -9 spotify
-```
+    killall -9 spotify
 
-⚠️ Kills **everything** with that name. Use carefully.
+Guardrail: kills everything with that process name.
+
+---
+
+## 🧱 Kill Escalation Strategy (Exam Critical)
+
+1) Inspect state and command first:
+
+    ps -o pid,stat,etime,cmd -p PID
+
+2) Send SIGTERM (graceful):
+
+    kill PID
+
+3) Verify:
+
+    ps -p PID || echo "gone"
+
+4) Escalate to SIGKILL only if needed:
+
+    kill -9 PID
+
+5) If the process is in `D` state (uninterruptible sleep):
+- `kill -9` may not work
+- fix the underlying I/O problem (disk/NFS/storage) instead
 
 ---
 
 ## 🎛️ Job Control (Shell-Level)
 
-Job control applies to **your current terminal session**.
+Job control applies to your current terminal session.
+
+Run a job in the background:
+
+    sleep 300 &
+
+List jobs:
+
+    jobs
+
+Stop a foreground job:
+
+    Ctrl+Z
+
+Resume a stopped job in background:
+
+    bg %1
+
+Bring a job to foreground:
+
+    fg %1
+
+Kill a job by job number:
+
+    kill %1
 
 ---
 
-## ▶️ Running a Job in Background
+## 🧪 Verify Stopped vs Running
 
-```bash
-sleep 300 &
-```
+    ps -o pid,stat,cmd -p PID
 
----
+`T` indicates a stopped process.
 
-## ⏸️ Stopping a Running Job
-
-Press:
-
-```
-Ctrl+Z
-```
-
-Now check:
-
-```bash
-jobs
-```
-
-You’ll see:
-
-```
-[1]+  Stopped  sleep 300
-```
-
----
-
-## 🔁 Resume in Background
-
-```bash
-bg %1
-```
-
----
-
-## 🎯 Bring to Foreground
-
-```bash
-fg %1
-```
-
----
-
-## 💀 Kill a Job by Job Number
-
-```bash
-kill %1
-```
-
----
-
-## 🧪 Verifying a Stopped Process State
-
-```bash
-ps -o pid,stat,cmd -p PID
-```
-
-If you see:
-
-```
-T
-```
-
-That means **stopped**.
-
----
-
-## 🧠 The Spotify Case (Real Example)
-
-You observed:
-
-- multiple Spotify processes
-- killed one PID → others remained
-- used:
-
-```bash
-pkill spotify
-```
-
-Then verified:
-
-```bash
-pgrep spotify || echo "clean"
-```
-
-This is **exactly correct LFCS behavior**.
-
----
-
-## ⚠️ When kill -9 Is Appropriate
-
-Use `-9` only when:
-
-- process ignores SIGTERM
-- process is stuck in uninterruptible state
-- normal kill does nothing
-
-**Rule:** Try normal kill first. Escalate only if needed.
-
----
-
-## 🧭 Standard Control Workflow (Exam)
-
-1. Inspect:
-```bash
-ps aux | grep name
-```
-
-2. Narrow:
-```bash
-pgrep -a name
-```
-
-3. Try graceful:
-```bash
-kill PID
-```
-
-4. Verify:
-```bash
-ps -p PID || echo "gone"
-```
-
-5. Escalate if needed:
-```bash
-kill -9 PID
-```
-
----
-
-## 🧠 LFCS What You Must Be Able To Do
-
-- Stop and resume jobs with Ctrl+Z, bg, fg
-- Kill by PID and by name
-- Use pkill, pgrep, killall
-- Understand SIGTERM vs SIGKILL
-- Verify process death
-- Recognize stopped (`T`) state
-
----
-
-## 🏁 Mental Model
-
-> **Inspect → Signal → Verify → Escalate (if needed)**
-
-Never start with `-9`.
-
----
+EOF
 
