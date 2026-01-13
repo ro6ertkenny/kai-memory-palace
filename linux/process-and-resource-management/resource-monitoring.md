@@ -1,50 +1,42 @@
-# 📊 Resource Monitoring (CPU, Memory, Disk, LFCS)
+## 📊 Resource Monitoring (CPU, Memory, Disk, LFCS)
 
 Mental mode: **Understand what the system is doing right now**
 
-This document covers how to **inspect CPU, memory, and disk usage** using standard Linux tools.  
-These are **core LFCS exam skills** and are used constantly in real operations.
+This document covers how to inspect CPU, memory, and disk usage using standard Linux tools.
 
 ---
 
 ## 🎯 Goals
 
 You must be able to:
-
 - identify high CPU consumers
 - identify high memory consumers
-- understand load vs CPU
+- understand load vs CPU saturation
 - inspect memory pressure
-- inspect disk space usage
-- inspect inode usage
-- explain what is “normal” vs “concerning”
+- inspect disk space and inode exhaustion
+- find where disk usage is coming from
 
 ---
 
 ## 🧠 Core Idea
 
-> **Processes consume CPU, memory, and disk.**  
-> These tools tell you **who is using what** and **how badly**.
+Processes consume CPU, memory, and disk.
+
+These tools tell you who is using what and how badly.
 
 ---
 
-# 🧩 CPU & Process Load
+## 🧩 CPU and Process Usage
 
-## 1️⃣ ps — Snapshot of Process Usage
+Top CPU consumers:
 
-### Top CPU consumers:
+    ps aux --sort=-%cpu | head -n 10
 
-```bash
-ps aux --sort=-%cpu | head -n 10
-```
+Top memory consumers:
 
-### Top memory consumers:
+    ps aux --sort=-%mem | head -n 10
 
-```bash
-ps aux --sort=-%mem | head -n 10
-```
-
-Important columns:
+High-signal fields:
 - `%CPU` = CPU usage
 - `%MEM` = memory usage
 - `RSS` = real memory in RAM
@@ -53,201 +45,91 @@ Important columns:
 
 ---
 
-## 2️⃣ uptime — Load Averages
+## ⏱️ uptime — Load Averages
 
-```bash
-uptime
-```
+    uptime
 
 Shows:
-- how long system has been up
+- system uptime
 - number of users
-- **load average (1, 5, 15 min)**
+- load average (1, 5, 15 minutes)
 
-### Rule of thumb:
+Rule of thumb:
+- load ≈ number of CPU cores: busy but possibly fine
+- load >> number of cores: overloaded or blocked
 
-> Load ≈ number of CPU cores = system is busy but OK  
-> Load >> number of cores = system is overloaded
-
----
-
-# 🧠 Memory
-
-## 3️⃣ free — Memory Overview
-
-```bash
-free -h
-```
-
-You ran this:
-
-```bash
-free -h
-```
-
-Important columns:
-- `total` = total RAM
-- `used` = used RAM
-- `free` = completely unused
-- `available` = what the system can actually still give you
-
-> **Always look at “available”, not “free”.**
+Note: load includes tasks waiting on I/O, not only CPU.
 
 ---
 
-# 💽 Disk Space
+## 🧠 Memory
 
-## 4️⃣ df — Filesystem Usage
+Memory overview:
 
-### Human readable:
+    free -h
 
-```bash
-df -h
-```
-
-Shows:
-- size
-- used
-- available
-- percent used
-- mountpoint
-
-Example mental questions:
-- Is `/` full?
-- Is `/home` full?
-- Is `/boot` full?
+Operator rule:
+- use `available` to understand what can still be allocated
+- `free` being low is not automatically a problem (Linux uses RAM for cache)
 
 ---
 
-## 5️⃣ df — Inodes
+## 💽 Disk Space
 
-```bash
-df -i
-```
+Filesystem usage:
 
-Shows:
-- inode usage (number of files)
-- You can run out of inodes **even with free disk space**
+    df -h
 
-> Disk full OR inode full both break systems.
+Inode usage:
 
----
+    df -i
 
-# 📦 Disk Usage by Directory
-
-## 6️⃣ du — Who Is Using Space?
-
-### Top-level overview:
-
-```bash
-sudo du -x -sh /* | sort -h
-```
-
-Flags:
-- `-s` = summary
-- `-h` = human readable
-- `-x` = stay on same filesystem
-- `sort -h` = sort by size
+Guardrail:
+- a filesystem can fail because it is out of space OR out of inodes
 
 ---
 
-## 7️⃣ Drill Down
+## 📦 Disk Usage by Directory
 
-```bash
-du -sh /home/* | sort -h
-du -sh /home/ro6ert/* | sort -h
-du -sh /home/ro6ert/.* | sort -h
-```
+High-level top-down scan (single filesystem):
 
-This answers:
+    sudo du -x -sh /* | sort -h
 
-> **Where did my disk space go?**
+Drill-down examples:
 
----
-
-## 🧯 Why You Saw “cannot access /proc/...”
-
-`/proc` is a **live virtual filesystem**.  
-Processes come and go while `du` is scanning.
-
-This is **normal and harmless**.
+    du -sh /home/* | sort -h
+    du -sh /home/ro6ert/* | sort -h
+    du -sh /home/ro6ert/.* | sort -h
 
 ---
 
-# 🧠 Memory vs Disk vs CPU (Mental Model)
+## 🧯 Why You May See “cannot access /proc/...”
 
-- CPU → `ps`, `uptime`
-- Memory → `free`, `ps`
-- Disk space → `df -h`
-- Inodes → `df -i`
-- Directory usage → `du`
+`/proc` is a live virtual filesystem. Processes can exit while `du` is scanning.
+
+This is normal.
 
 ---
 
-# 🧪 Quick Triage Checklist (Exam & Real Life)
+## 🧪 Quick Triage Checklist (Exam and Real Life)
 
-```bash
-uptime
-free -h
-df -h
-df -i
-ps aux --sort=-%cpu | head
-ps aux --sort=-%mem | head
-```
+    uptime
+    free -h
+    df -h
+    df -i
+    ps aux --sort=-%cpu | head
+    ps aux --sort=-%mem | head
 
 ---
 
-# 🧭 LFCS What You Must Be Able To Do
+## 🧭 LFCS What You Must Be Able To Do
 
-- Find high CPU processes
-- Find high memory processes
-- Check system load
-- Check RAM pressure
-- Check disk usage
-- Check inode exhaustion
-- Identify which directory is consuming space
+- identify top CPU and memory consumers
+- interpret load averages at a high level
+- check memory availability (not just “free”)
+- detect disk-full and inode-full conditions
+- locate large directories using `du`
+- build a safe, repeatable triage sequence
 
----
-
-# 🧠 Exam Mental Model
-
-> **Is the system slow?**  
-> → Check CPU, memory, disk, inodes.
-
-> **Is disk full?**  
-> → Use `df`, then `du`.
-
----
-
-# 🏁 Remember
-
-> **df tells you WHAT is full**  
-> **du tells you WHO filled it**
-
----
-
-# 🔁 One-Line Emergency Workflow
-
-```bash
-uptime && free -h && df -h && df -i
-```
-
-Then:
-
-```bash
-ps aux --sort=-%cpu | head
-ps aux --sort=-%mem | head
-```
-
-Then:
-
-```bash
-sudo du -x -sh /* | sort -h
-```
-
----
-
-This is the **core operational skillset** for diagnosing a sick Linux system.
-
----
+EOF
 
