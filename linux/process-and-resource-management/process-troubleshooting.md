@@ -2,15 +2,13 @@
 
 Mental mode: **Diagnose before you destroy**
 
-This document covers how to **recognize, diagnose, and respond to misbehaving processes**.  
-These scenarios appear **on the LFCS exam** and constantly in real systems.
+This document covers how to recognize, diagnose, and respond to misbehaving processes.
 
 ---
 
 ## 🎯 Goals
 
 You must be able to:
-
 - recognize process states
 - identify hung and stuck processes
 - understand zombies
@@ -22,210 +20,142 @@ You must be able to:
 
 ## 🧠 Process State Refresher
 
-View state:
-
-```bash
-ps -o pid,stat,cmd -p PID
-```
+    ps -o pid,stat,cmd -p PID
 
 Common states:
-
 - `R` = Running
 - `S` = Sleeping
 - `T` = Stopped
 - `Z` = Zombie
-- `D` = Uninterruptible sleep (usually disk I/O)
+- `D` = Uninterruptible sleep (usually disk or network I/O)
 
 ---
 
-# 🧟 Zombie Processes
+## 🧟 Zombie Processes
 
-## What is a Zombie?
+What it is:
+- the process has finished
+- the parent has not reaped it
+- it uses no CPU and essentially no memory
+- it still occupies a PID entry
 
-- Process has **finished**
-- Parent has **not reaped it**
-- Uses **no CPU**
-- Uses **no memory**
-- Still occupies a **PID entry**
+Detect zombies:
 
-Shows as:
+    ps aux | awk '$8 ~ /Z/ { print $0 }'
 
-```
-Z
-```
+Fix:
+- you do not kill zombies
+- you fix the parent (restart parent process/service, or fix the parent’s wait/reap behavior)
 
-### Find zombies:
-
-```bash
-ps aux | awk '$8 ~ /Z/ { print $0 }'
-```
-
-### Fix:
-
-> You do NOT kill zombies.  
-> You kill or restart **the parent process**.
+Practical approach:
+- identify the parent PID (PPID)
+- restart the owning service if applicable
 
 ---
 
-# 🪨 D-State (Uninterruptible Sleep)
+## 🪨 D-State (Uninterruptible Sleep)
 
-## What is it?
+What it is:
+- process is blocked in the kernel waiting on I/O
+- the kernel will not allow it to be killed
+- even `kill -9` may do nothing
 
-- Process waiting on **I/O**
-- Kernel will NOT allow it to be killed
-- Even `kill -9` does **nothing**
+Typical causes:
+- failing disk
+- hung NFS / remote filesystem
+- blocked storage path
+- device driver / kernel issues
 
-Shows as:
-
-```
-D
-```
-
-### Common causes:
-
-- dead disk
-- hung NFS
-- blocked storage
-- kernel bug
-
-### Fix:
-
-> You fix the **I/O problem**, not the process.
-
-Often requires:
-- unmount
-- storage fix
-- reboot
+Fix:
+- solve the I/O problem (storage/network)
+- sometimes requires unmount, storage recovery, or reboot
 
 ---
 
-# 🧊 Hung Processes
+## 🧊 Hung Processes
 
-## Symptoms:
+Symptoms:
+- high CPU and no progress
+- unresponsive UI
+- process ignores SIGTERM
+- process may resist SIGKILL if in D-state
 
-- 100% CPU or 0% CPU but never finishes
-- ignores SIGTERM
-- might ignore SIGKILL if in D-state
-
----
-
-# 🗡️ Kill Escalation Strategy (EXAM CRITICAL)
-
-1. Inspect:
-```bash
-ps -o pid,stat,cmd -p PID
-```
-
-2. Try polite:
-```bash
-kill PID
-```
-
-3. Verify:
-```bash
-ps -p PID || echo "gone"
-```
-
-4. Escalate:
-```bash
-kill -9 PID
-```
-
-5. If still alive and state = `D`:
-> Killing will NOT work.
+Operator approach:
+1) inspect process state and command
+2) inspect parent/service relationship
+3) attempt graceful termination
+4) escalate only if required
+5) verify
 
 ---
 
-# 🧪 Stopped (T) vs Hung
+## 🗡️ Kill Escalation Strategy (Exam Critical)
 
-Stopped:
+1) Inspect:
 
-- shows `T`
-- can be resumed with:
-```bash
-kill -CONT PID
-```
-or:
-```bash
-fg
-```
+    ps -o pid,ppid,stat,etime,cmd -p PID
 
-Hung:
+2) Graceful:
 
-- often shows `D` or `R`
-- does NOT respond normally
+    kill PID
 
----
+3) Verify:
 
-# 🧠 Real Case: Spotify & Chrome
+    ps -p PID || echo "gone"
 
-You observed:
+4) Force (last resort):
 
-- multiple processes
-- some die, some respawn
-- had to use:
-```bash
-pkill spotify
-```
-and sometimes:
-```bash
-kill -9 PID
-```
+    kill -9 PID
 
-That is **normal modern app behavior**.
+5) If still alive and state is `D`:
+- killing will not work
+- fix the I/O path or reboot
 
 ---
 
-# 🧪 Detecting a Respawning Service
+## 🧪 Stopped (T) vs Hung
 
-If a process:
+Stopped (`T`):
+- typically caused by job control (`Ctrl+Z`) or SIGSTOP
+- can be resumed
 
-- dies
-- comes back immediately
+Resume with:
+
+    kill -CONT PID
+
+Or for shell jobs:
+
+    fg %1
+
+---
+
+## 🧬 Detecting a Respawning Process
+
+If a process dies and returns immediately:
+- it may be managed by `systemd`
+- it may be supervised by another process
 
 Check:
 
-```bash
-systemctl status servicename
-```
+    systemctl status servicename --no-pager
 
-systemd may be **restarting it**.
+Then read logs:
 
----
-
-# 🧨 When Reboot Is the Only Fix
-
-- many D-state processes
-- broken storage
-- kernel deadlock
-
-> **This is not failure. This is Linux reality.**
+    sudo journalctl -u servicename -n 50 --no-pager
 
 ---
 
-# 🧭 LFCS What You Must Be Able To Do
+## 🧨 When Reboot Is the Correct Fix
 
-- Recognize Z, D, T states
-- Know which can be killed and which cannot
-- Apply kill escalation correctly
-- Understand when parent process is the problem
-- Identify respawning daemons
+Examples:
+- many D-state processes (blocked I/O)
+- filesystem or storage path dead
+- kernel deadlock symptoms
+- core system services cannot be restarted reliably
 
----
+Operator rule:
+- reboot is not a first step
+- reboot is sometimes the only step that actually restores the system
 
-# 🧠 Exam Decision Tree
-
-> Is it stopped? → CONT  
-> Is it zombie? → Fix parent  
-> Is it running? → kill → kill -9  
-> Is it D-state? → Fix I/O or reboot  
-
----
-
-# 🏁 Mental Model
-
-> **Not all processes can be killed.**  
-> The kernel always wins.
-
----
+EOF
 
