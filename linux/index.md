@@ -148,6 +148,19 @@ This wing builds safety.
 
 ---
 
+### 7 'linux/troubleshooting/'
+**Mental mode:** linux-wide troubleshooting wing
+
+This wing establishes:
+- 
+
+Start here if:
+-
+
+This wing builds troubleshooting thought processes and skills.
+
+---
+
 ## 🔁 Relationship to Kubernetes
 
 Linux is **upstream of all Kubernetes behavior**.
