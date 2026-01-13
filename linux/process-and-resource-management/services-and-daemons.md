@@ -2,15 +2,13 @@
 
 Mental mode: **Control long-running system behavior**
 
-This document covers how to **inspect, control, verify, and troubleshoot services (daemons)** using `systemd`.  
-These skills are **core LFCS exam material** and represent real-world operational work.
+This document covers how to inspect, control, verify, and troubleshoot services (daemons) using `systemd`.
 
 ---
 
 ## 🎯 Goals
 
 You must be able to:
-
 - list running services
 - inspect a service’s status
 - start, stop, restart, enable, and disable services
@@ -23,7 +21,7 @@ You must be able to:
 
 ## 🧠 Core Concept: What Is a Service?
 
-A **service (daemon)** is a **long-running background process** started and supervised by `systemd`.
+A service (daemon) is a long-running background process started and supervised by `systemd`.
 
 Examples:
 - `cron`
@@ -34,236 +32,138 @@ Examples:
 
 ---
 
-## 📋 Listing Running Services
+## 📋 Listing Services
 
-```bash
-systemctl list-units --type=service --state=running
-```
+Running services:
 
-This shows **currently active services**.
+    systemctl list-units --type=service --state=running
+
+Failed services:
+
+    systemctl --failed
 
 ---
 
 ## 🔍 Inspecting a Service
 
-```bash
-systemctl status cron
-```
+    systemctl status cron
 
-Better for scripts / no pager:
+No pager (better for scripts and copy/paste):
 
-```bash
-systemctl status cron --no-pager
-```
+    systemctl status cron --no-pager
 
 This shows:
-- whether it’s running
+- active state
 - main PID
 - recent log lines
-- unit file path
+- unit file location
 
 ---
 
 ## ▶️ Starting / Stopping / Restarting
 
-```bash
-sudo systemctl start cron
-sudo systemctl stop cron
-sudo systemctl restart cron
-```
+    sudo systemctl start cron
+    sudo systemctl stop cron
+    sudo systemctl restart cron
 
 ---
 
 ## 🔁 Enable / Disable at Boot
 
-```bash
-sudo systemctl enable cron
-sudo systemctl disable cron
-```
+    sudo systemctl enable cron
+    sudo systemctl disable cron
 
 Enable = start automatically at boot  
 Disable = do not start at boot
 
 ---
 
-## 🧪 Verifying a Service Is Actually Running
+## ✅ Verifying a Service Is Actually Running
 
-### Method 1: systemctl
+Method 1: is-active
 
-```bash
-systemctl is-active cron
-```
+    systemctl is-active cron
 
-### Method 2: Get Main PID
+Method 2: MainPID
 
-```bash
-systemctl show -p MainPID --value cron
-```
+    systemctl show -p MainPID --value cron
 
-Then:
+Then verify the PID exists:
 
-```bash
-ps -p $(systemctl show -p MainPID --value cron)
-```
-
-You did **exactly this** during your lab.
+    ps -p $(systemctl show -p MainPID --value cron)
 
 ---
 
 ## 🧾 Logs with journalctl
 
-### Show recent logs for a service:
+Recent logs for a service:
 
-```bash
-journalctl -u cron
-```
+    journalctl -u cron
 
-### Last 20 lines:
+Last 20 lines:
 
-```bash
-journalctl -u cron -n 20
-```
+    journalctl -u cron -n 20
 
-### Show only errors:
+Follow (tail -f style):
 
-```bash
-journalctl -p err
-```
+    journalctl -u cron -f
 
-### No pager:
+Errors only:
 
-```bash
-journalctl -u cron --no-pager
-```
+    journalctl -p err
+
+No pager:
+
+    journalctl -u cron --no-pager
 
 ---
 
 ## 🔐 Permissions Note
 
 If you see:
+- “You are currently not seeing messages from other users…”
 
-> You are currently not seeing messages from other users...
+Use:
 
-You need either:
-- `sudo`
-- or membership in `adm` or `systemd-journal`
+    sudo journalctl -u cron
 
-So:
-
-```bash
-sudo journalctl -u cron
-```
+Or ensure appropriate group membership (`adm`, `systemd-journal`) depending on distro policy.
 
 ---
 
-## 🧯 Restart Recovery Drill (You Did This)
+## 📁 Where Unit Files Live
 
-1. Stop the service:
-```bash
-sudo systemctl stop cron
-```
-
-2. Verify it’s gone:
-```bash
-systemctl is-active cron
-```
-
-3. Start it again:
-```bash
-sudo systemctl start cron
-```
-
-4. Verify PID:
-```bash
-ps -p $(systemctl show -p MainPID --value cron)
-```
+Common locations:
+- `/usr/lib/systemd/system/` (vendor units)
+- `/lib/systemd/system/` (some distros)
+- `/etc/systemd/system/` (overrides and custom units)
 
 ---
 
-## 📁 Where Service Files Live
+## 🔁 Common Failure Patterns
 
-Usually:
+- service is running but the port is not open (wrong bind address, firewall, config)
+- service is enabled but not started (expected on-demand behavior, or failure at boot)
+- restart loop due to configuration error
+- dependency failure (another unit is failing)
 
-```bash
-/usr/lib/systemd/system/
-```
-
-Override configs:
-
-```bash
-/etc/systemd/system/
-```
+Operator workflow:
+1) `systemctl status <service>`
+2) `journalctl -u <service> -n 50 --no-pager`
+3) fix config
+4) restart
+5) verify health
 
 ---
 
 ## 🧠 Relationship to Processes
 
-- systemd **starts** the process
-- systemd **monitors** the process
-- systemd **restarts** it if configured
-- systemd **tracks** the PID
+Services are processes with a manager:
+- you still inspect them with `ps`
+- you still send signals when needed
+- but the preferred control surface is `systemctl`
 
----
+If you kill a managed process directly, `systemd` may restart it.
 
-## 🧪 If a Service Fails
-
-```bash
-systemctl status servicename
-journalctl -u servicename
-```
-
-These two commands solve **80% of service problems**.
-
----
-
-## 🧭 LFCS What You Must Be Able To Do
-
-- List running services
-- Check service status
-- Start/stop/restart services
-- Enable/disable at boot
-- Verify PID is running
-- Inspect logs with journalctl
-- Recognize failed services
-
----
-
-## 🏁 Mental Model
-
-> **systemctl controls the service**  
-> **journalctl explains the service**
-
----
-
-## 🔁 Exam Workflow
-
-1. Check status:
-```bash
-systemctl status name
-```
-
-2. Check logs:
-```bash
-journalctl -u name
-```
-
-3. Restart:
-```bash
-sudo systemctl restart name
-```
-
-4. Verify:
-```bash
-ps -p $(systemctl show -p MainPID --value name)
-```
-
----
-
-## 🧠 Remember
-
-A service is just a **process with a supervisor**.
-
-systemd is that supervisor.
-
----
+EOF
 
