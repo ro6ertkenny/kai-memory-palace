@@ -1,162 +1,106 @@
-# 🗂️ Filesystems & Storage — README
+# 💽 Filesystems & Storage — README
 
 ## 🎯 Purpose
-Build **operational clarity** around how Linux stores, exposes, and protects data.
 
-This directory exists to make filesystem behavior:
-- predictable
-- inspectable
-- fixable
+This wing teaches how Linux **stores data**, **finds it again**, and **fails when storage is stressed**.
 
-Most Linux failures reduce to **paths, ownership, permissions, or storage state**.
+Storage failures are among the **most destructive and least forgiving** classes of incidents.
+
+This wing exists to make:
+- disk behavior predictable
+- space usage explainable
+- mounts and filesystems non-mysterious
+- storage incidents survivable
 
 ---
 
 ## 🧠 Mental Mode
-**Controlling access to data**
+**Persistence and I/O**
 
-- know where data lives
-- know who owns it
-- know who can act on it
-- know why access succeeds or fails
-- know how filesystems are attached and detached at runtime
-
-If you understand the filesystem, you can recover from most system issues.
+You should be able to:
+- explain where data lives
+- explain how it is mounted
+- explain why something is full
+- explain what is safe to delete and what is not
+- recover from space pressure without breaking the system
 
 ---
 
 ## 🧭 Scope
-This domain focuses on **filesystem fundamentals that affect daily operations**.
+
+This domain focuses on:
+- filesystem hierarchy
+- block devices and partitions
+- mounts and mount options
+- disk space and inode exhaustion
+- usage inspection and triage
+- safe recovery patterns
 
 Included:
-- filesystem hierarchy and paths
-- ownership and permissions
-- directory semantics
-- execute bit behavior
-- diagnosing access failures
-- safe corrective actions
-- mounting and unmounting filesystems
-- bind mounts and namespace grafting
-- /etc/fstab and persistent mounts
-- fsck and offline recovery basics
+- filesystems, partitions, and mounts
+- disk usage and inode usage
+- finding where space went
+- interpreting df and du
+- space pressure failure modes
 
 Excluded:
-- advanced filesystem internals
+- filesystem internals
 - performance tuning
-- storage hardware specifics
-- kernel-level VFS theory
-
-If it does not explain *why a command can or cannot access data*,  
-or *why data is or is not visible at a path*,  
-it does not belong here.
+- advanced RAID/LVM internals
 
 ---
 
-## 📁 Directory Layout
+## 📁 Directory Navigation
 
-### `filesystems-and-storage/README.md`
-This file.
-- defines scope
-- sets mental model
-- explains how to use this domain
+Core docs:
 
----
-
-### `filesystems-and-storage/filesystem-and-perms.md`
-Core operational guide.
-
-Covers:
-- absolute vs relative paths
-- ownership evaluation order
-- permission bits
-- directory behavior
-- execute bit
-- sudo boundaries
-- diagnosing permission failures
-
-This is the **primary reference** for filesystem-related access errors.
-
----
-
-### Runtime & Recovery (Day 7)
-
-This wing also covers **how filesystems are attached to the live system** and how to recover them safely:
-
+- `block-devices-and-identifiers.md`
 - `mounting-and-unmounting.md`
-  - the live mount tree
-  - loop mounts
-  - “target is busy”
-  - lazy unmount
-  - why Linux is a tree of mountpoints
+- `fstab.md`
+- `filesystem-hierarchy.md`
+- `disk-usage-and-du.md`
 
-- `bind-mounts-and-namespace-grafting.md`
-  - making one directory appear at another path
-  - stacked mounts
-  - namespace composition
+Day 9 operator doctrine:
 
-- `fstab-and-persistent-mounts.md`
-  - /etc/fstab as the boot-time mount plan
-  - UUIDs
-  - pass and dump fields
-  - verifying before reboot
-
-- `fsck-and-recovery-basics.md`
-  - what fsck is
-  - why it must not run on mounted filesystems
-  - offline consistency checking
-
-- `filesystem-debugging-checklist.md`
-  - systematic workflow for storage problems
-
-These documents explain **why data sometimes “disappears”, why paths change meaning, and how to recover safely**.
+- `df-command.md`  
+  The **filesystem pressure indicator** and first question:
+  > “Which filesystem is full?”
 
 ---
 
-## 🧪 How to Use This Domain
-Use this directory when:
-- a command fails unexpectedly
-- something works with sudo but not without it
-- a file exists but cannot be accessed
-- permissions feel confusing
-- ownership changes are required
-- data is “missing” or a path does not show what you expect
-- a mount or unmount fails
-- a system dropped into recovery because of storage
+## 🧪 How To Use This Wing
 
-Start with inspection, not action.
+Use this wing when:
+- something says “No space left on device”
+- writes are failing
+- systems behave strangely under load
+- containers fail due to disk pressure
+- logs stop writing
 
----
+Start with:
 
-## 🔎 Diagnostic First Principle
-Before fixing anything, you should be able to answer:
-- which user is acting
-- which path is being resolved
-- who owns the target
-- what permissions apply
-- what filesystem is mounted there (if any)
-
-If you cannot answer those, you are not ready to change state.
+1) `df-command.md` → which filesystem is full?  
+2) `disk-usage-and-du.md` → where did the space go?
 
 ---
 
-## ⚠️ Operational Guardrails
-- avoid recursive permission changes
-- prefer fixing ownership over loosening permissions
-- never use broad permissions as a shortcut
-- inspect parent directories, not just the target
-- never run fsck on a mounted filesystem
+## ⚠️ Storage Rules
 
-Filesystem mistakes propagate quickly.
+- Never delete before you know **which filesystem** is full
+- Never delete before you know **which directory tree** is responsible
+- Never delete system files blindly
+- Always confirm free space after cleanup
 
 ---
 
 ## ✅ Outcome
+
 You should be able to say:
 
-I know why access failed.  
-I know what the filesystem state is.  
-I know what is mounted where and why.  
-And I know exactly how to fix it.
+I can explain where disk space is going,  
+I can find what is consuming it,  
+and I can recover space **without damaging the system**.
 
-That is filesystem fluency.
+That is storage fluency.
+EOF
 
