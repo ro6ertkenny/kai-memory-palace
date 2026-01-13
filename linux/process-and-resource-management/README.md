@@ -33,7 +33,7 @@ Included:
 - foreground/background job control
 - signals and termination strategy
 - CPU, memory, and disk pressure triage
-- services and long-running daemons (`systemd`)
+- services and long-running daemons (systemd)
 - safe troubleshooting patterns
 
 Excluded:
@@ -51,12 +51,33 @@ If it does not help you understand or control running work, it does not belong h
 Start with:
 - `index.md` (authoritative navigation map)
 
-Canonical docs:
+Core process mechanics:
 - `process-inspection.md`
 - `process-control.md`
 - `resource-monitoring.md`
 - `services-and-daemons.md`
 - `process-troubleshooting.md`
+
+Process and signal fundamentals:
+- `ps-and-process-states.md`
+- `signals-and-sigkill.md`
+- `shell-vs-system.md`
+
+---
+
+## 🧠 Day 9 — Operator Doctrine (Core of This Domain)
+
+These documents define how an **operator thinks**, not just which commands to run.
+
+Read in this order:
+
+- `operator-decision-tree.md`  
+  The mental model for diagnosing real systems under pressure.
+
+- `operator-readiness-checklist.md`  
+  The graduation standard for process and resource operations.
+
+These are the capstone documents for this domain.
 
 ---
 
@@ -102,6 +123,5 @@ I know why it is running,
 and I know how to control it safely.
 
 That is process fluency.
-
 EOF
 
