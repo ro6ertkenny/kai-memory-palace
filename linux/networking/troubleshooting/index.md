@@ -1,11 +1,8 @@
-cat << 'EOF' > linux/networking/troubleshooting/index.md
-# Troubleshooting — Master Index
+# 🧭 Troubleshooting — Master Index
 
-This index is the entry point for all Linux networking troubleshooting
-material in the kai-memory-palace.
+This index is the entry point for Linux networking troubleshooting material in kai-memory-palace.
 
 This directory is not for theory.
-
 It is for:
 - failure modes
 - recovery playbooks
@@ -14,77 +11,66 @@ It is for:
 
 ---
 
-## Core Mental Model
+## 🧠 Core mental model
 
 Inspect state before testing behavior.
 
 Always walk the diagnostic ladder:
 
-Link -> Address -> Route -> Listener -> Name
+Link → Address → Route → Listener → Name
 
 If you skip steps, you will misdiagnose.
 
 ---
 
-## Playbooks
+## 📚 Playbooks
 
-These are structured recovery guides for common real-world failures.
+- 📋 network-debugging-checklist.md  
+  Canonical step-by-step diagnostic flow. Start here.
 
-- network-debugging-checklist.md  
-  The canonical step-by-step diagnostic flow. Start here first.
+- 🧯 common-mistakes.md  
+  Fast recovery patterns caused by bad assumptions and skipped steps.
 
-- common-mistakes.md  
-  Patterns of failure caused by bad assumptions and skipped steps.
+- 📡 wifi-not-detected.md  
+  No wireless interface appears at all.
 
-- wifi-not-detected.md  
-  What to do when no wireless interface appears at all.
-  This often leads into:
-  - usb-wifi-realtek-dkms.md
-  - interface-renaming-with-udev.md
-
-- usb-wifi-realtek-dkms.md  
+- 🔌 usb-wifi-realtek-dkms.md  
   Realtek USB adapters, DKMS, kernel upgrades, and driver recovery.
 
-- interface-renaming-with-udev.md  
-  Making interface names stable and human-readable (for example: tp-link).
+- 🏷️ interface-renaming-with-udev.md  
+  Make interface names stable and human-readable (e.g., tp-link).
 
 ---
 
-## Incidents
+## 🗂️ Incidents
 
-This directory contains forensic-quality writeups of real failures.
-
+Incidents are forensic-quality writeups of real failures.
 Purpose:
 - build pattern recognition
-- avoid repeating the same investigation twice
-- capture upgrade and hardware breakage scenarios
+- avoid repeating investigations
+- capture upgrade/hardware breakage scenarios
 
-- incidents/2026-01-usb-wifi-broken-after-upgrade.md  
-  Debian 13 kernel upgrade broke Realtek USB WiFi; DKMS rebuild and udev renaming recovery.
-
-This incident ties together:
-- wifi-not-detected.md
-- usb-wifi-realtek-dkms.md
-- interface-renaming-with-udev.md
+- 📁 incidents/2026-01-usb-wifi-broken-after-upgrade.md  
+  Debian 13 upgrade broke Realtek USB WiFi; DKMS + udev recovery.
 
 ---
 
-## How To Use This Section
+## 🧪 How to use this section
 
 When something breaks:
 
-1. Start with:
+1) Start with:
    network-debugging-checklist.md
 
-2. If the failure matches a known class:
-   Go to the relevant playbook
+2) If the failure matches a known class:
+   jump to the relevant playbook
 
-3. If this is new or weird:
-   Create a new incident report in incidents/
+3) If this is new or weird:
+   create a new incident report in incidents/
 
 ---
 
-## Contribution Rule
+## ✍️ Contribution rule
 
 Every painful failure becomes:
 - either a new playbook
@@ -94,7 +80,7 @@ Nothing is allowed to be learned twice.
 
 ---
 
-## Exit Criteria
+## ✅ Exit criteria
 
 This section is working when:
 - you no longer panic during outages
@@ -102,7 +88,6 @@ This section is working when:
 - recovery feels procedural, not emotional
 
 You are not fixing networks.
-
 You are operating a diagnostic system.
 EOF
 
