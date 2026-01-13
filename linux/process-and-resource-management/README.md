@@ -15,6 +15,7 @@ If you cannot see what the system is doing, you cannot control it.
 ## 🧠 Mental Mode
 **Observing and shaping system activity**
 
+You should be able to:
 - know what is running
 - know who started it
 - know how it behaves over time
@@ -28,44 +29,34 @@ Processes are the living state of the system.
 This domain focuses on **day-to-day operational control of processes and resources**.
 
 Included:
-- process inspection
-- foreground and background execution
-- signals and termination
-- CPU and memory usage
-- load and contention
-- services and long-running daemons
+- process inspection and process states
+- foreground/background job control
+- signals and termination strategy
+- CPU, memory, and disk pressure triage
+- services and long-running daemons (`systemd`)
+- safe troubleshooting patterns
 
 Excluded:
 - kernel scheduler internals
 - performance tuning theory
 - real-time systems
-- advanced cgroup internals
+- deep cgroup internals
 
 If it does not help you understand or control running work, it does not belong here.
 
 ---
 
-## 📁 Directory Layout
+## 📁 Directory Navigation
 
-### `process-and-resource-management/README.md`
-This file.
-- defines scope
-- sets mental model
-- explains how to use this domain
+Start with:
+- `index.md` (authoritative navigation map)
 
----
-
-### `process-and-resource-management/processes-and-services.md`
-Core operational guide.
-
-Covers:
-- process lifecycle
-- inspecting running processes
-- sending signals
-- managing services
-- understanding system load
-
-This is the **primary reference** for runtime behavior.
+Canonical docs:
+- `process-inspection.md`
+- `process-control.md`
+- `resource-monitoring.md`
+- `services-and-daemons.md`
+- `process-troubleshooting.md`
 
 ---
 
@@ -111,3 +102,6 @@ I know why it is running,
 and I know how to control it safely.
 
 That is process fluency.
+
+EOF
+
