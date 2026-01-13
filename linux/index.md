@@ -126,6 +126,8 @@ Start here if:
 - containers behave oddly
 - resource limits cause outages
 
+see: linux/processes-and-resource-management/index.md
+
 This wing builds intuition.
 
 ---
