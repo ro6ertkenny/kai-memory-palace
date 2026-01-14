@@ -19,16 +19,16 @@ Playbooks are organized as:
 Daily drills. The default set you repeat until automatic.
 
 Scenarios:
-- `core/scenario-00-triage-playbook.md`
-- `core/scenario-01-system-feels-slow.md`
-- `core/scenario-02-disk-is-full.md`
-- `core/scenario-03-service-is-down.md`
-- `core/scenario-04-process-wont-die.md`
-- `core/scenario-05-cpu-pegged.md`
-- `core/scenario-06-memory-keeps-growing.md`
-- `core/scenario-07-inodes-exhausted.md`
-- `core/scenario-08-permissions-denied.md`
-- `core/scenario-09-dns-intermittent.md`
+- `core/scenario-0-triage-playbook.md`
+- `core/scenario-1-system-feels-slow.md`
+- `core/scenario-2-disk-is-full.md`
+- `core/scenario-3-service-is-down.md`
+- `core/scenario-4-process-wont-die.md`
+- `core/scenario-5-cpu-pegged.md`
+- `core/scenario-6-memory-keeps-growing.md`
+- `core/scenario-7-inodes-exhausted.md`
+- `core/scenario-8-permissions-denied.md`
+- `core/scenario-9-dns-intermittent.md`
 - `core/scenario-10-service-restart-loop.md`
 - `core/scenario-11-deleted-but-open-files.md`
 - `core/scenario-12-io-wait.md`
