@@ -1,8 +1,8 @@
-# 🧠 Scenario 12 — “System Is Slow Because of I/O Wait”
+# 🧰 Operator Playbook — Scenario 12: “IO Wait Slowness”
 
-**Mental mode:** Storage, blocking I/O, and kernel wait states  
-**Failure class:** Disk or storage is the bottleneck, not CPU or memory  
-**Goal:** Prove whether slowness is caused by storage and identify who is causing it
+**Primary domain:** IO Pressure  
+**Domain playbook:** core/domain-playbooks/io-pressure-playbook.md  
+**Why this domain:** The system is blocked waiting on storage, not starved for CPU or memory.
 
 ---
 

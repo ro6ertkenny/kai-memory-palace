@@ -1,8 +1,8 @@
-# 🧠 Scenario 8 — “Permission Denied but Everything Looks Correct”
+# 🧰 Operator Playbook — Scenario 8: “Permission Denied But Looks Correct”
 
-**Mental mode:** Linux security layers  
-**Failure class:** Permissions, ownership, or execution context mismatch  
-**Goal:** Systematically find *which* permission layer is blocking access
+**Primary domain:** Process & Service Failures  
+**Domain playbook:** core/domain-playbooks/process-and-service-failures-playbook.md  
+**Why this domain:** The incident is about execution context, identity, or control constraints rather than resource exhaustion or performance.
 
 ---
 

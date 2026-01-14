@@ -1,8 +1,8 @@
-# 🧠 Scenario 11 — “Disk Is Full but Deleting Files Does Not Free Space”
+# 🧰 Operator Playbook — Scenario 11: “Disk Full After Deleting Files (Deleted-but-Open)”
 
-**Mental mode:** Filesystems, file descriptors, and Unix semantics  
-**Failure class:** Deleted-but-open files holding disk space  
-**Goal:** Prove where the space is actually held and release it safely
+**Primary domain:** Disk Exhaustion  
+**Domain playbook:** core/domain-playbooks/disk-exhaustion-playbook.md  
+**Why this domain:** The filesystem cannot reclaim space because blocks are still held by open file descriptors, which is an allocation failure.
 
 ---
 

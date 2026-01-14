@@ -1,11 +1,8 @@
-# 🧠 Scenario 6 — Memory Usage Keeps Growing (Leak / Creep)
+# 🧰 Operator Playbook — Scenario 6: “Memory Growth / Leak”
 
-**Mental mode:** Detecting leaks vs normal growth vs cache behavior  
-**Failure class:** Gradual memory pressure  
-**Goal:** Decide whether memory growth is:
-- normal and harmless
-- cache-related
-- or a real leak that will eventually cause an outage
+**Primary domain:** Memory Pressure  
+**Domain playbook:** core/domain-playbooks/memory-pressure-playbook.md  
+**Why this domain:** The incident is about memory growth, reclaim, or OOM risk rather than CPU or IO blocking.
 
 ---
 

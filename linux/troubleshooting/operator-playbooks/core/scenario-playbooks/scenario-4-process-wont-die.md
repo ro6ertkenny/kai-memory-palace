@@ -1,5 +1,8 @@
-# 🧠 Scenario 4 — A Process Won’t Die
-**Operator Playbook: When kill doesn’t work**
+# 🧰 Operator Playbook — Scenario 4: “Process Won’t Die”
+
+**Primary domain:** Process & Service Failures  
+**Domain playbook:** core/domain-playbooks/process-and-service-failures-playbook.md  
+**Why this domain:** The incident is about process lifecycle and control (signals, supervision, or kernel-stuck tasks), not about resource saturation.
 
 ---
 

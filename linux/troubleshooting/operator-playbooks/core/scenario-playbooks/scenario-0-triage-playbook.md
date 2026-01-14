@@ -1,5 +1,9 @@
 # 🧭 Scenario 0 — Universal Triage (Domain Classification Router)
 
+**Primary domain:** N/A (Classification Router)  
+**Domain playbook:** N/A  
+**Why this domain:** This playbook does not solve incidents; it classifies them and routes to the correct domain playbook.
+
 **Type:** Meta-scenario (always first)  
 **Mental mode:** Classification before action  
 **Goal:** Route the incident into the correct **failure domain** before you do anything else

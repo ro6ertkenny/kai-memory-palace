@@ -1,8 +1,8 @@
-# 🧠 Scenario 7 — Inodes Exhausted (Disk Not Full but Writes Fail)
+# 🧰 Operator Playbook — Scenario 7: “Inodes Exhausted”
 
-**Mental mode:** Filesystem capacity is not just bytes  
-**Failure class:** Metadata exhaustion  
-**Goal:** Detect and fix inode exhaustion when disk space looks fine
+**Primary domain:** Disk Exhaustion  
+**Domain playbook:** core/domain-playbooks/disk-exhaustion-playbook.md  
+**Why this domain:** The incident is an inode allocation failure, not a performance or scheduling problem.
 
 ---
 

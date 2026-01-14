@@ -1,8 +1,8 @@
-# 🧠 Scenario 9 — “DNS / Networking Works Sometimes but Not Always”
+# 🧰 Operator Playbook — Scenario 9: “DNS or Networking Intermittent”
 
-**Mental mode:** Connectivity, name resolution, and partial failure  
-**Failure class:** Intermittent DNS, routing, or network path instability  
-**Goal:** Determine whether the failure is DNS, network, or service-path related
+**Primary domain:** Network & DNS Failures  
+**Domain playbook:** core/domain-playbooks/network-and-dns-failures-playbook.md  
+**Why this domain:** The incident is about unreliable name resolution or packet delivery rather than local resource or process failures.
 
 ---
 

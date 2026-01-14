@@ -1,8 +1,8 @@
-# 🧠 Scenario 10 — “Service Is in a Restart Loop / Crash Looping”
+# 🧰 Operator Playbook — Scenario 10: “Service Crash Loop”
 
-**Mental mode:** Service supervision, failure loops, and root-cause isolation  
-**Failure class:** systemd (or container) keeps restarting a broken service  
-**Goal:** Determine *why* the service is failing and *what* is causing the loop
+**Primary domain:** Process & Service Failures  
+**Domain playbook:** core/domain-playbooks/process-and-service-failures-playbook.md  
+**Why this domain:** The incident is about service lifecycle control loops and supervision, even if the root cause is a resource failure.
 
 ---
 

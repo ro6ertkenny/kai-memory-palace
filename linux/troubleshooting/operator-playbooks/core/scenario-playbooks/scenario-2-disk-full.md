@@ -1,9 +1,10 @@
 # 🧰 Operator Playbook — Scenario 2: “Disk Is Full” (No space left on device)
 
-**Goal:** Restore write capability safely by proving *what* is full (blocks vs inodes), *where*, and *why*.
+**Primary domain:** Disk Exhaustion  
+**Domain playbook:** core/domain-playbooks/disk-exhaustion-playbook.md  
+**Why this domain:** The failure is an allocation failure (no blocks or inodes available), not a performance or scheduling problem.
 
-**Golden rule:**  
-Do not delete blindly. First identify the filesystem, then the path, then the cause.
+**Goal:** Restore write capability safely by proving *what* is full (blocks vs inodes), *where*, and *why*.
 
 ---
 

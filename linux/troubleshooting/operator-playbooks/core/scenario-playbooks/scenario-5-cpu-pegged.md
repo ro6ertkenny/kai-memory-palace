@@ -1,5 +1,8 @@
-## 🧠 Scenario 5 — CPU Is Pegged at 100%
-**Operator Playbook: When the system is burning CPU**
+# 🧰 Operator Playbook — Scenario 5: “CPU Pegged”
+
+**Primary domain:** CPU Pressure  
+**Domain playbook:** core/domain-playbooks/cpu-pressure-playbook.md  
+**Why this domain:** The incident is about scheduler saturation and runnable backlog, not memory or IO blocking.
 
 ---
 

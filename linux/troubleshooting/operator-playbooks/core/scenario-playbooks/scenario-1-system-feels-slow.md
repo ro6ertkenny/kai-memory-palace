@@ -1,7 +1,8 @@
-# 🧰 Operator Playbook — Scenario 1: “System Feels Slow — Is It Memory?”
+# 🧰 Operator Playbook — Scenario 1: “System Feels Slow”
 
-**Goal:** Prove or disprove **memory pressure** before touching anything.  
-**Golden rule:** Never decide based on “used memory”. Decide based on **pressure signals**.
+**Primary domain:** N/A (Classification Scenario)  
+**Domain playbook:** N/A  
+**Why this domain:** This scenario exists to differentiate between CPU, memory, IO, disk, process, network, or time failures and route to the correct domain playbook.
 
 ---
 

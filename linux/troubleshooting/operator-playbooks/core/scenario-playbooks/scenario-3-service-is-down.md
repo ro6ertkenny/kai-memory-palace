@@ -1,5 +1,8 @@
-# 🧠 Scenario 3 — A Service Is Down
-**Operator Playbook: Is it the service, the process, or the system?**
+# 🧰 Operator Playbook — Scenario 3: “Service Is Down”
+
+**Primary domain:** Process & Service Failures  
+**Domain playbook:** core/domain-playbooks/process-and-service-failures-playbook.md  
+**Why this domain:** The incident is about service lifecycle, supervision, or dependency failure rather than resource pressure.
 
 ---
 

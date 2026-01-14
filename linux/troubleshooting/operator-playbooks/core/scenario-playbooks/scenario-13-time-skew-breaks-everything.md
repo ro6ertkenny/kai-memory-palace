@@ -1,8 +1,8 @@
-# 🧠 Scenario 13 — “Time Is Wrong and Everything (TLS, Certs, Auth) Is Breaking”
+# 🧰 Operator Playbook — Scenario 13: “Time Skew Breaks Everything”
 
-**Mental mode:** Time, trust, and distributed systems  
-**Failure class:** Clock skew / time drift / broken time sync  
-**Goal:** Prove whether time is wrong, fix it, and restore trust
+**Primary domain:** Time & Clock Failures  
+**Domain playbook:** core/domain-playbooks/time-and-clock-failures-playbook.md  
+**Why this domain:** The incident is caused by clock skew breaking trust, authentication, or coordination between systems.
 
 ---
 
