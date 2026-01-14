@@ -1,208 +1,185 @@
-# 🐘 Finding Memory Hogs
-*How to identify which processes are actually consuming RAM*
-
----
+# 🔍 Finding Memory Hogs (Operator Guide)
 
 ## 🎯 Purpose
 
-This document teaches the **operator method** for answering one question:
-
-> “Which processes are actually using memory — and how much does each one really use?”
-
-It is not about:
-- virtual address space
-- theoretical limits
-- “looks big”
-
-It is about:
-- **real RAM consumption**
-- **memory pressure contribution**
-- **who is actually hurting the system**
-
----
-
-## 🧠 Core Mental Model
-
-Memory pressure comes from:
-
-> **The sum of RSS across processes vs available RAM**
+This document teaches you how to **identify which process is actually causing memory pressure**.
 
 Not:
-- VSZ
-- VmSize
-- MemFree
-- “big looking numbers”
+- who has the biggest VSZ
+- who “looks big”
+- who you *feel* is guilty
 
-Always think in:
+But:
 
-- **RSS (Resident Set Size)** → real RAM
-- **MemAvailable** → global headroom
-- **Swap usage** → pressure indicator
+> **Which process is consuming real RAM (RSS) and contributing to pressure?**
 
 ---
 
-## 🔎 The Primary Tool: `ps`
+## 🧠 The Only Two Levels That Matter
 
-### Top memory consumers by RSS
+Memory problems exist at two levels:
 
-    ps aux --sort=-%mem | head -n 20
+1) **Global pressure**
+   - Is the system under memory stress?
 
-Key columns:
+2) **Per-process usage**
+   - Which process is responsible?
 
-- `%MEM` → percentage of RAM
-- `RSS`  → resident memory in KB (this is the real number)
-- `VSZ`  → virtual size (mostly noise)
-
----
-
-## ⚠️ The VSZ Trap
-
-Example:
-
-    VSZ: 1461511284
-    RSS:    594872
-
-Meaning:
-
-- The process *can* address ~1.4 TB
-- The process is actually using ~580 MB of RAM
-
-> **Always trust RSS. Ignore VSZ for pressure analysis.**
-
-VSZ includes:
-- mmap reservations
-- shared libraries
-- unused address space
-- guard regions
+You must always answer **(1) before (2)**.
 
 ---
 
-## 🧭 Operator Workflow: Find the Hog
+## 🧪 Step 1 — Prove There Is Memory Pressure
 
-### Step 1 — Check global health
+Check:
 
     free -h
 
 Focus on:
+- `MemAvailable` → must be low to indicate real pressure
 
-- `MemAvailable`
-- Swap usage
+Check:
 
-If MemAvailable is healthy and swap is 0 → memory is not the problem.
-
----
-
-### Step 2 — List top consumers
-
-    ps aux --sort=-%mem | head -n 20
+    vmstat 1 5
 
 Look for:
+- `si` or `so` > 0
+- rising `wa`
+- growing `swpd`
 
-- unusually large RSS
-- multiple instances of the same app
-- runaway processes
+Check:
 
----
+    cat /proc/pressure/memory
 
-### Step 3 — Deep inspect a suspect
+Look for:
+- non-zero `some` or `full` averages
 
-Pick a PID and inspect:
-
-    cat /proc/<PID>/status | egrep -i "VmRSS|VmSize|RssAnon|RssFile|VmSwap"
-
-What matters:
-
-- `VmRSS`   → real RAM used
-- `RssAnon` → heap / stacks / runtime
-- `RssFile` → mapped files / shared libs
-- `VmSwap`  → swapped pages (pressure indicator)
+If **none of these show pressure**, you do **not** have a memory problem.
 
 ---
 
-## 🧱 How to Interpret the Numbers
+## 🔎 Step 2 — Find Top Memory Consumers (By RSS)
 
-### Healthy process looks like:
+Run:
 
-- VmRSS: reasonable for its role
-- VmSwap: 0
-- RssAnon / RssFile: sane proportions
+    ps aux --sort=-%mem | head -n 15
 
-### Suspicious process looks like:
+This sorts by **RSS usage**, not VSZ.
 
-- VmRSS: very large (GBs)
-- VmSwap: non-zero
-- RssAnon: growing steadily
+Key columns:
+- `%MEM` → share of physical RAM
+- `RSS` → real memory in use
+- `VSZ` → virtual address space (mostly lies)
 
-That indicates:
-- memory leak
-- runaway workload
-- mis-sized cache
-- or pathological behavior
+---
+
+## ⚠️ Critical Mental Model: RSS vs VSZ
+
+Example:
+
+- VSZ: 1.4 TB
+- RSS: 580 MB
+
+This means:
+- The process mapped lots of address space
+- But is only using **580 MB of real RAM**
+
+> **Always trust RSS. Ignore VSZ.**
+
+---
+
+## 🧬 Step 3 — Inspect a Specific Process Deeply
+
+Pick a suspect PID and run:
+
+    cat /proc/<PID>/status | egrep -i "vmrss|vmsize|vmswap|rss"
+
+Important fields:
+- `VmRSS` → real RAM used (this is the truth)
+- `VmSize` → virtual memory (ignore for pressure)
+- `RssAnon` → heap / stacks / anonymous memory
+- `RssFile` → file-backed memory
+- `VmSwap` → swapped-out pages (pressure signal)
+
+---
+
+## 🧠 Interpretation Guide
+
+Healthy process:
+- VmRSS reasonable
+- VmSwap = 0
+- RssAnon stable
+
+Bad process:
+- VmRSS growing over time
+- VmSwap > 0
+- System PSI rising
+- MemAvailable shrinking
+
+---
+
+## 🧪 Step 4 — Check for Swapped Processes
+
+Run:
+
+    grep -R "VmSwap" /proc/*/status | grep -v "0 kB"
+
+If this prints anything:
+- You have **real memory pressure**
+- The kernel is actively evicting memory
+
+---
+
+## 🧠 Step 5 — Check cgroup / Container Context
+
+If in containers / Kubernetes / systemd:
+
+Check:
+
+    cat /proc/<PID>/cgroup
+
+Then inspect:
+
+    memory.max
+    memory.current
+    memory.events
+    memory.pressure
+
+A process can be killed **even when the system has tons of free RAM** if its cgroup is out of budget.
 
 ---
 
 ## 🧠 The Golden Rules
 
-- **Memory pressure is caused by RSS, not VSZ**
-- **One huge process or many medium ones can both kill a system**
-- **Swap usage means the kernel is already under stress**
-- **MemFree is irrelevant**
-- **MemAvailable is king**
+You diagnose memory using:
+- `MemAvailable`
+- `vmstat (si/so)`
+- `PSI`
+- `RSS`
+- `VmSwap`
 
----
-
-## 🚨 What a Real Incident Looks Like
-
-You will see:
-
-- MemAvailable shrinking
-- Swap being used
-- One or more processes with large RSS
-- System becoming sluggish
-
-Your job:
-
-> Identify which process(es) are responsible and decide whether to:
-> - restart
-> - reconfigure
-> - limit
-> - or kill
-
----
-
-## 🧭 Relationship to Other Docs
-
-- `memory-inspection.md` → teaches *how memory works*
-- This doc → teaches *who is using it*
-- `swap-and-reclaim.md` → teaches *what the kernel does under pressure*
-- `oom-killer.md` → teaches *what happens when things go too far*
-
----
-
-## ✅ Outcome
-
-After this document, you should be able to:
-
-- Prove which processes are consuming RAM
-- Ignore misleading virtual size numbers
-- Identify real memory hogs confidently
-- Support decisions with evidence, not guesses
-
-That is **operator-grade memory analysis**.
-
----
-
-## 📎 Canonical Commands (Muscle Memory)
-
-    free -h
-    ps aux --sort=-%mem | head
-    cat /proc/<PID>/status
+You **ignore**:
+- `MemFree`
+- `VSZ / VmSize`
+- “It looks big”
 
 ---
 
 ## 🧠 One-Sentence Operator Summary
 
-> “Memory hogs are identified by RSS, not by VSZ, and only RSS contributes to real memory pressure.”
+> “Memory hogs are identified by RSS growth under real pressure, not by who has the biggest virtual address space.”
 
 ---
 
+## ✅ Outcome
+
+You can now:
+- Prove whether memory is actually the problem
+- Identify which process is consuming real RAM
+- Tell normal memory usage from dangerous memory growth
+- Detect swap activity and reclaim pressure
+- Avoid killing the wrong process
+
+That is **operator-grade memory diagnosis**.
+
+---
