@@ -6,11 +6,11 @@ This directory is the **capstone training ground** for becoming a real Linux ope
 
 It does not teach commands.
 
-It teaches **how to think and decide under incident pressure**.
+It teaches **how to think, classify, and decide under incident pressure**.
 
 This wing trains one core loop:
 
-Symptom → Evidence → Decision → Action → Verification
+Symptom → Classification → Evidence → Decision → Action → Verification
 
 Not:
 
@@ -20,11 +20,12 @@ Not:
 
 ## 🧠 Mental Mode
 
-**Operating a system under uncertainty and partial information**
+**Operating a system under uncertainty and partial information.**
 
 You are training the skill of:
 
-- recognizing what *kind* of problem this is
+- recognizing what *kind* of failure this is
+- classifying it into the correct **domain**
 - collecting only the evidence that matters
 - making a decision that matches the evidence
 - taking the smallest safe action
@@ -40,57 +41,118 @@ and
 
 ---
 
-## 🏗️ Conceptual Structure
+## 🏗️ Conceptual Architecture
 
-This wing has **three layers**:
+This wing is organized into **three layers**:
+
+---
 
 ### 1) Scenario 0 — Universal Triage
 
-**File:**
+**Path:**
 core/scenario-0-triage-playbook.md
 
 This is the **entry point to every incident**.
 
 It answers the first and most important question:
 
-“What class of failure is this?”
+> “What class of failure is this?”
 
-CPU, memory, disk, I/O, service, network, permissions, time, etc.
+CPU, memory, IO, disk, process/service, network, time, etc.
 
 You always start here.
 
----
+Its only job is:
 
-### 2) Core Scenarios (`core/`)
-
-These are the **highest-frequency, exam-grade, real-world failure patterns**.
-
-They are:
-
-- intentionally limited in number
-- intentionally drilled until automatic
-- the scenarios you should be able to run **without hesitation**
-
-If you master only this set, you can operate most systems competently.
+> Correct **classification**.
 
 ---
 
-### 3) Advanced Scenarios (`advanced/`)
+### 2) Domain Playbooks — The Physics of Failure
 
-These are:
+**Path:**
+core/domain-playbooks/
+
+These are the **canonical pressure / failure domains**.
+
+They explain:
+
+- what kind of failure is happening
+- how to differentiate it from similar-looking failures
+- how to stabilize the system
+- when to escalate or drain a node
+
+They are **not scenarios**.
+
+They are the **underlying physics**:
+
+- memory-pressure-playbook.md
+- cpu-pressure-playbook.md
+- io-pressure-playbook.md
+- disk-exhaustion-playbook.md
+- process-and-service-failures-playbook.md
+- network-and-dns-failures-playbook.md
+- time-and-clock-failures-playbook.md
+
+Rule:
+
+> If you correctly identify the **domain**, the solution space collapses.
+
+---
+
+### 3) Scenario Playbooks — Common Failure Patterns
+
+**Path:**
+core/scenario-playbooks/  
+and  
+advanced/
+
+These are **concrete incidents**:
+
+- “System is slow”
+- “Process won’t die”
+- “Disk full but df shows space”
+- “Service crash looping”
+- “Node randomly goes NotReady”
+
+Each scenario:
+
+- starts from symptoms
+- guides classification
+- then points you to the correct **domain playbook**
+
+Core scenarios:
+
+- high-frequency
+- exam-grade
+- should be drilled until automatic
+
+Advanced scenarios:
 
 - rarer
-- more specialized
-- more multi-factor
+- more complex
 - more environment-specific
+- used for depth and pattern exposure
 
-They are:
+---
 
-- reference material
-- pattern exposure
-- depth building
+## 🧭 How To Use This System During an Incident
 
-Not daily drills unless you are preparing for a specific environment or exam.
+1) Start with:
+
+   core/scenario-0-triage-playbook.md
+
+2) Classify the failure into a **domain**.
+
+3) Go to the matching **domain playbook**.
+
+4) Use it to:
+   - confirm the diagnosis
+   - stabilize the system
+   - decide next actions
+
+5) Only then:
+   - follow or consult a **scenario playbook** if needed.
 
 ---
 
@@ -110,6 +172,7 @@ Not daily drills unless you are preparing for a specific environment or exam.
 4) You should be able to explain:
    - what you saw
    - what it means
+   - what domain it belongs to
    - what you will do
    - why that is safe
    - how you will verify
@@ -118,16 +181,17 @@ If you can’t explain it, you don’t own it yet.
 
 ---
 
-## 🧭 Operator Rule Zero
+## 🧱 Operator Rule Zero
 
 Symptoms first.  
-Evidence second.  
+Classification second.  
+Evidence third.  
 Action last.  
 Verification always.
 
 ---
 
-## 🧱 What This Wing Represents
+## 🧠 What This Wing Is Actually Teaching
 
 This is where:
 
@@ -155,5 +219,4 @@ If you can run these playbooks calmly and correctly, you can:
 
 This is **operator thinking**.
 
-EOF
-
+---
