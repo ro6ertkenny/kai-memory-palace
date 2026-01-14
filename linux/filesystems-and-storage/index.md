@@ -109,7 +109,20 @@ fstab -> systemd -> mount syscalls -> live mount tree
 
 ---
 
-### 6️⃣ `fsck-and-recovery-basics.md`
+### 6️⃣ `df-command.md`
+Defines:
+- what `df` measures (filesystem space, not directory size)
+- `df -h` vs `df -i` (space vs inodes)
+- mapping a full filesystem back to a mountpoint
+- why “disk full” can be “inode full”
+- the operator workflow:
+  df -> identify mount -> drill down with du (without guessing)
+
+This is the entry point for “No space left on device” triage.
+
+---
+
+### 7️⃣ `fsck-and-recovery-basics.md`
 Defines:
 - what fsck is and what it checks
 - why it must not be run on mounted filesystems
@@ -125,7 +138,7 @@ Running fsck while mounted risks corruption.
 
 ---
 
-### 7️⃣ `filesystem-debugging-checklist.md`
+### 8️⃣ `filesystem-debugging-checklist.md`
 Defines:
 - an exam-grade workflow to debug:
   - “missing data”
