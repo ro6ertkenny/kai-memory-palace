@@ -19,6 +19,7 @@ Playbooks are organized as:
 Daily drills. The default set you repeat until automatic.
 
 Scenarios:
+- `core/scenario-00-triage-playbook.md`
 - `core/scenario-01-system-feels-slow.md`
 - `core/scenario-02-disk-is-full.md`
 - `core/scenario-03-service-is-down.md`
