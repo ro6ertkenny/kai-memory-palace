@@ -1,210 +1,107 @@
-# 🗂️ Filesystems & Storage — Index
-*Operational clarity for where data lives, why it’s visible, and how to recover it safely*
+iro6ert@ro6bx:~/kai-memory-palace/linux/filesystems-and-storage$ cat README.md 
+# 💽 Filesystems & Storage — README
+
+## 🎯 Purpose
+
+This wing teaches how Linux **stores data**, **finds it again**, and **fails when storage is stressed**.
+
+Storage failures are among the **most destructive and least forgiving** classes of incidents.
+
+This wing exists to make:
+- disk behavior predictable
+- space usage explainable
+- mounts and filesystems non-mysterious
+- storage incidents survivable
 
 ---
 
-## 📌 Purpose
+## 🧠 Mental Mode
+**Persistence and I/O**
 
-This index provides the **structured navigation map** for the
-`linux/filesystems-and-storage` wing.
-
-It answers the questions:
-
-- “Why can’t I access this path?”
-- “Why did data ‘disappear’?”
-- “What is mounted where — and why?”
-- “How do I change filesystem state without breaking the system?”
-- “How do I validate persistence and recover it safely?”
-
-This wing builds **operational clarity**: predictable, inspectable, fixable.
+You should be able to:
+- explain where data lives
+- explain how it is mounted
+- explain why something is full
+- explain what is safe to delete and what is not
+- recover from space pressure without breaking the system
 
 ---
 
-## 🧠 Mental Model
+## 🧭 Scope
 
-Filesystem behavior is governed by four layers:
+This domain focuses on:
+- filesystem hierarchy
+- block devices and partitions
+- mounts and mount options
+- disk space and inode exhaustion
+- usage inspection and triage
+- safe recovery patterns
 
-1) **Namespace**  
-   What is mounted where (the live mount tree)
+Included:
+- filesystems, partitions, and mounts
+- disk usage and inode usage
+- finding where space went
+- interpreting df and du
+- space pressure failure modes
 
-2) **Identity and policy**  
-   Who is acting (user/group) and what privileges exist
-
-3) **Object metadata**  
-   Ownership, permissions, links, attributes
-
-4) **Storage state**  
-   The health of the filesystem on disk (consistency, recovery)
-
-Most failures are explained by identifying which layer is broken.
-
----
-
-## 🔁 Recommended Learning Order
-
-Read these documents **in order** to build correct system intuition.
+Excluded:
+- filesystem internals
+- performance tuning
+- advanced RAID/LVM internals
 
 ---
 
-### 1️⃣ `README.md`
-Defines:
-- scope
-- mental mode
-- how this wing differs from foundations or shell content
+## 📁 Directory Navigation
 
-Start here.
+Core docs:
 
----
+- `block-devices-and-identifiers.md`
+- `mounting-and-unmounting.md`
+- `fstab.md`
+- `filesystem-hierarchy.md`
+- `disk-usage-and-du.md`
 
-### 2️⃣ `filesystem-and-perms.md`
-Defines:
-- path resolution (absolute vs relative)
-- ownership and permissions evaluation
-- directory semantics and execute bit behavior
-- sudo boundaries
-- how to diagnose permission failures
+Day 9 operator doctrine:
 
-This is the primary reference for access failures.
+- `df-command.md`  
+  The **filesystem pressure indicator** and first question:
+  > “Which filesystem is full?”
 
 ---
 
-### 3️⃣ `mounting-and-unmounting.md`
-Defines:
-- the live mount tree (namespace grafting)
-- device vs filesystem vs mountpoint
-- inspecting mounts: mount, findmnt, /proc/self/mounts
-- loop mounts (filesystem inside a file)
-- “target is busy”, fuser/lsof, lazy unmount
+## 🧪 How To Use This Wing
 
-Core mental model:
+Use this wing when:
+- something says “No space left on device”
+- writes are failing
+- systems behave strangely under load
+- containers fail due to disk pressure
+- logs stop writing
 
-Linux is not one disk.  
-It is a tree of mountpoints built from multiple filesystems.
+Start with:
 
----
-
-### 4️⃣ `bind-mounts-and-namespace-grafting.md`
-Defines:
-- what a bind mount is (one directory appears at another path)
-- no copying: same data, two doorways
-- mounting subtrees (/dev/sda4[/subdir])
-- stacked mounts and why “it’s still mounted” happens
-
-This proves the namespace is composable.
+1) `df-command.md` → which filesystem is full?  
+2) `disk-usage-and-du.md` → where did the space go?
 
 ---
 
-### 5️⃣ `fstab-and-persistent-mounts.md`
-Defines:
-- /etc/fstab as the declarative boot-time plan
-- UUID-based device identity
-- fstab line format:
-  <what> <where> <type> <options> <dump> <pass>
-- dump/pass intuition (1 first, 2 later, 0 never)
-- validating safely with:
-  sudo findmnt --verify
+## ⚠️ Storage Rules
 
-Mental model:
-fstab -> systemd -> mount syscalls -> live mount tree
-
----
-
-### 6️⃣ `df-command.md`
-Defines:
-- what `df` measures (filesystem space, not directory size)
-- `df -h` vs `df -i` (space vs inodes)
-- mapping a full filesystem back to a mountpoint
-- why “disk full” can be “inode full”
-- the operator workflow:
-  df -> identify mount -> drill down with du (without guessing)
-
-This is the entry point for “No space left on device” triage.
-
----
-
-### 7️⃣ `fsck-and-recovery-basics.md`
-Defines:
-- what fsck is and what it checks
-- why it must not be run on mounted filesystems
-- “offline check” workflow
-- forced checks (-f)
-- pass-based checks at boot
-
-Big mental model:
-
-fsck works on on-disk data structures.  
-Mounting uses those same structures live.  
-Running fsck while mounted risks corruption.
-
----
-
-### 8️⃣ `filesystem-debugging-checklist.md`
-Defines:
-- an exam-grade workflow to debug:
-  - “missing data”
-  - mount failures
-  - busy unmounts
-  - stacked mounts
-  - fstab issues
-  - when to use fsck
-
-Use this as your “runbook” under pressure.
-
----
-
-## ⚠️ Common Operational Mistakes
-
-> **⚠️ Mistake:** Debugging permissions without checking mounts  
-> If the wrong filesystem is mounted, permissions are not the problem.
-
-> **⚠️ Mistake:** Running fsck on a mounted filesystem  
-> fsck and the kernel can modify the same metadata and corrupt the filesystem.
-
-> **⚠️ Mistake:** Assuming unmount removes all layers  
-> Mounts can stack. Unmount removes one layer at a time.
-
----
-
-## 🔗 Relationship to Other Wings
-
-- `linux/foundations/`  
-  Explains the primitives (system state, processes, baseline permissions theory)
-
-- Accounts + Privilege (currently in `linux/foundations/`)  
-  Identity, authentication, privilege (who is acting)
-
-- `linux/shell-and-bash/`  
-  Provides the tooling and muscle memory to execute safely
-
-- `k8s/*`  
-  Kubernetes volumes and container filesystems mirror these primitives
-
-This wing is where “storage stopped behaving” becomes explainable.
-
----
-
-## ▶️ How To Use This Wing
-
-- Learning → read top to bottom
-- Debugging → start with:
-  1) `findmnt /path`
-  2) `lsblk -f`
-  3) identity + permissions
-- Recovery → verify unmounted, then fsck (offline)
+- Never delete before you know **which filesystem** is full
+- Never delete before you know **which directory tree** is responsible
+- Never delete system files blindly
+- Always confirm free space after cleanup
 
 ---
 
 ## ✅ Outcome
 
-After completing this wing, you should be able to say:
+You should be able to say:
 
-- I know what is mounted where and why
-- I know why a path shows what it shows
-- I can diagnose access failures without guessing
-- I can validate persistence before reboot
-- I can recover safely from common filesystem failures
+I can explain where disk space is going,  
+I can find what is consuming it,  
+and I can recover space **without damaging the system**.
 
 That is storage fluency.
-
----
+EOF
 
