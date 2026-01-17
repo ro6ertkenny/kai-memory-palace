@@ -27,7 +27,8 @@ Linux networking is a **stack of independent layers**:
 4. **Name** — can it resolve hostnames?
 5. **Service** — is something listening?
 6. **Access** — is traffic allowed (firewall / policy)?
-7. **Application** — does the protocol work?
+7. **Path Plumbing** — is traffic flowing through bridges, bonds, or proxies?
+8. **Application** — does the protocol work?
 
 > You must debug **from the bottom up**.
 
@@ -45,24 +46,42 @@ This wing teaches you to:
 - understand name resolution (NSS, `getent`, `resolv.conf`)
 - inspect listening services (`ss -tulpen`)
 - debug failures **systematically** instead of guessing
+
+And at the **operator level**, it also teaches:
+
 - 🔥 **Firewalling**:
   - how to inspect active rules
   - how to prove whether traffic is being blocked
   - how to safely open a port
   - how to verify end-to-end reachability  
   See: `firewall-operator-basics.md`
+
 - 🔐 **SSH access**:
   - how to verify sshd service and ports
   - how to distinguish network vs firewall vs auth failures
   - how to fix key, permission, config, and service issues  
   See: `ssh-operator-basics.md`
 
+- 🔗 **Bridge & Bonding**:
+  - how to recognize when a system is using a bridge or a bond
+  - how to inspect which interfaces are enslaved
+  - how to determine where the IP address actually lives
+  - how to verify which device really carries traffic  
+  See: `bridge-and-bonding-operator-basics.md`
+
+- ⚖️ **Load Balancing / Reverse Proxy**:
+  - how to set up a minimal nginx or HAProxy frontend
+  - how to verify backend reachability
+  - how to detect partial backend failure
+  - how to prove whether the failure is in the client, LB, or backend  
+  See: `load-balancer-operator-basics.md`
+
 ---
 
 ## 🧱 What This Wing Does NOT Cover
 
 - advanced routing protocols (BGP, OSPF, etc.)
-- deep firewall design or policy architecture
+- deep firewall architecture or large policy design
 - performance tuning
 - deep TCP internals
 
@@ -85,7 +104,9 @@ Conceptually, the flow is:
 5. **Ports & Listeners** → is the service reachable?
 6. **Firewalling** → is traffic being allowed or blocked?
 7. **SSH Access** → can you actually log in?
-8. **Debug Checklist** → the exam-grade operator flow
+8. **Bridge & Bonding** → how traffic is plumbed between interfaces
+9. **Load Balancer** → how traffic is proxied to backend services
+10. **Debug Checklist** → the exam-grade operator flow
 
 Each file owns **one layer of the stack**.
 
@@ -104,6 +125,7 @@ When this wing is mastered:
   - name
   - service
   - access
+  - plumbing
   - application
 - And you can fix it **mechanically under pressure**.
 
