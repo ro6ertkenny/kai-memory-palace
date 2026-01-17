@@ -123,6 +123,43 @@ This answers:
 
 ---
 
+### 8️⃣ `ssh-operator-basics.md`
+
+Defines:
+- how to verify sshd service state
+- how to verify listening ports
+- how to distinguish service vs firewall vs auth failures
+- how to read ssh client errors (`ssh -v`)
+- how to diagnose and fix:
+  - service down
+  - wrong port
+  - firewall blocking
+  - key / permission problems
+  - bad sshd_config
+
+This answers:
+
+> “Why can’t I SSH into this machine?”
+
+---
+
+### 9️⃣ `bridge-and-bonding-operator-basics.md`
+
+Defines:
+- what a bridge is and how to recognize one
+- what bonding is and how to recognize it
+- how to inspect:
+  - which interfaces are enslaved
+  - where the IP address actually lives
+  - which device actually carries traffic
+- how to verify the real egress path using `ip route get`
+
+This answers:
+
+> “Which interface is actually carrying my traffic, and why?”
+
+---
+
 ## 📚 Supporting Files
 
 - `mistakes.md`  
