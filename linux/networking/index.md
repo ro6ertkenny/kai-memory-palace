@@ -108,10 +108,27 @@ This is the **capstone operational playbook**.
 
 ---
 
+### 7️⃣ `firewall-operator-basics.md`
+
+Defines:
+- how to identify which firewall system is active (nftables / iptables / ufw / firewalld)
+- how to list active rules
+- how to prove whether the firewall is blocking traffic
+- how to safely open a port (without locking yourself out)
+- how to verify end-to-end connectivity
+
+This answers:
+
+> “Is the firewall blocking this traffic?”
+
+---
+
 ## 📚 Supporting Files
 
 - `mistakes.md`  
   Common conceptual and operational mistakes.
+
+- `../troubleshooting/operator-playbooks/core/domain-playbooks/firewall-blocking-traffic.md`
 
 - `README.md`  
   Scope, philosophy, and how this wing fits into the palace.
