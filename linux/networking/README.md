@@ -44,6 +44,12 @@ This wing teaches you to:
 - understand name resolution (NSS, `getent`, `resolv.conf`)
 - inspect listening services (`ss -tulpen`)
 - debug failures **systematically** instead of guessing
+- 🔥 Firewalling:
+  - how to inspect active rules
+  - how to prove whether traffic is being blocked
+  - how to safely open a port
+  - how to verify end-to-end reachability  
+  See: `firewall-operator-basics.md`
 
 ---
 
