@@ -33,13 +33,26 @@ Every network request requires:
 2. Routing decision
 3. Packet delivery out
 4. Packet delivery back
-5. No middlebox interference
+5. No middlebox or policy interference
 
 Failure can occur at **any step**.
 
 So always decompose:
 
-> Is this a DNS problem, a routing problem, or a packet delivery problem?
+> Is this a DNS problem, a routing problem, a firewall/policy problem, or a packet delivery problem?
+
+---
+
+## 🧭 Layered Debug Order (Never Skip Layers)
+
+1. **Link** — is the interface up?
+2. **Address** — does it have an IP?
+3. **Route** — does the kernel know where to send packets?
+4. **Name** — does DNS resolve correctly?
+5. **Service** — is something listening?
+6. **Access** — is traffic being blocked? (firewall / policy)
+7. **Path plumbing** — bridges, bonds, virtualization, weird topology
+8. **Upstream** — load balancer or backend health
 
 ---
 
@@ -58,8 +71,8 @@ Interpretation:
 
 - If IP ping works but name ping fails → DNS
 - If name resolves but connect hangs → network path or firewall
-- If some destinations work and others don’t → routing or ACLs
-- If it works “sometimes” → packet loss or timeouts
+- If some destinations work and others don’t → routing, ACLs, or upstream pool
+- If it works “sometimes” → packet loss, MTU, or timeouts
 
 ---
 
@@ -95,6 +108,7 @@ Make sure resolution order is sane.
 
     ip route
     ip rule
+    ip route get 1.1.1.1
 
 ### Sockets
 
@@ -139,6 +153,16 @@ Make sure resolution order is sane.
    - Many short-lived connections
    - New connections fail, old ones work
 
+6. **Topology / plumbing issues**
+   - Bridge vs physical NIC confusion
+   - Bonding hides real egress path
+   - VM / container / host path mismatch
+
+7. **Upstream / load balancer issues**
+   - Some backends dead
+   - Partial pool failures
+   - Proxy config lies
+
 ---
 
 ## 🛑 Stabilization Actions (In Order)
@@ -168,16 +192,75 @@ Make sure resolution order is sane.
 
 ---
 
-## ⚠️ Dangerous Misinterpretations
+## 🧭 Operator Surface Handoffs
 
-- “The service is down”
-  - Often it is DNS.
+### 🔥 Firewall suspected?
 
-- “It works from my machine”
-  - Then this is **path-specific**.
+Symptoms:
 
-- “It fails randomly”
-  - That is usually packet loss, MTU, or state exhaustion.
+- Works locally but not remotely
+- Port open locally, blocked externally
+- Connection refused or silently dropped
+
+➡️ Use:
+
+- `linux/networking/firewall-operator-basics.md`
+
+---
+
+### 🔐 SSH-specific failure?
+
+Symptoms:
+
+- “I can’t SSH in”
+- But ping / curl / port 22 is reachable
+
+Check:
+
+    systemctl status ssh
+    ss -lntup | grep :22
+
+➡️ Use:
+
+- `linux/networking/ssh-operator-basics.md`
+
+---
+
+### 🔗 Topology / Bridge / Bond weirdness?
+
+Symptoms:
+
+- IP not on the interface you expect
+- Traffic disappears
+- VM / host / multi-NIC confusion
+
+Check:
+
+    ip link
+    bridge link
+    nmcli device
+
+➡️ Use:
+
+- `linux/networking/bridge-and-bonding-operator-basics.md`
+
+---
+
+### ⚖️ Load balancer / upstream pool suspected?
+
+Symptoms:
+
+- Some requests work, some fail
+- Some backends reachable, some not
+- Intermittent or partial outages
+
+Test backends directly:
+
+    curl http://<backend-ip>
+
+➡️ Use:
+
+- `linux/networking/load-balancer-operator-basics.md`
 
 ---
 
@@ -233,4 +316,3 @@ All of these reduce to:
 
 > The path between two endpoints is unreliable or misconfigured.
 
----
