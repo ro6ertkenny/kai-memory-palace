@@ -160,6 +160,27 @@ This answers:
 
 ---
 
+### 🔟 `load-balancer-operator-basics.md`
+
+Defines:
+- what a load balancer / reverse proxy is at the operator level
+- how to configure a **minimal** nginx or HAProxy load balancer
+- how to verify:
+  - the frontend is listening
+  - backends are reachable
+  - traffic is actually being forwarded
+- how to diagnose:
+  - all backends down
+  - partial backend failure
+  - misconfiguration (502/504)
+  - firewall or bind-address issues
+
+This answers:
+
+> “Is the failure in the client, the load balancer, or the backend pool?”
+
+---
+
 ## 📚 Supporting Files
 
 - `mistakes.md`  
