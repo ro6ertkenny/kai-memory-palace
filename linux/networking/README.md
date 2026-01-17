@@ -1,5 +1,5 @@
 # 🌐 Linux Networking
-*Understanding how Linux connects, routes, and exposes services*
+*Understanding how Linux connects, routes, secures, and exposes services*
 
 ---
 
@@ -13,7 +13,7 @@ Most networking problems feel “mysterious” only because people:
 - guess
 - jump to tools instead of state
 
-This wing trains **layered reasoning**.
+This wing trains **layered, mechanical reasoning**.
 
 ---
 
@@ -26,7 +26,8 @@ Linux networking is a **stack of independent layers**:
 3. **Route** — does it know where to send packets?
 4. **Name** — can it resolve hostnames?
 5. **Service** — is something listening?
-6. **Application** — does the protocol work?
+6. **Access** — is traffic allowed (firewall / policy)?
+7. **Application** — does the protocol work?
 
 > You must debug **from the bottom up**.
 
@@ -44,23 +45,28 @@ This wing teaches you to:
 - understand name resolution (NSS, `getent`, `resolv.conf`)
 - inspect listening services (`ss -tulpen`)
 - debug failures **systematically** instead of guessing
-- 🔥 Firewalling:
+- 🔥 **Firewalling**:
   - how to inspect active rules
   - how to prove whether traffic is being blocked
   - how to safely open a port
   - how to verify end-to-end reachability  
   See: `firewall-operator-basics.md`
+- 🔐 **SSH access**:
+  - how to verify sshd service and ports
+  - how to distinguish network vs firewall vs auth failures
+  - how to fix key, permission, config, and service issues  
+  See: `ssh-operator-basics.md`
 
 ---
 
 ## 🧱 What This Wing Does NOT Cover
 
-- advanced routing protocols
-- firewalling and nftables/iptables (separate topic)
+- advanced routing protocols (BGP, OSPF, etc.)
+- deep firewall design or policy architecture
 - performance tuning
 - deep TCP internals
 
-This is about **operational correctness**, not optimization.
+This wing is about **operational correctness and diagnosis**, not optimization or large-scale network engineering.
 
 ---
 
@@ -70,59 +76,34 @@ The canonical navigation order is in:
 
 > `index.md`
 
-But conceptually, the flow is:
+Conceptually, the flow is:
 
 1. **Basics** → vocabulary and concepts
 2. **Interface & Addressing** → is the host connected?
-3. **Routes** → where will packets go?
+3. **Routes & Reachability** → where will packets go?
 4. **Name Resolution** → how names become IPs
 5. **Ports & Listeners** → is the service reachable?
-6. **Debug Checklist** → the exam-grade playbook
+6. **Firewalling** → is traffic being allowed or blocked?
+7. **SSH Access** → can you actually log in?
+8. **Debug Checklist** → the exam-grade operator flow
 
 Each file owns **one layer of the stack**.
 
 ---
 
-## 🧪 How to Use This Wing
+## 🏁 End State
 
-### If you are learning:
+When this wing is mastered:
 
-Read **top to bottom** following `index.md`.
-
-### If something is broken:
-
-Jump straight to:
-
-> `network-debugging-checklist.md`
-
-And follow it **line by line**.
-
----
-
-## ⚠️ The One Rule That Matters
-
-> **Never guess. Always inspect. Always follow the layers.**
-
----
-
-## ✅ Outcome
-
-If you understand this wing:
-
-- “networking issues” stop being vague
-- failures become **mechanical to locate**
-- the LFCS networking section becomes **free points**
-
----
-
-## 🧭 Relationship to Other Wings
-
-- `linux/foundations/` → processes, permissions, inspection
-- `linux/shell-and-bash/` → using the tools
-- `k8s/networking/` → builds on all of this
-
-Linux networking understanding is **upstream of everything distributed**.
-
----
-EOF
+- You do not guess.
+- You do not jump layers.
+- You can explain **any** network failure in terms of:
+  - link
+  - address
+  - route
+  - name
+  - service
+  - access
+  - application
+- And you can fix it **mechanically under pressure**.
 
