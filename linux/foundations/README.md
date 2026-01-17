@@ -19,7 +19,7 @@ This **is**:
 - how the kernel and userspace relate
 - how processes, files, memory, and resources actually behave
 - how the system represents **identity, authentication, and privilege**
-- how to reason about system state before touching it
+- how the system exposes **control surfaces** (sysctl, SELinux, containers, virtualization)
 
 If you understand this wing, higher-level tools (shell, systemd, containers, Kubernetes) stop feeling magical and start feeling **inevitable**.
 
@@ -66,12 +66,19 @@ This wing focuses on **conceptual and operational primitives**:
 - how the system represents **users, groups, authentication, and sudo**
 - how to reason about “what is happening” before acting
 
+It also covers **core operational control surfaces** (LFCS-relevant):
+
+- kernel parameters and sysctl (`kernel-parameters-sysctl.md`)
+- SELinux operator basics (`selinux-operator-basics.md`)
+- container operator basics (`containers/container-operator-basics.md`)
+- libvirt operator basics (`virtualization/libvirt-operator-basics.md`)
+
 It intentionally avoids:
 
 - deep performance tuning
 - kernel internals
 - hardware engineering
-- tool-specific workflows
+- large-scale system design
 
 ---
 
@@ -136,7 +143,8 @@ After completing this wing, you should be able to say:
 - I know what state it is in
 - I know who the system thinks I am
 - I know what I am allowed to do and why
-- I know why things behave the way they do
+- I know which control surface to use (and which not to)
 - I know where to look before I change anything
 
 That is **Linux literacy**.
+

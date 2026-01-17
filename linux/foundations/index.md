@@ -29,7 +29,7 @@ Linux **is**:
 
 - a kernel managing resources
 - a userspace providing interfaces
-- a contract between processes, memory, files, devices, and the scheduler
+- a contract between processes, memory, files, devices, identity, and the scheduler
 
 Understanding Linux foundations means understanding **responsibility boundaries and state**.
 
@@ -125,7 +125,7 @@ This teaches **packaging and recovery workflows**.
 
 ---
 
-### 9️⃣ Accounts, Identity, and Privilege (Day 6)
+### 9️⃣ Accounts, Identity, and Privilege
 
 Defines:
 - what a user and group actually are (UID/GID vs names)
@@ -146,6 +146,37 @@ Read in this order:
 - `accounts-debugging-checklist.md`
 
 This section teaches **who you are, how the system knows, and what you are allowed to do**.
+
+---
+
+## ⚙️ Operations & Deployment Surfaces (LFCS-Relevant)
+
+These are **foundational control surfaces** that frequently appear as tasks or root causes of failures:
+
+- `kernel-parameters-sysctl.md`
+  - Live tunables vs persistent config
+  - How to inspect, change, and verify kernel parameters safely
+  - Supporting playbook:
+    - `../troubleshooting/operator-playbooks/core/domain-playbooks/kernel-parameter-misconfiguration.md`
+
+- `selinux-operator-basics.md`
+  - MAC model, enforcing vs permissive, contexts, denials
+  - Supporting playbook:
+    - `../troubleshooting/operator-playbooks/core/domain-playbooks/selinux-denials.md`
+
+- `containers/container-operator-basics.md`
+  - Run, inspect, logs, exec, mounts, ports
+  - Supporting playbook:
+    - `../troubleshooting/operator-playbooks/core/domain-playbooks/container-failures.md`
+
+- `virtualization/libvirt-operator-basics.md`
+  - virsh connectivity, list/start/stop, minimal operator flow
+  - Supporting playbook:
+    - `../troubleshooting/operator-playbooks/core/domain-playbooks/libvirt-vm-failures.md`
+
+Optional host build guide (not required for LFCS tasks):
+
+- `virtualization/kvm-ubuntu-server-lts-vm.md`
 
 ---
 
@@ -189,3 +220,4 @@ Linux foundations are **upstream of everything**.
 If you understand Linux foundations, higher-level systems stop feeling magical.
 
 ---
+
