@@ -100,7 +100,56 @@ This is an **execution checklist**.
 
 ---
 
-## 🧩 7) Packet Inspection
+## 🧱 7) Packet Filtering (Explicit Drill)
+
+Goal: Prove you can implement and verify packet filtering rules.
+
+### Option A: nftables (preferred on modern Debian)
+
+- Show ruleset
+- Add a simple allow rule for SSH (example)
+- Verify rule exists
+- Remove rule
+
+    sudo nft list ruleset
+
+Create a temporary table/chain (lab-safe). This does not persist unless you save it:
+
+    sudo nft add table inet lfcs_lab
+    sudo nft add chain inet lfcs_lab input '{ type filter hook input priority 0; policy accept; }'
+    sudo nft add rule inet lfcs_lab input tcp dport 22 accept
+    sudo nft list table inet lfcs_lab
+
+Cleanup:
+
+    sudo nft delete table inet lfcs_lab
+
+### Option B: ufw (simple interface)
+
+- Enable ufw (if not enabled)
+- Allow/deny ports
+- Show numbered rules
+
+    sudo ufw status verbose
+    sudo ufw enable
+    sudo ufw allow 22
+    sudo ufw deny 1234
+    sudo ufw status numbered
+
+### Option C: iptables (legacy)
+
+- List rules
+- Add rule (example allow SSH)
+- Delete rule
+
+    sudo iptables -L -n -v
+    sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT
+    sudo iptables -L -n -v
+    sudo iptables -D INPUT -p tcp --dport 22 -j ACCEPT
+
+---
+
+## 🧩 8) Packet Inspection
 
 - Capture packets
 - Capture on specific interface
@@ -114,7 +163,7 @@ This is an **execution checklist**.
 
 ---
 
-## 🔁 8) Network Services
+## 🔁 9) Network Services
 
 - Check service status
 - Restart networking service
@@ -127,7 +176,7 @@ This is an **execution checklist**.
 
 ---
 
-## 🧠 9) Persistent Configuration (Distro Dependent)
+## 🧠 10) Persistent Configuration (Distro Dependent)
 
 - Netplan (Ubuntu)
 - systemd-networkd
@@ -139,7 +188,7 @@ This is an **execution checklist**.
 
 ---
 
-## 🧪 10) nmcli Drills (If NetworkManager Present)
+## 🧪 11) nmcli Drills (If NetworkManager Present)
 
 - Show devices
 - Show connections
@@ -156,7 +205,7 @@ This is an **execution checklist**.
 
 ---
 
-## 🛣️ 11) Routing Drills
+## 🛣️ 12) Routing Drills
 
 - Show routing table
 - Add static route
@@ -168,7 +217,38 @@ This is an **execution checklist**.
 
 ---
 
-## 🔐 12) SSH Drills
+## ⏱️ 13) Time Synchronization (NTP / timesync)
+
+Goal: Prove you can inspect and correct time sync behavior.
+
+Baseline inspection:
+
+    timedatectl
+    timedatectl timesync-status 2>/dev/null || true
+
+systemd-timesyncd (common on Debian minimal installs):
+
+    systemctl status systemd-timesyncd --no-pager || true
+    sudo systemctl enable --now systemd-timesyncd || true
+    sudo systemctl restart systemd-timesyncd || true
+    journalctl -u systemd-timesyncd --since "30 minutes ago" --no-pager || true
+
+chrony (common alternative):
+
+    sudo apt-get update
+    sudo apt-get install -y chrony
+    systemctl status chrony --no-pager
+    chronyc sources || true
+    chronyc tracking || true
+
+Quick verification:
+
+    date
+    timedatectl
+
+---
+
+## 🔐 14) SSH Drills
 
 - SSH to localhost
 - SSH with key
@@ -182,7 +262,7 @@ This is an **execution checklist**.
 
 ---
 
-## 🧯 13) Emergency Network Recovery
+## 🧯 15) Emergency Network Recovery
 
 - Bring loopback up
 - Restart network stack
@@ -201,5 +281,7 @@ You are **done with this file** when:
 - You can diagnose "no network" in minutes
 - You can set a static IP blindfolded
 - You can prove where the breakage is: link, IP, route, DNS, firewall, or service
+- You can implement and verify packet filtering rules
+- You can verify time sync status and restart/fix the time sync service
 
 ---
