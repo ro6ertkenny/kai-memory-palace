@@ -1,24 +1,23 @@
 # 🧪 Security and SELinux — Execution Drills (LFCS)
 
 Mental mode: Defense, containment, and proof.  
-Goal: Be able to **audit access, harden a system, control services, manage firewalling, and diagnose SELinux denials** under time pressure.
+Goal: Be able to **audit access, harden a system, control services, manage firewalling, and diagnose MAC (SELinux/AppArmor) denials** under time pressure.
 
 This is not a tutorial.  
 This is an **execution checklist**.
 
 Notes:
-- Some systems use **SELinux** (RHEL, Rocky, Alma, Fedora). Others use **AppArmor** (Ubuntu, Debian).
-- Do the SELinux sections if SELinux exists; otherwise still practice the command recognition.
+- Some systems use **SELinux** (RHEL, Rocky, Alma, Fedora).
+- Others use **AppArmor** (Ubuntu, Debian).
+- If SELinux is not present, **still practice command recognition and AppArmor inspection**.
+
+Core law:
+
+> If permissions look right but access is denied, assume MAC until proven otherwise.
 
 ---
 
 ## 🔎 1) Baseline Security Inspection
-
-- Show logged-in users
-- Show last logins
-- Show listening ports
-- Show open network services
-- Show running processes as root
 
     who
     w
@@ -30,12 +29,6 @@ Notes:
 
 ## 🔐 2) Account and Authentication Hardening
 
-- Lock a user
-- Unlock a user
-- Expire a user
-- Force password change
-- Show password aging
-
     sudo passwd -l testuser
     sudo passwd -u testuser
     sudo chage -E 2026-12-31 testuser
@@ -45,12 +38,6 @@ Notes:
 ---
 
 ## 🧱 3) File Permission Audits
-
-- Find world-writable files
-- Find world-writable directories
-- Find SUID files
-- Find SGID files
-- Find files with no owner
 
     find / -perm -0002 -type f 2>/dev/null
     find / -perm -0002 -type d 2>/dev/null
@@ -62,11 +49,6 @@ Notes:
 
 ## 🧷 4) ACL Auditing and Control
 
-- Show ACLs
-- Set ACL
-- Remove ACL
-- Set default ACL on directory
-
     getfacl file.txt
     setfacl -m u:testuser:r-- file.txt
     getfacl file.txt
@@ -77,38 +59,24 @@ Notes:
 
 ## 🔥 5) Firewall Basics (ufw / nftables / iptables)
 
-- Show firewall status
-- List rules
-- Allow a port
-- Deny a port
-- Reload firewall
-- Verify open port
-
-ufw (if present):
-
-    sudo ufw status verbose
-    sudo ufw allow 22
-    sudo ufw deny 1234
-    sudo ufw reload
+    sudo ufw status verbose || sudo nft list ruleset || sudo iptables -L
+    sudo ufw allow 22 || true
+    sudo ufw deny 1234 || true
+    sudo ufw reload || true
     ss -lntup | grep 22 || true
 
-nftables (if present):
+nftables:
 
     sudo nft list ruleset
     sudo nft list tables
 
-iptables (legacy systems):
+iptables:
 
     sudo iptables -L -n -v
 
 ---
 
 ## 🌐 6) Service Exposure Control
-
-- Check if a service is listening
-- Stop service
-- Disable service at boot
-- Mask service
 
     ss -lntup | grep 80 || true
     sudo systemctl stop nginx || true
@@ -119,10 +87,6 @@ iptables (legacy systems):
 
 ## 🧠 7) sudo Policy Inspection
 
-- Show your sudo privileges
-- Edit sudoers safely
-- Add user to sudo group
-
     sudo -l
     sudo visudo
     sudo usermod -aG sudo testuser
@@ -131,15 +95,11 @@ iptables (legacy systems):
 
 ## 🧪 8) Integrity and Package Trust
 
-- Verify package files (if rpm)
-- Verify deb package integrity (if deb)
-- Show file hashes
+RPM:
 
-RPM-based:
+    rpm -Va | head -n 20 || true
 
-    rpm -Va | head -n 20
-
-DEB-based:
+DEB:
 
     debsums -s 2>/dev/null || true
 
@@ -151,39 +111,56 @@ Hashes:
 
 ---
 
-## 🧱 9) SELinux Status and Modes (If Present)
+# =========================
+# 🔐 MAC: SELinux / AppArmor
+# =========================
 
-- Show SELinux status
-- Show current mode
-- Set permissive mode
-- Set enforcing mode
+## 🧱 9) Determine What Is In Use
 
+SELinux:
+
+    getenforce || true
     sestatus || true
+
+AppArmor:
+
+    sudo aa-status || true
+
+Write down:
+- Which one is active?
+- In what mode?
+
+---
+
+## 🏷️ 10) SELinux Context Inspection (If Present)
+
+    ls -Z /bin/ls || true
+    ls -Z /usr/bin/sudo || true
+    ps auxZ | head || true
+    ps auxZ | grep -E 'sshd|systemd' || true
+
+Format reminder:
+
+    user:role:type:level
+
+---
+
+## 🧱 11) SELinux Modes (Debug Only)
+
     getenforce || true
     sudo setenforce 0 || true
     getenforce || true
     sudo setenforce 1 || true
     getenforce || true
 
----
-
-## 🏷️ 10) SELinux Context Inspection
-
-- Show file contexts
-- Show process contexts
-- Show port contexts
-
-    ls -Z /var/www || true
-    ps -eZ | head -n 10 || true
-    semanage port -l 2>/dev/null | head -n 20 || true
+Rule:
+- Never leave system in permissive.
 
 ---
 
-## 🔧 11) Fixing Common SELinux Denials (Label Issues)
+## 🔧 12) Fixing Label Problems (Correct Way)
 
-- Restore default contexts
-- Restore recursively
-- Check what would change (dry run)
+Preferred fix:
 
     sudo restorecon -v /var/www/html || true
     sudo restorecon -Rv /var/www || true
@@ -191,12 +168,35 @@ Hashes:
 
 ---
 
-## 🚧 12) Allowing Services on Non-Standard Ports (SELinux)
+## 🚧 13) Persistent Fix — semanage fcontext
 
-- Show current allowed ports
-- Add new allowed port
-- Verify change
-- Remove port rule
+    sudo semanage fcontext -l | head || true
+    sudo semanage fcontext -a -t httpd_sys_content_t "/var/www/html/custom(/.*)?" || true
+    sudo restorecon -Rv /var/www/html/custom || true
+
+---
+
+## ⚠️ 14) Temporary Fix — chcon (Know Why This Is Bad)
+
+    sudo chcon -t httpd_sys_content_t /var/www/html/index.html || true
+    ls -Z /var/www/html/index.html || true
+
+Law:
+- chcon is temporary
+- will be lost after relabel or restorecon
+
+---
+
+## 🧾 15) Diagnosing SELinux Denials
+
+    sudo grep -i denied /var/log/audit/audit.log 2>/dev/null | tail -n 20 || true
+    sudo ausearch -m avc 2>/dev/null || true
+    sudo journalctl -g denied || true
+    sudo sealert -a /var/log/audit/audit.log 2>/dev/null || true
+
+---
+
+## 🧱 16) Allowing Services on Non-Standard Ports (SELinux)
 
     semanage port -l | grep http || true
     sudo semanage port -a -t http_port_t -p tcp 8081 || true
@@ -205,24 +205,7 @@ Hashes:
 
 ---
 
-## 🧾 13) Diagnosing SELinux Denials
-
-- Search audit log
-- Use ausearch
-- Use sealert (if present)
-
-    sudo grep -i denied /var/log/audit/audit.log 2>/dev/null | tail -n 20 || true
-    sudo ausearch -m avc -ts recent 2>/dev/null || true
-    sudo sealert -a /var/log/audit/audit.log 2>/dev/null || true
-
----
-
-## 🧯 14) Emergency Access Recovery
-
-- Boot into rescue/emergency
-- Remount root rw
-- Fix permissions or SELinux
-- Reboot
+## 🧯 17) Emergency Access Recovery
 
     mount -o remount,rw /
     restorecon -Rv / || true
@@ -230,13 +213,7 @@ Hashes:
 
 ---
 
-## 🛡️ 15) Quick Hardening Checklist
-
-- Disable unused services
-- Close unused ports
-- Remove SUID where not needed
-- Verify root login policy
-- Verify SSH config
+## 🛡️ 18) Quick Hardening Checklist
 
     systemctl --failed
     ss -lntup
@@ -246,13 +223,37 @@ Hashes:
 
 ---
 
+## 🧠 19) Failure Recognition Drills (Mental)
+
+Scenarios:
+- chmod didn’t fix it → check MAC
+- Permissions 755 but still denied → ls -Z, getenforce, logs
+- Someone set permissive and left it → fix immediately
+- Someone used chcon instead of semanage → relabel will break it again
+
+---
+
+## 🧪 20) Timed Drills
+
+    getenforce > /tmp/selinux-mode.txt || true
+    ls -Z /usr/bin/less || true
+    sudo restorecon -Rv /var/www || true
+
+---
+
+## 🔒 Final Law
+
+If you don’t understand MAC, you will “fix” systems by making them less secure.
+
+---
+
 ## ✅ Completion Criteria
 
 You are done with this file when:
 
-- You can quickly prove whether a problem is permissions, firewall, service, or SELinux
+- You can prove whether a failure is DAC or MAC
 - You can fix mislabeled files in seconds
-- You can safely open or close ports and services
-- You can explain why access is denied, not just guess
+- You can create persistent SELinux rules correctly
+- You never leave systems in permissive mode
+- You can explain *why* access is denied, not guess
 
----
