@@ -1,54 +1,57 @@
-# 🧪 Users and Permissions — Execution Drills (LFCS)
+# 🧪 Users, Groups, Sudo, Environment, and Limits — Execution Drills (LFCS)
 
-Mental mode: Identity, access, and damage control.  
-Goal: Be able to **create, modify, secure, audit, and recover user access and permissions** quickly and safely.
+Path:
+  linux/LFCS-training/execution-drills/users-and-permissions.md
+
+Mental mode: Identity and privilege control.  
+Goal: Be able to **create, modify, secure, audit, and recover users, groups, sudo access, environments, and limits** quickly and safely.
 
 This is not a tutorial.  
-This is an **execution checklist + drill pack**.
+This is an **execution checklist**.
+
+Always remember:
+
+- Identity mistakes lock users out.
+- Sudo mistakes lock **you** out.
+- Limits mistakes break systems under load.
 
 ---
 
-## 🧰 Drill Framework (Applies to this file)
+## 🧱 Safety Rules
 
-Drill types:
-- **A: Atomic** — one skill, repeat until automatic
-- **B: Timed** — same skill under time pressure
-- **C: Failure Injection** — break intentionally; recover fast
-- **D: Diagnosis** — interpret output; choose the correct fix
-- **E: Composition** — 3–6 primitives chained (exam style)
-
-Rules of engagement:
-- Never `chmod -R` blindly on real paths
-- Directories need execute bit to traverse (`x` on dirs is not “execute a file”)
-- Prefer smallest required privilege (ACLs before ownership changes when possible)
-- Always verify: `ls -l`, `stat`, `id`, `getent`, `getfacl`
+⚠️ Do NOT modify or delete your own active user.  
+⚠️ Always keep one root-capable session open when editing sudoers.  
+⚠️ Always use `visudo`.
 
 ---
 
-## 🧱 Phase 1 Lab Setup (Do once)
+## 🧱 Lab Setup (Once)
 
-    mkdir -p ~/lfcs-labs/execution-drills/phase-1
-    cd ~/lfcs-labs/execution-drills/phase-1
+    mkdir -p ~/lfcs-labs/execution-drills/users
+    cd ~/lfcs-labs/execution-drills/users
 
-Create users and groups if they do not exist:
+Create lab groups and users (ignore errors if they exist):
 
-    sudo groupadd devs || true
-    sudo useradd -m alice || true
-    sudo useradd -m bob || true
-    sudo usermod -aG devs alice
-    sudo usermod -aG devs bob
+    sudo groupadd students || true
+    sudo groupadd developers || true
 
-Create sandbox:
+    sudo useradd -m -s /bin/bash alice || true
+    sudo useradd -m -s /bin/bash bob || true
 
-    mkdir -p sandbox/{shared,private,links,acl,dropbox}
-    touch sandbox/file1 sandbox/file2
-    ls -l sandbox
+Set passwords:
+
+    sudo passwd alice
+    sudo passwd bob
 
 ---
 
 ## 👤 1) User Inspection
 
-Checklist:
+- Show current user
+- Show user ID info
+- Show logged-in users
+- Show last logins
+- Inspect passwd and group databases
 
     whoami
     id
@@ -58,464 +61,350 @@ Checklist:
     getent passwd
     getent group
 
-Atomic reps:
-- Pick 10 accounts (system + human). For each: state owner/group memberships and primary group.
-
-    id root
-    id alice
-    id bob
-
 ---
 
-## ➕ 2) User Creation and Deletion
+## ➕ 2) User Creation
 
-Checklist:
+Create user with custom home and shell:
 
-    sudo useradd testuser
-    sudo useradd -m -s /bin/bash testuser2
-    sudo passwd testuser
-    sudo passwd -l testuser
-    sudo passwd -u testuser
-    sudo userdel testuser
-    sudo userdel -r testuser2
+    sudo useradd -m -d /home/school/harry -s /bin/bash harry
+    ls -ld /home/school/harry
+    getent passwd harry
 
-Scenario reps (build reflex):
-- Create a service-style user with no login shell and a custom home:
+Create temp user:
 
-    sudo useradd -m -d /opt/backup -s /usr/sbin/nologin backupadmin
-
-Verify:
-
-    getent passwd backupadmin
-    ls -ld /opt/backup
+    sudo useradd -m tempuser
+    getent passwd tempuser
 
 ---
 
 ## 🧰 3) User Modification
 
-Checklist:
+Change shell:
 
-    sudo usermod -s /bin/sh testuser
-    sudo usermod -d /home/newhome -m testuser
-    sudo usermod -u 2001 testuser
-    sudo chage -E 2026-12-31 testuser
-    sudo chage -l testuser
+    sudo usermod -s /bin/bash harry
 
-Timed reps:
-- In 30 seconds, set max age 90 days and warn at 7:
+Change home (and move it):
 
-    sudo chage -M 90 -W 7 testuser
-    sudo chage -l testuser
+    sudo usermod -d /home/newharry -m harry
+    ls -ld /home/newharry
+
+Expire password (force change on next login):
+
+    sudo passwd -e harry
+
+Lock and unlock:
+
+    sudo passwd -l harry
+    sudo passwd -u harry
 
 ---
 
-## 👥 4) Group Management
+## ❌ 4) User Deletion
 
-Checklist:
+Delete user and home:
 
-    sudo groupadd devs
-    sudo groupdel devs
-    sudo usermod -aG sudo testuser
-    sudo gpasswd -d testuser sudo
-    sudo usermod -g devs testuser
-    groups testuser
-    id testuser
+    sudo userdel -r tempuser
 
-Phase 1 drill: primary vs secondary groups
-- Make `devs` primary for a user, then verify:
+---
 
-    sudo usermod -g devs alice
-    id alice
+## 👥 5) Groups
+
+Create and delete group:
+
+    sudo groupadd testgroup
+    getent group testgroup
+    sudo groupdel testgroup
+
+Primary vs supplementary groups:
+
+Set primary:
+
+    sudo usermod -g students alice
+
+Add supplementary (CRITICAL: use -aG):
+
+    sudo usermod -aG developers,sudo alice
+
+Check:
+
     groups alice
+    id alice
 
 ---
 
-## 🔐 5) Password Policy and Aging
+## 🏠 6) /etc/skel
 
-Checklist:
-
-    sudo chage -l testuser
-    sudo chage -m 1 -M 90 -W 7 testuser
-    sudo chage -d 0 testuser
-    sudo passwd -l testuser
-    sudo passwd -u testuser
-
-Drill: expiry date (account expiration)
-- Set an account expiry date and verify:
-
-    sudo chage -E 2026-12-31 testuser
-    sudo chage -l testuser
-
----
-
-## 🏠 6) Skeleton Directory
-
-Checklist:
-
-    ls -la /etc/skel
-    sudo nano /etc/skel/README
-    sudo useradd -m skeltest
-    ls -la /home/skeltest
-
-Drill: create a required file for all new users
-- Add a file to `/etc/skel` and verify it appears for a new user:
+Add file to skeleton:
 
     sudo touch /etc/skel/NEWS
-    sudo useradd -m skelnews
-    ls -la /home/skelnews | grep NEWS || true
+
+Create user:
+
+    sudo useradd -m skeltest
+    ls -l /home/skeltest
+
+Cleanup:
+
+    sudo userdel -r skeltest
+    sudo rm -f /etc/skel/NEWS
 
 ---
 
-## 📁 7) Ownership and Basic Permissions
+## 🌱 7) Environment Variables
 
-Checklist:
+System-wide:
 
-    ls -l file.txt
-    sudo chown testuser file.txt
-    sudo chgrp devs file.txt
-    chmod 640 file.txt
-    chmod u+x,g-w,o-r file.txt
-    chmod -R 750 somedir
+Edit:
 
-### A) Atomic Drills (Precision & Repetition)
+    sudo vi /etc/environment
 
-#### A1 — Read permissions instantly
-Pick 10 different paths. For each: say owner/group/mode/meaning.
+Add:
 
-    ls -l /etc/passwd
-    ls -ld /tmp
-    stat /etc/passwd
+    LFCS_USERS_PHASE=ACTIVE
 
-#### A2 — Symbolic chmod
-Repeat 10 times.
+Reload or re-login:
 
-    touch a2.txt
-    chmod u+x a2.txt
-    chmod g-w a2.txt
-    chmod o= a2.txt
-    ls -l a2.txt
+    source /etc/environment
+    printenv LFCS_USERS_PHASE
 
-Reset:
+Per-user:
 
-    chmod 644 a2.txt
+    echo 'export MYTESTVAR=hello' >> ~/.bashrc
+    source ~/.bashrc
+    echo $MYTESTVAR
 
-#### A3 — Octal chmod
-Repeat until instant.
+Capture environment:
 
-    chmod 755 a2.txt
-    ls -l a2.txt
-    chmod 640 a2.txt
-    ls -l a2.txt
-    chmod 700 a2.txt
-    ls -l a2.txt
-
-#### A4 — Ownership changes
-Practice user and group ownership changes safely.
-
-    sudo chown alice a2.txt
-    ls -l a2.txt
-    sudo chown alice:devs a2.txt
-    ls -l a2.txt
-    sudo chgrp devs a2.txt
-    ls -l a2.txt
-
-#### A5 — Umask behavior (predict then verify)
-Observe current umask result:
-
-    umask
-    rm -f umask.txt
-    touch umask.txt
-    ls -l umask.txt
-
-Temporary change:
-
-    umask 027
-    rm -f umask2.txt
-    touch umask2.txt
-    ls -l umask2.txt
-
-Reset (example):
-
-    umask 022
+    env > env.txt
+    ls -l env.txt
 
 ---
 
-## 🧷 8) Special Permissions
+## 🔐 8) sudo (Privilege Control)
 
-Checklist:
+Always use:
 
-    chmod u+s somebin
-    chmod g+s somedir
-    chmod +t /shared
-    find / -perm -4000 -type f 2>/dev/null
-    find / -perm -2000 -type d 2>/dev/null
-    find / -perm -1000 -type d 2>/dev/null
+    sudo visudo
 
-### C) Special Bits (Behavior Drills)
+### 8.1 Passwordless sudo for user
 
-#### C1 — SGID directory behavior (group inheritance)
-Set group + SGID:
+Add:
 
-    sudo chgrp devs sandbox/shared
-    chmod 2775 sandbox/shared
-    ls -ld sandbox/shared
+    harry ALL=(ALL) NOPASSWD: ALL
 
-Create as alice:
-
-    sudo -u alice touch sandbox/shared/from-alice.txt
-    ls -l sandbox/shared
-
-Pass condition: new file is group-owned by `devs`.
-
-#### C2 — Sticky bit behavior (delete control)
-Set sticky:
-
-    chmod 1777 sandbox/shared
-    ls -ld sandbox/shared
-
-Create files as different users and test delete behavior.
-
-#### C3 — Find special bits (muscle memory)
-Practice and interpret:
-
-    find /usr -type f -perm -4000 | head
-    find / -type d -perm -2000 | head
-    find / -type d -perm -1000 | head
-
----
-
-## 🔗 9) Links (Hard vs Soft)
-
-#### L1 — Hard link behavior (inode shared)
-    echo "DATA" > sandbox/links/original.txt
-    ln sandbox/links/original.txt sandbox/links/hard.txt
-    ls -li sandbox/links
-
-Delete original:
-
-    rm sandbox/links/original.txt
-    cat sandbox/links/hard.txt
-
-Pass condition: explain why data still exists (same inode, link count).
-
-#### L2 — Symlink behavior (path reference)
-    echo "DATA" > sandbox/links/real.txt
-    ln -s sandbox/links/real.txt sandbox/links/sym.txt
-    ls -l sandbox/links
-
-Delete target:
-
-    rm sandbox/links/real.txt
-    ls -l sandbox/links
-    cat sandbox/links/sym.txt
-
-Pass condition: explain why it breaks (symlink points to missing path).
-
-#### L3 — readlink
-    readlink sandbox/links/sym.txt
-
----
-
-## 🧠 10) umask
-
-Checklist:
-
-    umask
-    umask 027
-    touch testfile
-    ls -l testfile
-
-Drill note:
-- Practice predicting the created mode before you run `touch`.
-
----
-
-## 🧪 11) Access Control Lists (ACLs)
-
-Checklist:
-
-    mount | grep acl || true
-    setfacl -m u:testuser:rw file.txt
-    getfacl file.txt
-    setfacl -d -m u:testuser:rw somedir
-    setfacl -b file.txt
-
-### D) ACL Drills (Phase 1)
-
-#### D1 — View ACL
-    getfacl sandbox/file1
-
-#### D2 — Grant user access (without changing owner)
-    setfacl -m u:alice:rw sandbox/file1
-    getfacl sandbox/file1
-    ls -l sandbox/file1
-
-Pass condition: observe the `+` in `ls -l`.
-
-#### D3 — Mask behavior (effective rights)
-    setfacl -m m::r sandbox/file1
-    getfacl sandbox/file1
-
-Pass condition: explain why effective permissions changed (mask limits named users/groups).
-
-#### D4 — Remove ACLs
-    setfacl -b sandbox/file1
-    getfacl sandbox/file1
-
----
-
-## 🔍 12) Auditing and Forensics
-
-Checklist:
-
-    find / -user testuser 2>/dev/null
-    find / -perm -0002 2>/dev/null
-    find / -nouser -o -nogroup 2>/dev/null
-
-Phase 1 drills: find by ownership & mode
-- Find not owned by root (practice interpreting results):
-
-    find /etc -type f ! -user root | head
-
-- Find world writable (silence errors):
-
-    find / -type f -perm -0002 2>/dev/null | head
-
-- Find exact mode in sandbox:
-
-    find sandbox -type f -perm 0644
-
----
-
-## 👑 13) sudo and Privilege Escalation
-
-Checklist:
+Test as harry:
 
     sudo -l
+
+### 8.2 Group sudo
+
+Add:
+
+    %developers ALL=(ALL) ALL
+
+### 8.3 Restrict to one command
+
+Add:
+
+    harry ALL=(ALL) /usr/bin/mount
+
+### 8.4 Run as specific user
+
+Add:
+
+    harry ALL=(sam) ALL
+
+Explain:
+- harry can run commands as user sam.
+
+---
+
+## 📏 9) Resource Limits
+
+View current:
+
+    ulimit -a
+
+Edit limits:
+
+    sudo vi /etc/security/limits.conf
+
+Add:
+
+    harry soft nproc 20
+    harry hard nproc 30
+
+Log out and log back in as harry, then:
+
+    ulimit -a
+
+---
+
+## 🗃️ 10) Identity Databases
+
+Inspect:
+
+    head /etc/passwd
+    head /etc/group
+    sudo head /etc/shadow
+
+Find specific user:
+
+    grep '^harry:' /etc/passwd
+
+---
+
+## ⏱️ 11) Timed Drills
+
+### 11.1 Create exact user (30 seconds)
+
+Requirements:
+- user: examuser
+- home: /home/exam/examuser
+- shell: /bin/bash
+- group: students
+
+    sudo useradd examuser -d /home/exam/examuser -m -s /bin/bash -g students
+    getent passwd examuser
+
+### 11.2 Passwordless sudo (20 seconds)
+
     sudo visudo
-    sudo usermod -aG sudo testuser
-    sudo -i
 
-Drill: least-privilege sudo rule (one command only)
-- Allow a user to run one specific systemctl command without password (practice editing safely):
+Add:
 
-    sudo visudo
+    examuser ALL=(ALL) NOPASSWD: ALL
 
-Verify:
+Test:
 
-    sudo -l -U testuser
+    sudo -l
 
----
+### 11.3 Force password change (10 seconds)
 
-## 🧯 14) Account Recovery
-
-Checklist:
-
-    mount -o remount,rw /
-    passwd
-    reboot
+    sudo passwd -e examuser
 
 ---
 
-## ⏱️ Timed Drills (Speed)
+## 🧨 12) Failure Injection Drills
 
-### T1 — Fix a broken tree (30 seconds)
-Broken tree:
+### 12.1 Forgot -a with -G
 
-    mkdir -p broken/dir
-    touch broken/dir/file
-    chmod -R 777 broken
+Simulate:
 
-Fix to:
-- directories: 755
-- files: 644
+    sudo usermod -G developers alice
 
-Target commands:
+Check:
 
-    find broken -type d -exec chmod 755 {} +
-    find broken -type f -exec chmod 644 {} +
+    groups alice
 
-### T2 — Shared directory setup (30 seconds)
-Goal:
-- group = devs
-- SGID
-- rwxrwsr-x
-
-    chgrp devs sandbox/shared
-    chmod 2775 sandbox/shared
-    ls -ld sandbox/shared
-
-### T3 — Grant user access without changing ownership (20 seconds)
-    setfacl -m u:bob:rw sandbox/file2
-    getfacl sandbox/file2
-
----
-
-## 🧨 Failure Injection Drills (Break & Recover)
-
-### F1 — Lock yourself out (controlled)
-Break:
-
-    mkdir -p sandbox/lockme
-    chmod 600 sandbox/lockme
-    ls sandbox/lockme
+Explain:
+- It overwrote supplementary groups.
 
 Fix:
 
-    chmod 700 sandbox/lockme
-
-Pass condition: explain why directories need execute bit.
-
-### F2 — Break symlink target and diagnose
-Break:
-
-    ln -s /no/such/path sandbox/links/broken
-    ls -l sandbox/links
-
-Diagnose:
-
-    readlink sandbox/links/broken
+    sudo usermod -aG developers,sudo alice
 
 ---
 
-## 🧩 Composition Drills (Exam Style)
+### 12.2 Bad shell path
 
-### E1 — Secure shared dropbox
-Requirements:
-- anyone can write
-- only owner can delete
+Break:
 
-    mkdir -p sandbox/dropbox
-    chmod 1777 sandbox/dropbox
-    ls -ld sandbox/dropbox
+    sudo usermod -s /bin/notreal harry
 
-### E2 — Give alice access to a log without changing owner
-    sudo touch /tmp/app.log
-    sudo chown root:root /tmp/app.log
-    sudo chmod 640 /tmp/app.log
-    sudo setfacl -m u:alice:rw /tmp/app.log
-    getfacl /tmp/app.log
+Explain:
+- User cannot log in.
+
+Fix:
+
+    sudo usermod -s /bin/bash harry
+
+---
+
+### 12.3 Sudoers syntax error (theory)
+
+Explain:
+- Why visudo exists
+- How it prevents total lockout
+
+---
+
+## 🧩 13) Composition (Exam Style)
+
+### 13.1 Full user provisioning
+
+Goal:
+- user: projectadmin
+- home: /home/projects/projectadmin
+- shell: /bin/bash
+- group: developers
+- passwordless sudo
+- force password change
+
+    sudo useradd projectadmin -d /home/projects/projectadmin -m -s /bin/bash -g developers
+    sudo passwd projectadmin
+    sudo visudo
+
+Add:
+
+    projectadmin ALL=(ALL) NOPASSWD: ALL
+
+Then:
+
+    sudo passwd -e projectadmin
+    getent passwd projectadmin
+
+---
+
+### 13.2 Apply resource limit
+
+Add to /etc/security/limits.conf:
+
+    projectadmin hard nproc 50
+
+Re-login and verify:
+
+    ulimit -a
+
+---
+
+## 🧯 14) Account Recovery (Awareness)
+
+- Boot into rescue/emergency
+- Remount root rw
+- Fix passwd/shadow/sudoers
+- Reboot
+
+    mount -o remount,rw /
+    visudo
+    reboot
 
 ---
 
 ## ✅ Completion Criteria
 
-You are done with this file when:
+You are done when:
 
-- You can read permissions instantly and explain them
-- You can convert symbolic <-> octal without thinking
-- You can fix broken directory trees safely under time pressure
-- You can explain and use SUID, SGID, sticky (including directory inheritance)
-- You can explain and predict hard vs symlink behavior
-- You can use ACLs and explain mask effects
-- You can find files by owner, group, and mode reliably
-- You never lock yourself out permanently and you can recover cleanly
+- You can create users with exact homes, shells, and groups
+- You never break supplementary groups accidentally
+- You can lock/unlock and expire accounts safely
+- You can grant and restrict sudo without locking yourself out
+- You can explain and apply resource limits
+- You can reason about /etc/passwd, /etc/group, /etc/shadow
+- You can recover from identity or sudo breakage
 
 ---
 
 ## 🔒 Law
 
-If you do not control **who can touch what**, you do not control the system.
+If you don’t control identity and privilege, you don’t control the system.
 
 ---
+
+## 🧹 Cleanup (Optional)
+
+    sudo userdel -r harry
+    sudo userdel -r examuser
+    sudo userdel -r projectadmin
 
