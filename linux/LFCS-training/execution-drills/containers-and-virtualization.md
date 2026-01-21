@@ -1,49 +1,90 @@
 # 🧪 Containers and Virtualization — Execution Drills (LFCS)
 
 Mental mode: Runtime control and isolation.  
-Goal: Be able to **build, run, inspect, network, persist, and troubleshoot containers**, and to **recognize/operate basic virtualization signals** on a Linux system.
+Goal: Be able to **build, run, inspect, network, persist, and troubleshoot containers**, and to **recognize/operate basic virtualization signals and virsh/libvirt controls** on a Linux system.
 
 This is not a tutorial.  
 This is an **execution checklist**.
 
 Notes:
 - Container tooling varies by distro: Docker, Podman, containerd, nerdctl.
-- Prefer the tool that exists on your box. Run the detection step first.
+- Virtualization tooling may or may not exist: libvirt, virsh, virt-install.
+- Prefer the tool that exists on your box. Run detection first.
+
+Core laws:
+
+> Containers = fast, disposable workloads.  
+> VMs = heavier, stateful workloads.  
+> You must control both.
 
 ---
 
 ## 🧭 1) Detect What’s Installed
 
-- Identify available container tools
-- Identify the active container runtime service(s)
+Container tools:
 
     command -v docker || true
     command -v podman || true
     command -v nerdctl || true
     command -v ctr || true
 
+Runtime services:
+
     systemctl status docker || true
     systemctl status podman || true
     systemctl status containerd || true
     systemctl status crio || true
 
+Virtualization tools:
+
+    command -v virsh || true
+    command -v virt-install || true
+    systemctl status libvirtd || true
+
+Quick versions:
+
+    docker --version 2>/dev/null || true
+    podman --version 2>/dev/null || true
+    virsh --version 2>/dev/null || true
+
 ---
 
-## 🧱 2) Container Image Basics (Pull / List / Inspect)
+## 🧱 2) Lab Setup (Debian/Ubuntu)
 
-- Pull an image
-- List local images
-- Inspect image metadata
-- Remove an image
+Create workspace:
 
-Docker:
+    mkdir -p ~/lfcs-labs/execution-drills/phase-11
+    cd ~/lfcs-labs/execution-drills/phase-11
+
+Install tools (safe defaults; install what you plan to use):
+
+    sudo apt-get update
+    sudo apt-get install -y docker.io libvirt-clients libvirt-daemon-system virtinst
+
+Start services if installed:
+
+    sudo systemctl enable --now docker 2>/dev/null || true
+    sudo systemctl enable --now libvirtd 2>/dev/null || true
+
+Sanity:
+
+    docker ps 2>/dev/null || true
+    virsh list --all 2>/dev/null || true
+
+---
+
+# =========================
+# 🐳 3) Containers — Images
+# =========================
+
+## 3.1 Pull / List / Inspect / Remove (Docker)
 
     docker pull alpine
     docker images
     docker inspect alpine
     docker rmi alpine
 
-Podman:
+## 3.2 Pull / List / Inspect / Remove (Podman)
 
     podman pull alpine
     podman images
@@ -52,37 +93,47 @@ Podman:
 
 ---
 
-## ▶️ 3) Run Containers (Interactive / Detached)
+# =========================
+# ▶️ 4) Run Containers
+# =========================
 
-- Run an interactive shell
-- Run a one-shot command
-- Run detached
-- Name a container
-- Auto-remove container on exit
+## 4.1 Interactive shell + one-shot command
 
 Docker:
 
     docker run -it alpine sh
     docker run --rm alpine echo hello
-    docker run -d --name web nginx
-    docker run --rm --name tmp alpine echo ok
 
 Podman:
 
     podman run -it alpine sh
     podman run --rm alpine echo hello
+
+## 4.2 Detached, named container
+
+Docker:
+
+    docker run -d --name web nginx
+
+Podman:
+
     podman run -d --name web nginx
+
+## 4.3 Auto-remove on exit
+
+Docker:
+
+    docker run --rm --name tmp alpine echo ok
+
+Podman:
+
     podman run --rm --name tmp alpine echo ok
 
 ---
 
-## 📋 4) List, Inspect, Logs, Exec
-
-- List running containers
-- List all containers
-- Inspect a container
-- View logs
-- Exec into a running container
+# =========================
+# 📋 5) Inspect / Logs / Exec
+# =========================
 
 Docker:
 
@@ -102,13 +153,9 @@ Podman:
 
 ---
 
-## 🛑 5) Stop, Start, Restart, Remove
-
-- Stop container
-- Start container
-- Restart container
-- Remove container
-- Force remove
+# =========================
+# 🛑 6) Stop / Start / Remove
+# =========================
 
 Docker:
 
@@ -128,19 +175,26 @@ Podman:
 
 ---
 
-## 🧠 6) Networking Basics (Ports, Networks)
+# =========================
+# 🌐 7) Networking Basics
+# =========================
 
-- Show container port mappings
-- Publish a port
-- Verify with curl
-- List networks
-- Create custom network
-- Attach container to network
+## 7.1 Publish ports + verify with curl
 
 Docker:
 
     docker run -d --name web -p 8080:80 nginx
     curl -I http://127.0.0.1:8080
+
+Podman:
+
+    podman run -d --name web -p 8080:80 nginx
+    curl -I http://127.0.0.1:8080
+
+## 7.2 Networks (create + attach)
+
+Docker:
+
     docker network ls
     docker network create labnet
     docker run -d --name web2 --network labnet nginx
@@ -148,8 +202,6 @@ Docker:
 
 Podman:
 
-    podman run -d --name web -p 8080:80 nginx
-    curl -I http://127.0.0.1:8080
     podman network ls
     podman network create labnet
     podman run -d --name web2 --network labnet nginx
@@ -157,12 +209,11 @@ Podman:
 
 ---
 
-## 💾 7) Storage (Bind Mounts and Volumes)
+# =========================
+# 💾 8) Storage (Bind + Volume)
+# =========================
 
-- Bind mount a host directory
-- Verify file appears inside container
-- Create a named volume
-- Mount named volume
+## 8.1 Bind mount (read-only site content)
 
 Docker:
 
@@ -171,17 +222,23 @@ Docker:
     docker run --rm -p 8081:80 -v /tmp/ctr-lab:/usr/share/nginx/html:ro nginx
     curl -s http://127.0.0.1:8081 | head -n 5
 
-    docker volume create webdata
-    docker run --rm -v webdata:/data alpine sh -c "echo hi > /data/hi.txt; ls -la /data"
-    docker volume ls
-    docker volume inspect webdata
-
 Podman:
 
     mkdir -p /tmp/ctr-lab
     echo "hello" > /tmp/ctr-lab/index.html
     podman run --rm -p 8081:80 -v /tmp/ctr-lab:/usr/share/nginx/html:ro nginx
     curl -s http://127.0.0.1:8081 | head -n 5
+
+## 8.2 Named volume
+
+Docker:
+
+    docker volume create webdata
+    docker run --rm -v webdata:/data alpine sh -c "echo hi > /data/hi.txt; ls -la /data"
+    docker volume ls
+    docker volume inspect webdata
+
+Podman:
 
     podman volume create webdata
     podman run --rm -v webdata:/data alpine sh -c "echo hi > /data/hi.txt; ls -la /data"
@@ -190,11 +247,9 @@ Podman:
 
 ---
 
-## 🧪 8) Resource Controls (CPU / Memory) and Limits
-
-- Run with memory limit
-- Run with CPU quota
-- Inspect limits
+# =========================
+# 🧪 9) Resource Controls
+# =========================
 
 Docker:
 
@@ -208,39 +263,59 @@ Podman:
 
 ---
 
-## 🧾 9) Build a Simple Image (Dockerfile)
+# =========================
+# 🧾 10) Build an Image (Dockerfile)
+# =========================
 
-- Create a simple image
-- Build it
-- Run it
-- Inspect it
+## 10.1 Minimal build
+
+Create build context:
+
+    mkdir -p ~/lfcs-labs/execution-drills/phase-11/imglab
+    cd ~/lfcs-labs/execution-drills/phase-11/imglab
+
+Write Dockerfile:
+
+    printf "%s\n" \
+      "FROM nginx" \
+      "COPY index.html /usr/share/nginx/html/index.html" \
+      > Dockerfile
+
+Create content:
+
+    echo "PHASE 11 TEST" > index.html
+
+Build:
 
 Docker:
 
-    mkdir -p /tmp/imglab
-    cd /tmp/imglab
-    printf "%s\n" "FROM alpine" "RUN echo hello-from-image > /hello.txt" "CMD [\"cat\",\"/hello.txt\"]" > Dockerfile
-    docker build -t imglab:1 .
-    docker run --rm imglab:1
-    docker history imglab:1
+    docker build -t myimage:1.0 .
 
 Podman:
 
-    mkdir -p /tmp/imglab
-    cd /tmp/imglab
-    printf "%s\n" "FROM alpine" "RUN echo hello-from-image > /hello.txt" "CMD [\"cat\",\"/hello.txt\"]" > Dockerfile
-    podman build -t imglab:1 .
-    podman run --rm imglab:1
-    podman history imglab:1
+    podman build -t myimage:1.0 .
+
+Run + verify:
+
+Docker:
+
+    docker run -d -p 8181:80 --name mycontainer myimage:1.0
+    curl http://127.0.0.1:8181
+    docker rm -f mycontainer
+
+Podman:
+
+    podman run -d -p 8181:80 --name mycontainer myimage:1.0
+    curl http://127.0.0.1:8181
+    podman rm -f mycontainer
 
 ---
 
-## 🧯 10) Troubleshooting Drills
+# =========================
+# 🧯 11) Troubleshooting Drills
+# =========================
 
-- Container exits immediately: inspect exit code and logs
-- DNS inside container: test name resolution
-- Network reachability: curl from inside container
-- Check mounts: verify file path
+## 11.1 Container exits immediately (exit code + logs)
 
 Docker:
 
@@ -249,9 +324,6 @@ Docker:
     docker logs fail || true
     docker rm fail
 
-    docker run --rm alpine getent hosts github.com || true
-    docker run --rm alpine sh -c "apk add --no-cache curl >/dev/null 2>&1; curl -I https://example.com | head -n 1" || true
-
 Podman:
 
     podman run --name fail alpine sh -c "exit 7" || true
@@ -259,15 +331,44 @@ Podman:
     podman logs fail || true
     podman rm fail
 
+## 11.2 DNS and reachability inside container
+
+Docker:
+
+    docker run --rm alpine getent hosts github.com || true
+    docker run --rm alpine sh -c "apk add --no-cache curl >/dev/null 2>&1; curl -I https://example.com | head -n 1" || true
+
+Podman:
+
     podman run --rm alpine getent hosts github.com || true
     podman run --rm alpine sh -c "apk add --no-cache curl >/dev/null 2>&1; curl -I https://example.com | head -n 1" || true
 
+## 11.3 “Container unreachable” checklist
+
+Checklist:
+- Is it running?
+
+    docker ps 2>/dev/null || true
+    podman ps 2>/dev/null || true
+
+- Was port published?
+
+    docker port web 2>/dev/null || true
+    podman port web 2>/dev/null || true
+
+- Is host listening?
+
+    ss -tlnp | head
+
+- Validate curl to published port:
+
+    curl -I http://127.0.0.1:8080 2>/dev/null | head -n 5 || true
+
 ---
 
-## 🧷 11) Systemd and Containers (Service Control Awareness)
-
-- Check if container engine is enabled
-- Enable and start engine (if required)
+# =========================
+# 🧷 12) Persistence Awareness (systemd)
+# =========================
 
     systemctl is-enabled docker 2>/dev/null || true
     sudo systemctl enable --now docker 2>/dev/null || true
@@ -277,14 +378,11 @@ Podman:
 
 ---
 
-## 🧠 12) Virtualization Signals (Basic Host Awareness)
+# =========================
+# 🖥️ 13) Virtualization Signals (Host Awareness)
+# =========================
 
-Goal: Recognize whether you are inside a VM, and identify virtualization support.
-
-- Detect if running inside a VM/container
-- Check CPU virtualization flags
-- Check KVM device
-- Check loaded modules
+Goal: Recognize whether you are inside a VM/container, and identify virtualization support.
 
     systemd-detect-virt
     lscpu | grep -i virtualization || true
@@ -294,14 +392,155 @@ Goal: Recognize whether you are inside a VM, and identify virtualization support
 
 ---
 
-## ✅ Completion Criteria
+# =========================
+# 🖥️ 14) libvirt / virsh Basics (If Present)
+# =========================
+
+## 14.1 List VMs
+
+    virsh list --all
+
+## 14.2 Start / shutdown / destroy
+
+(Use an existing VM name.)
+
+    virsh start VM1
+    virsh shutdown VM1
+    virsh destroy VM1
+
+Meaning:
+- shutdown = graceful
+- destroy = power off (hard)
+
+## 14.3 Autostart
+
+Enable:
+
+    virsh autostart VM1
+
+Disable:
+
+    virsh autostart --disable VM1
+
+## 14.4 Undefine VM (DO NOT delete disk)
+
+    virsh undefine VM1
+
+Meaning:
+- XML definition removed
+- disk usually remains
+
+## 14.5 Memory control (persistent)
+
+    virsh setmaxmem VM2 80M --config
+    virsh setmem VM2 80M --config
+
+Meaning:
+- --config = persistent (next boot)
+
+---
+
+# =========================
+# 🧠 15) virt-install (Conceptual or Lab-Real)
+# =========================
+
+Example flow (if you already have an image):
+
+    virt-install \
+      --name mockexam1 \
+      --memory 1024 \
+      --vcpus 1 \
+      --disk path=/var/lib/libvirt/images/ubuntu.img \
+      --import \
+      --os-variant ubuntu22.04 \
+      --graphics none \
+      --network network=default
+
+---
+
+# =========================
+# ⏱️ 16) Timed Drills
+# =========================
+
+## 16.1 Run nginx on 1234 in 20 seconds
+
+Docker:
+
+    docker run -d -p 1234:80 --name website nginx
+
+Podman:
+
+    podman run -d -p 1234:80 --name website nginx
+
+## 16.2 List all containers in 5 seconds
+
+    docker ps -a 2>/dev/null || true
+    podman ps -a 2>/dev/null || true
+
+## 16.3 Remove all containers (lab only)
+
+Docker:
+
+    docker rm -f $(docker ps -a -q) 2>/dev/null || true
+
+Podman:
+
+    podman rm -f $(podman ps -a -q) 2>/dev/null || true
+
+## 16.4 List all VMs in 5 seconds
+
+    virsh list --all 2>/dev/null || true
+
+---
+
+# =========================
+# 🧯 17) Failure Injection Drills (Mental)
+# =========================
+
+- destroy vs shutdown
+  - destroy = power cut
+  - shutdown = graceful OS shutdown
+
+- docker rm vs docker rmi
+  - rm  = remove container
+  - rmi = remove image
+
+- “port published” mistakes
+  - container runs, curl fails
+  - confirm: published port, host listener, correct port number
+
+---
+
+# =========================
+# ✅ Completion Criteria
+# =========================
 
 You are done with this file when:
 
 - You can run, inspect, exec, log, mount, and publish ports in minutes
 - You can build a simple image without hesitation
 - You can isolate whether a failure is image, command, network, or storage
+- You can explain container vs image lifecycle clearly
 - You can quickly identify whether the host is virtualized
+- You can list/start/stop/destroy VMs and set autostart (if libvirt exists)
 
 ---
+
+# 🔒 Final Law
+
+If you can’t control workloads, you can’t control compute.
+
+---
+
+# Cleanup (Optional / Lab Only)
+
+Docker:
+
+    docker rm -f $(docker ps -a -q) 2>/dev/null || true
+    docker rmi myimage:1.0 2>/dev/null || true
+
+Podman:
+
+    podman rm -f $(podman ps -a -q) 2>/dev/null || true
+    podman rmi myimage:1.0 2>/dev/null || true
 
