@@ -1,276 +1,364 @@
 # 🧪 Networking — Execution Drills (LFCS)
 
+Path:
+  linux/LFCS-training/execution-drills/networking.md
+
 Mental mode: Connectivity under pressure.  
-Goal: Be able to **inspect, configure, test, debug, and persist networking** quickly and safely.
+Goal: Be able to **inspect, test, debug, and (when required) make safe temporary changes** to networking under time pressure.
 
 This is not a tutorial.  
 This is an **execution checklist**.
 
+Always diagnose unreachable systems in this order:
+
+    interface → IP → route → DNS → firewall → service
+
 ---
 
-## 🌐 1) Inspect Network State
+## 🧱 Lab Setup (Safe Mode)
+
+⚠️ If this is your primary machine, avoid touching your real interface config.  
+Prefer: a VM, or use a dummy interface / network namespace.
+
+Install common tools (Debian/Ubuntu):
+
+    sudo apt-get update
+    sudo apt-get install -y iproute2 iputils-ping dnsutils curl net-tools ufw tcpdump traceroute
+
+Optional tools (only if you want them):
+
+    sudo apt-get install -y nmap
+
+If you want a local service to test reachability:
+
+    sudo apt-get install -y nginx
+    sudo systemctl enable --now nginx
+
+---
+
+## 1) Inspect Network State (Baseline)
 
 - Show interfaces
 - Show IP addresses
 - Show routes
 - Show DNS configuration
-- Show listening ports
+- Show listeners
 
     ip link
     ip addr
     ip route
-    resolvectl status || cat /etc/resolv.conf
+    resolvectl status 2>/dev/null || cat /etc/resolv.conf
     ss -lntup
+
+Save evidence (exam habit):
+
+    ip addr > ips.txt
+    ip route > routes.txt
+    ss -lntup > listening.txt
 
 ---
 
-## 🔌 2) Basic Connectivity Tests
+## 2) Basic Connectivity Tests
 
-- Ping local gateway
-- Ping public IP
-- Ping DNS name
-- Trace route
-- Show path MTU issues
+- Local TCP/IP stack
+- Reach public IP (routing)
+- Reach DNS name (DNS + routing)
+- Trace path
 
     ping -c 3 127.0.0.1
     ping -c 3 8.8.8.8
     ping -c 3 google.com
     traceroute 8.8.8.8 || tracepath 8.8.8.8
-    tracepath google.com
+    tracepath google.com || true
+
+HTTP service check (local):
+
+    curl -I http://127.0.0.1 2>/dev/null | head -n 5 || true
 
 ---
 
-## 🧭 3) Interface Configuration (Temporary)
+## 3) Temporary IP and Routes (Do NOT use main interface)
 
-- Bring interface up/down
-- Assign IP address
-- Remove IP address
-- Add default route
-- Delete route
+Use a dummy interface (safe drill):
 
-    sudo ip link set eth0 down
-    sudo ip link set eth0 up
-    sudo ip addr add 192.168.50.10/24 dev eth0
-    sudo ip addr del 192.168.50.10/24 dev eth0
-    sudo ip route add default via 192.168.50.1
-    sudo ip route del default
+    sudo ip link add dummy0 type dummy
+    sudo ip link set dummy0 up
+
+Add an IP:
+
+    sudo ip addr add 192.168.50.10/24 dev dummy0
+    ip addr show dummy0
+
+Add a temporary route (example):
+
+    sudo ip route add 10.10.0.0/16 via 192.168.50.1
+    ip route
+
+Delete the route and IP:
+
+    sudo ip route del 10.10.0.0/16
+    sudo ip addr del 192.168.50.10/24 dev dummy0
+
+Cleanup:
+
+    sudo ip link del dummy0
+
+Rule:
+- Do NOT run `ip link set eth0 down` on a real machine you’re using.
 
 ---
 
-## 🧾 4) DNS Resolution
+## 4) DNS and Hosts
 
-- Test name resolution
-- Query specific DNS server
-- Flush caches (systemd-resolved)
+Inspect resolver wiring:
+
+    resolvectl status 2>/dev/null || true
+    cat /etc/resolv.conf
+
+Name resolution tests:
 
     getent hosts google.com
     dig google.com
     dig @8.8.8.8 google.com
-    sudo resolvectl flush-caches
+
+Local override drill (/etc/hosts):
+
+    sudo vi /etc/hosts
+
+Add:
+
+    127.0.0.1 test.local
+
+Test:
+
+    ping -c 1 test.local
+
+Flush caches (systemd-resolved, if present):
+
+    sudo resolvectl flush-caches 2>/dev/null || true
 
 ---
 
-## 🔍 5) Port and Service Testing
+## 5) Listening Services and Port Testing
 
-- Check if port is listening
-- Test TCP connection
-- Test HTTP service
-- Scan ports (if available)
+Who is listening:
 
-    ss -lntup
-    nc -vz 127.0.0.1 22
-    curl -I http://127.0.0.1
-    nmap 127.0.0.1
+    ss -tlnp
+    sudo netstat -tulpn
+
+Test local TCP ports:
+
+    nc -vz 127.0.0.1 22 2>/dev/null || true
+    nc -vz 127.0.0.1 80 2>/dev/null || true
+
+Identify what is on port 80:
+
+    ss -tlnp | grep ':80' || true
 
 ---
 
-## 🔥 6) Firewall (nftables / ufw / iptables)
+## 6) Firewall — ufw
 
-- Show firewall status
-- Allow a port
-- Deny a port
-- Reload firewall
-- Verify rules
+Status and numbered rules:
 
-    sudo ufw status || sudo nft list ruleset || sudo iptables -L
+    sudo ufw status numbered
+
+Allow SSH and HTTP (safe baseline):
+
     sudo ufw allow 22
-    sudo ufw deny 1234
-    sudo ufw reload
-    sudo ufw status verbose
+    sudo ufw allow 80
+
+Insert a deny rule (simulation pattern):
+
+    sudo ufw insert 1 deny from 10.0.0.19
+
+Verify rules:
+
+    sudo ufw status numbered
+
+Delete rule by number:
+
+    sudo ufw delete 1
+
+Rule:
+- Always allow SSH before enabling a firewall on a remote system.
 
 ---
 
-## 🧱 7) Packet Filtering (Explicit Drill)
+## 7) Firewall — nftables / iptables (Inspection + Minimal Drills)
 
-Goal: Prove you can implement and verify packet filtering rules.
+nftables ruleset inspection (modern Debian):
 
-### Option A: nftables (preferred on modern Debian)
+    sudo nft list ruleset 2>/dev/null || true
 
-- Show ruleset
-- Add a simple allow rule for SSH (example)
-- Verify rule exists
-- Remove rule
+iptables list (legacy):
 
-    sudo nft list ruleset
+    sudo iptables -L -n -v 2>/dev/null || true
 
-Create a temporary table/chain (lab-safe). This does not persist unless you save it:
+NAT table inspection (read-only drill):
 
-    sudo nft add table inet lfcs_lab
-    sudo nft add chain inet lfcs_lab input '{ type filter hook input priority 0; policy accept; }'
-    sudo nft add rule inet lfcs_lab input tcp dport 22 accept
-    sudo nft list table inet lfcs_lab
+    sudo iptables -t nat -L -n -v 2>/dev/null || true
+
+Do not add real NAT rules unless in a disposable VM.
+
+---
+
+## 8) Packet Capture (Evidence)
+
+Capture on all interfaces:
+
+    sudo tcpdump -i any
+
+Capture a port:
+
+    sudo tcpdump -i any port 53
+    sudo tcpdump -i any port 22
+    sudo tcpdump -i any port 80
+
+Save capture to file:
+
+    sudo tcpdump -i any -w capture.pcap
+
+---
+
+## 9) SSH Behavior (Socket Activation Awareness)
+
+Inspect ssh service and socket:
+
+    systemctl status ssh 2>/dev/null || true
+    systemctl status ssh.socket 2>/dev/null || true
+
+Explain:
+- ssh.socket may accept connections even if ssh.service is not “enabled” the way you expect.
+
+Force classic behavior (when appropriate):
+
+    sudo systemctl enable --now ssh
+    systemctl is-enabled ssh || true
+
+Safe config location drill (DO NOT lock yourself out):
+
+    sudo vi /etc/ssh/sshd_config
+
+Find:
+
+    PermitRootLogin
+    PasswordAuthentication
+
+Config test and restart:
+
+    sudo sshd -t
+    sudo systemctl restart ssh
+
+---
+
+## 10) netplan (Inspect + Safety Workflow)
+
+If present (Ubuntu commonly):
+
+    ls -l /etc/netplan 2>/dev/null || true
+    sudo cat /etc/netplan/*.yaml 2>/dev/null || true
+
+Safety validation drill (do not accept changes that break connectivity):
+
+    sudo netplan try
+
+Rule:
+- Use `netplan try` before rebooting after netplan changes.
+
+---
+
+## 11) Persistent Configuration Surfaces (Distro Dependent)
+
+systemd-networkd:
+
+    ls /etc/systemd/network 2>/dev/null || true
+    systemctl status systemd-networkd --no-pager 2>/dev/null || true
+
+NetworkManager:
+
+    nmcli device status 2>/dev/null || true
+    nmcli connection show 2>/dev/null || true
+
+---
+
+## 12) Reverse Proxy (nginx) — Disposable Drill
+
+Goal: Stand up a simple reverse proxy listener and prove it responds.
+
+Create a site config:
+
+    sudo sh -c 'cat > /etc/nginx/sites-available/proxy-test <<EOF
+    server {
+        listen 8081;
+        location / {
+            proxy_pass http://example.com;
+        }
+    }
+    EOF'
+
+Enable it:
+
+    sudo ln -s /etc/nginx/sites-available/proxy-test /etc/nginx/sites-enabled/proxy-test
+
+Validate and reload:
+
+    sudo nginx -t
+    sudo systemctl reload nginx
+
+Test:
+
+    curl -I http://127.0.0.1:8081 2>/dev/null | head -n 5 || true
 
 Cleanup:
 
-    sudo nft delete table inet lfcs_lab
+    sudo rm -f /etc/nginx/sites-enabled/proxy-test
+    sudo rm -f /etc/nginx/sites-available/proxy-test
+    sudo systemctl reload nginx
 
-### Option B: ufw (simple interface)
+---
 
-- Enable ufw (if not enabled)
-- Allow/deny ports
-- Show numbered rules
+## 13) Timed Drills (Speed)
 
-    sudo ufw status verbose
-    sudo ufw enable
-    sudo ufw allow 22
-    sudo ufw deny 1234
+Save routes (10 seconds):
+
+    ip route > routes.txt
+    wc -l routes.txt
+
+Find who listens on 80 (10 seconds):
+
+    ss -tlnp | grep ':80' || true
+
+Allow subnet in ufw (15 seconds):
+
+    sudo ufw allow from 10.11.12.0/24
     sudo ufw status numbered
 
-### Option C: iptables (legacy)
-
-- List rules
-- Add rule (example allow SSH)
-- Delete rule
-
-    sudo iptables -L -n -v
-    sudo iptables -A INPUT -p tcp --dport 22 -j ACCEPT
-    sudo iptables -L -n -v
-    sudo iptables -D INPUT -p tcp --dport 22 -j ACCEPT
-
 ---
 
-## 🧩 8) Packet Inspection
+## 14) Failure Injection Drills (Diagnosis Reflex)
 
-- Capture packets
-- Capture on specific interface
-- Capture specific port
-- Save capture to file
+Unreachable checklist (run in order):
 
-    sudo tcpdump -i any
-    sudo tcpdump -i eth0
-    sudo tcpdump -i eth0 port 80
-    sudo tcpdump -i eth0 -w capture.pcap
-
----
-
-## 🔁 9) Network Services
-
-- Check service status
-- Restart networking service
-- Restart NetworkManager or systemd-networkd
-
-    systemctl status networking || systemctl status NetworkManager
-    sudo systemctl restart networking || sudo systemctl restart NetworkManager
-    systemctl status systemd-networkd || true
-    sudo systemctl restart systemd-networkd || true
-
----
-
-## 🧠 10) Persistent Configuration (Distro Dependent)
-
-- Netplan (Ubuntu)
-- systemd-networkd
-- NetworkManager
-
-    ls /etc/netplan || true
-    ls /etc/systemd/network || true
-    nmcli device status || true
-
----
-
-## 🧪 11) nmcli Drills (If NetworkManager Present)
-
-- Show devices
-- Show connections
-- Bring connection down/up
-- Set static IP
-- Set DNS
-
-    nmcli device status
-    nmcli connection show
-    nmcli connection down "Wired connection 1"
-    nmcli connection up "Wired connection 1"
-    nmcli connection modify "Wired connection 1" ipv4.method manual ipv4.addresses 192.168.50.10/24 ipv4.gateway 192.168.50.1 ipv4.dns 1.1.1.1
-    nmcli connection up "Wired connection 1"
-
----
-
-## 🛣️ 12) Routing Drills
-
-- Show routing table
-- Add static route
-- Delete static route
-
+    ip link
+    ip addr
     ip route
-    sudo ip route add 10.10.0.0/16 via 192.168.50.1
-    sudo ip route del 10.10.0.0/16
+    resolvectl status 2>/dev/null || cat /etc/resolv.conf
+    ss -tlnp
+    sudo ufw status numbered 2>/dev/null || true
+    sudo nft list ruleset 2>/dev/null || true
+    sudo iptables -L -n -v 2>/dev/null || true
 
----
+Explain what each checks:
+- link state (interface)
+- addressing
+- routing
+- resolver wiring
+- service listening
+- firewall policy
 
-## ⏱️ 13) Time Synchronization (NTP / timesync)
-
-Goal: Prove you can inspect and correct time sync behavior.
-
-Baseline inspection:
-
-    timedatectl
-    timedatectl timesync-status 2>/dev/null || true
-
-systemd-timesyncd (common on Debian minimal installs):
-
-    systemctl status systemd-timesyncd --no-pager || true
-    sudo systemctl enable --now systemd-timesyncd || true
-    sudo systemctl restart systemd-timesyncd || true
-    journalctl -u systemd-timesyncd --since "30 minutes ago" --no-pager || true
-
-chrony (common alternative):
-
-    sudo apt-get update
-    sudo apt-get install -y chrony
-    systemctl status chrony --no-pager
-    chronyc sources || true
-    chronyc tracking || true
-
-Quick verification:
-
-    date
-    timedatectl
-
----
-
-## 🔐 14) SSH Drills
-
-- SSH to localhost
-- SSH with key
-- Copy files with scp
-- Copy files with rsync
-
-    ssh localhost
-    ssh -i ~/.ssh/id_rsa user@host
-    scp file.txt user@host:/tmp/
-    rsync -av file.txt user@host:/tmp/
-
----
-
-## 🧯 15) Emergency Network Recovery
-
-- Bring loopback up
-- Restart network stack
-- Reacquire DHCP lease
-
-    sudo ip link set lo up
-    sudo systemctl restart NetworkManager || sudo systemctl restart networking
-    sudo dhclient -v
+Firewall lockout scenario rule:
+- Always keep a root console open when changing firewall rules.
 
 ---
 
@@ -278,10 +366,11 @@ Quick verification:
 
 You are **done with this file** when:
 
-- You can diagnose "no network" in minutes
-- You can set a static IP blindfolded
+- You can diagnose “no network” in minutes using the fixed order
 - You can prove where the breakage is: link, IP, route, DNS, firewall, or service
-- You can implement and verify packet filtering rules
-- You can verify time sync status and restart/fix the time sync service
+- You can safely add/remove temporary IPs and routes without breaking your main interface
+- You can open/close ports with ufw and verify the effective rules
+- You can inspect nftables/iptables (including NAT table) and explain what you’re seeing
+- You can prove reachability using listeners + curl/nc + logs/evidence files
 
 ---
