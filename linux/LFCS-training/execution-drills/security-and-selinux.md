@@ -205,7 +205,198 @@ Law:
 
 ---
 
-## 🧯 17) Emergency Access Recovery
+# =========================
+# 🔐 Phase 12 Additions
+# =========================
+
+## 🧠 17) Sudo Delegation Patterns (Safe + Testable)
+
+Rule:
+- Always keep one root-capable session open.
+- Always edit with `visudo`.
+
+Open sudoers safely:
+
+    sudo visudo
+
+Create a test user (if needed):
+
+    sudo useradd -m -s /bin/bash harry || true
+    sudo passwd harry
+
+Grant full sudo (password required):
+
+    sudo visudo
+
+Add:
+
+    harry ALL=(ALL) ALL
+
+Test:
+
+    su - harry
+    sudo id
+    exit
+
+Grant full sudo (no password):
+
+    sudo visudo
+
+Change to:
+
+    harry ALL=(ALL) NOPASSWD: ALL
+
+Test:
+
+    su - harry
+    sudo -l
+    sudo id
+    exit
+
+Group sudo (pattern):
+
+    sudo groupadd students || true
+    sudo usermod -aG students harry
+
+    sudo visudo
+
+Add:
+
+    %students ALL=(ALL) ALL
+
+Test:
+
+    su - harry
+    sudo -l
+    exit
+
+Restrict to a single command (verify deny works):
+
+    sudo visudo
+
+Add:
+
+    harry ALL=(ALL) /usr/bin/mount
+
+Test:
+
+    su - harry
+    sudo -l
+    sudo mount || true
+    sudo id || true
+    exit
+
+---
+
+## 🧯 18) MAC Triage Flow (Fast Diagnosis)
+
+If something “should work” but doesn’t:
+
+1) DAC: permissions / ownership / ACLs
+2) Sudo: do you actually have privileges?
+3) MAC: SELinux/AppArmor
+4) Logs: prove the denial
+
+Checklist:
+
+    namei -l <path> 2>/dev/null || true
+    ls -l <path> 2>/dev/null || true
+    getfacl <path> 2>/dev/null || true
+
+    sudo -l
+
+    getenforce || true
+    sestatus || true
+    sudo aa-status || true
+
+    sudo journalctl -g denied --no-pager || true
+    sudo ausearch -m avc 2>/dev/null || true
+
+---
+
+## 🧰 19) sysctl — Kernel Security Knobs (Inspect, Set, Persist)
+
+Goal:
+- Prove you can view, set temporarily, and persist values safely.
+
+Inspect (spot check):
+
+    sysctl -a | head
+
+Read a specific key:
+
+    sysctl vm.swappiness
+
+Set temporary value:
+
+    sudo sysctl -w vm.swappiness=10
+    sysctl vm.swappiness
+
+Persist (preferred: drop-in file):
+
+    echo "vm.swappiness=10" | sudo tee /etc/sysctl.d/99-lfcs.conf
+    sudo sysctl --system
+    sysctl vm.swappiness
+
+Alternate persist (classic file):
+
+    sudo vi /etc/sysctl.conf
+
+Add:
+
+    vm.swappiness=10
+
+Apply:
+
+    sudo sysctl -p
+
+Another example (IPv6 forwarding):
+
+    echo "net.ipv6.conf.all.forwarding=1" | sudo tee -a /etc/sysctl.d/99-lfcs.conf
+    sudo sysctl --system
+    sysctl net.ipv6.conf.all.forwarding
+
+Safety rule:
+- Prefer `/etc/sysctl.d/*.conf` for lab changes (easy rollback).
+
+Rollback (lab):
+
+    sudo rm -f /etc/sysctl.d/99-lfcs.conf
+    sudo sysctl --system
+
+---
+
+## ⏱️ 20) Timed Drills (Phase 12)
+
+Write MAC mode to file:
+
+    getenforce > /tmp/selinux-mode.txt || true
+    sudo aa-status > /tmp/apparmor-status.txt 2>/dev/null || true
+
+Fix mislabeled tree:
+
+    sudo restorecon -Rv /var/www || true
+
+Set + persist sysctl in 20 seconds:
+
+    sudo sysctl -w vm.swappiness=30
+    sudo sed -i 's/^vm.swappiness.*/vm.swappiness=30/' /etc/sysctl.conf || echo "vm.swappiness=30" | sudo tee -a /etc/sysctl.conf
+    sudo sysctl -p
+
+---
+
+## 🧠 21) Failure Recognition Drills (Mental)
+
+Scenarios:
+- chmod didn’t fix it → check MAC (getenforce / ls -Z / aa-status)
+- Permissions 755 but still denied → contexts + logs
+- Someone set permissive and left it → restore enforcing immediately
+- Someone used chcon instead of semanage → relabel will break it again
+- You edited sudoers with vi and broke sudo → always use visudo
+
+---
+
+## 🧯 22) Emergency Access Recovery
 
     mount -o remount,rw /
     restorecon -Rv / || true
@@ -213,31 +404,13 @@ Law:
 
 ---
 
-## 🛡️ 18) Quick Hardening Checklist
+## 🛡️ 23) Quick Hardening Checklist
 
     systemctl --failed
     ss -lntup
     find / -perm -4000 -type f 2>/dev/null
     grep -i '^PermitRootLogin' /etc/ssh/sshd_config || true
     grep -i '^PasswordAuthentication' /etc/ssh/sshd_config || true
-
----
-
-## 🧠 19) Failure Recognition Drills (Mental)
-
-Scenarios:
-- chmod didn’t fix it → check MAC
-- Permissions 755 but still denied → ls -Z, getenforce, logs
-- Someone set permissive and left it → fix immediately
-- Someone used chcon instead of semanage → relabel will break it again
-
----
-
-## 🧪 20) Timed Drills
-
-    getenforce > /tmp/selinux-mode.txt || true
-    ls -Z /usr/bin/less || true
-    sudo restorecon -Rv /var/www || true
 
 ---
 
@@ -256,4 +429,19 @@ You are done with this file when:
 - You can create persistent SELinux rules correctly
 - You never leave systems in permissive mode
 - You can explain *why* access is denied, not guess
+- You can set and persist sysctl values safely
+- You can delegate sudo without locking yourself out
+
+---
+
+## 🧹 Cleanup (Optional)
+
+Remove lab user:
+
+    sudo userdel -r harry || true
+
+Remove lab sysctl drop-in:
+
+    sudo rm -f /etc/sysctl.d/99-lfcs.conf
+    sudo sysctl --system
 
