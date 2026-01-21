@@ -1,10 +1,14 @@
 # 🧪 Files and Text — Execution Drills (LFCS)
 
 Mental mode: Precision and speed.  
-Goal: Be able to **create, inspect, transform, and analyze text and files** without hesitation.
+Goal: Be able to **create, inspect, search, transform, and pipeline text + files** without hesitation.
 
 This is not a tutorial.  
-This is an **execution checklist + drill pack**.
+This is an **execution checklist + drill packs**.
+
+This file contains two drill packs:
+- **Phase 0**: redirection + pipelines (muscle memory)
+- **Phase 2**: search / parse / transform (find, grep, sed, awk, cut, tr, sort, uniq)
 
 ---
 
@@ -20,13 +24,14 @@ Drill types:
 Rules of engagement:
 - Always know `>` vs `>>`
 - When capturing errors, verify `2>&1` ordering
-- Verify results; do not assume
+- Always preview before `-delete`
+- Prefer working on copies for destructive transforms (`sed -i` on a copy)
 
 ---
 
-## 🧪 Phase 0 — Redirection + Pipelines (Drill Pack)
+# 🧪 Phase 0 Drill Pack — Redirection + Pipelines
 
-### Setup (Do once)
+## 🧱 Setup (Do once)
 
     mkdir -p ~/lfcs-labs/execution-drills/phase-0
     cd ~/lfcs-labs/execution-drills/phase-0
@@ -44,10 +49,9 @@ Create reproducible input:
 
 ---
 
-### A) Atomic Drills (Repetition)
+## A) Atomic Drills (Repetition)
 
-#### A1 — Redirect STDOUT overwrite vs append
-Goal: never clobber by accident.
+### A1 — Redirect STDOUT overwrite vs append
 
     echo "one" > out.txt
     echo "two" >> out.txt
@@ -55,16 +59,14 @@ Goal: never clobber by accident.
 
 Target: 10 reps.
 
-#### A2 — Redirect STDERR only
-Goal: capture errors without mixing stdout.
+### A2 — Redirect STDERR only
 
     ls /no/such/path 2> err.txt
     cat err.txt
 
 Target: 10 reps.
 
-#### A3 — Redirect both: classic vs modern
-Goal: know equivalence and when to use.
+### A3 — Redirect both: classic vs modern
 
 Classic:
 
@@ -78,8 +80,7 @@ Modern:
 
 Target: 10 reps each.
 
-#### A4 — /dev/null patterns
-Goal: silence output intentionally.
+### A4 — /dev/null patterns
 
     ls /no/such/path 2> /dev/null
     ls /etc > /dev/null
@@ -87,8 +88,7 @@ Goal: silence output intentionally.
 
 Target: 10 reps.
 
-#### A5 — tee (view + save)
-Goal: capture output while observing it.
+### A5 — tee (view + save)
 
     dmesg | head -n 5 | tee out.txt
     cat out.txt
@@ -100,16 +100,14 @@ Append mode:
 
 Target: 10 reps.
 
-#### A6 — Pipes (simple)
-Goal: route stdout into next tool.
+### A6 — Pipes (simple)
 
     cat input.txt | wc -l
     cat input.txt | grep -c beta
 
 Target: 10 reps.
 
-#### A7 — Here-doc file creation
-Goal: create files without an editor.
+### A7 — Here-doc file creation
 
     cat > file.txt <<EOF
     line1
@@ -122,8 +120,7 @@ Verify:
 
 Target: 10 reps.
 
-#### A8 — Grouping for redirection
-Goal: redirect a group (not only one command).
+### A8 — Grouping for redirection
 
     { date; uptime; echo "OK"; } > report.txt
     cat report.txt
@@ -132,32 +129,27 @@ Target: 10 reps.
 
 ---
 
-### B) Timed Drills (Speed)
+## B) Timed Drills (Speed)
 
-#### B1 — Capture everything in 15 seconds
-Run a failing command, capture all output to `all.txt`, then show the file.
+### B1 — Capture everything in 15 seconds
 
     ls /no/such/path > all.txt 2>&1
     cat all.txt
 
 Pass condition: correct ordering (`> all.txt 2>&1`).
 
-#### B2 — 3-command pipeline in 20 seconds
-Count unique lines from `input.txt`:
+### B2 — 3-command pipeline in 20 seconds
 
     cat input.txt | sort | uniq -c
 
 Pass condition: correct output, no syntax stumbles.
 
-#### B3 — find + sort + head in 30 seconds
-Create test files, then find the largest.
+### B3 — find + sort + head in 30 seconds
 
     mkdir -p data
     dd if=/dev/zero of=data/a bs=1K count=10 status=none
     dd if=/dev/zero of=data/b bs=1K count=50 status=none
     dd if=/dev/zero of=data/c bs=1K count=20 status=none
-
-Find biggest:
 
     find data -type f -exec du -h {} + | sort -rh | head -n 1
 
@@ -165,30 +157,27 @@ Pass condition: `b` is largest.
 
 ---
 
-### C) Failure Injection Drills (Break & Recover)
+## C) Failure Injection Drills (Break & Recover)
 
-#### C1 — Misordered redirection
+### C1 — Misordered redirection
+
 Break:
 
     ls /no/such/path 2>&1 > all.txt
 
-Explain (to yourself) why it’s wrong, then fix:
+Fix:
 
     ls /no/such/path > all.txt 2>&1
 
 Pass condition: you can state the rule:
 - `2>&1` copies stderr to wherever stdout points at that moment.
 
-#### C2 — Accidental clobber prevention (feel the pain)
-Simulate a risky write:
+### C2 — Accidental clobber prevention
 
     echo "DO NOT LOSE THIS" > important.txt
-
-Overwrite it (intentionally):
-
     echo "oops" > important.txt
 
-Recovery practice:
+Recover:
 
     echo "DO NOT LOSE THIS" > important.txt
     cat important.txt
@@ -197,152 +186,294 @@ Pass condition: you stop clobbering files in real systems.
 
 ---
 
-### E) Composition Drills (Exam style)
+## E) Composition Drills (Exam style)
 
-#### E1 — Live filter + capture
-Goal: watch and save errors from a noisy command.
+### E1 — Live filter + capture
 
     (ls /no/such/path; ls /etc) 2>&1 | tee all.txt | grep -i "no such"
 
 Pass condition:
-- you see filtered line(s)
+- filtered line appears
 - `all.txt` contains full output
 
 ---
 
-## 📄 1) Create and Inspect Files
+# 🔎 Phase 2 Drill Pack — Search, Parse, Transform
 
-    touch a.txt b.txt
-    echo "hello world" > a.txt
-    printf "one\ntwo\nthree\n" > b.txt
-    file a.txt
-    ls -lh a.txt
-    stat a.txt
-    cat a.txt
-    less a.txt
-    nl -ba a.txt
+Mental mode:
+Most LFCS tasks are: find → filter → transform → sort → select → write → act
 
----
+## 🧱 Setup (Do once)
 
-## 📏 2) Counting and Measuring
+    mkdir -p ~/lfcs-labs/execution-drills/phase-2
+    cd ~/lfcs-labs/execution-drills/phase-2
 
-    wc a.txt
-    wc -l a.txt
-    wc -w a.txt
-    wc -c a.txt
+Create test data:
 
----
+    cat > data.txt <<EOF
+    10 alice 200
+    20 bob 50
+    30 carol 300
+    40 dave 120
+    50 eve 75
+    EOF
 
-## 🧭 3) Head, Tail, and Following Files
+    cat > words.txt <<EOF
+    apple
+    banana
+    apple
+    pear
+    banana
+    apple
+    EOF
 
-    head -n 5 /etc/passwd
-    tail -n 5 /etc/passwd
-    tail -f /var/log/syslog
-    tail -F /var/log/syslog
-
----
-
-## 🔍 4) Searching Text with grep
-
-    grep root /etc/passwd
-    grep -i root /etc/passwd
-    grep -v root /etc/passwd
-    grep -R root /etc
-    grep -n root /etc/passwd
-    grep -l root /etc/*
-    grep -w root /etc/passwd
-    grep -x root somefile.txt
+    mkdir -p tree/a tree/b tree/c
+    touch tree/a/a.conf tree/a/a.log tree/b/b.conf tree/c/c.txt
+    dd if=/dev/zero of=big1 bs=1K count=10 status=none
+    dd if=/dev/zero of=big2 bs=1K count=50 status=none
+    dd if=/dev/zero of=big3 bs=1K count=20 status=none
 
 ---
 
-## 🧠 5) Regular Expression Drills
+## A) Atomic Drills — find
 
-    grep '^root' /etc/passwd
-    grep 'bash$' /etc/passwd
-    grep '[0-9][0-9][0-9]' somefile.txt
-    grep '[a-z][a-z][a-z]' somefile.txt
-    grep -E '(ha){2,}' laugh.txt
+### A1 — Find by name and type
 
-Note: Perl regex (`grep -P`) may not be available everywhere. Prefer `-E`.
+    find tree -name "*.conf"
+    find tree -type d
+    find tree -type f
 
----
+Repeat until instant.
 
-## ✂️ 6) Cutting and Field Extraction
+### A2 — Find by size
 
-    cut -d ':' -f 1 /etc/passwd
-    cut -d ':' -f 1,3,7 /etc/passwd
-    cut -d ',' -f 2,3 file.csv
+    find . -type f -size +15k
+    find . -type f -size +5k -size -30k
 
----
+Verify with:
 
-## 🔄 7) Translating and Cleaning Text (tr)
+    ls -lh big1 big2 big3
 
-    tr ',' ';' < file.csv
-    tr -d ':' < /etc/passwd
-    tr -s ' ' < messy.txt
-    tr 'A-Z' 'a-z' < UPPER.txt
+### A3 — Find and exec
 
----
+    find tree -type f -exec ls -l {} \;
 
-## 🧱 8) Sorting and Uniqueness
+Explain why `{}` and `\;` are needed.
 
-    sort file.txt
-    sort -n numbers.txt
-    sort -r file.txt
-    uniq file.txt
-    sort file.txt | uniq
-    sort file.txt | uniq -c
+### A4 — Safe delete pattern (preview first)
 
----
+Preview:
 
-## 🔗 9) Joining and Pasting Files
+    find . -type f -name "*.log"
 
-    paste a.txt b.txt
-    join file1.txt file2.txt
-    join -1 2 -2 1 file1.txt file2.txt
+Then delete:
+
+    find . -type f -name "*.log" -delete
+
+Rule: always preview first.
 
 ---
 
-## 🧩 10) Splitting Files
+## B) Atomic Drills — grep
 
-    split -n 3 bigfile.txt
-    split -b 1M bigfile.txt
-    split -l 100 bigfile.txt
+### B1 — Basic, count, recursive
 
----
+    grep alice data.txt
+    grep -c apple words.txt
+    grep -R "conf" tree
 
-## 🧹 11) sed Editing Drills
+### B2 — Anchors and alternation
 
-    sed -n '1,10p' file.txt
-    sed '1,5d' file.txt
-    sed 's/foo/bar/' file.txt
-    sed 's/foo/bar/g' file.txt
-    sed 's/foo/bar/2' file.txt
-    sed -E 's/(foo)(bar)/\2\1/' file.txt
+    grep '^10' data.txt
+    grep '75$' data.txt
+    grep -E 'alice|carol' data.txt
 
----
+### B3 — Extract only matches
 
-## 🧮 12) awk Drills
+    echo "ID=54321" | grep -o '[0-9]\{5\}'
 
-    awk '{print $1}' /etc/passwd
-    awk -F: '{print $1, $3}' /etc/passwd
-    awk -F: '$3 > 1000 {print $1}' /etc/passwd
-    ps aux | awk 'BEGIN {sum=0} {sum+=$6} END {print sum}'
-    ps aux | awk '{printf "%-10s %s\n", $1, $11}'
+Note:
+- Prefer `grep -E` for portability
+- Use basic grep escaping when needed
 
 ---
 
-## 🧪 13) Binary and Encoding Inspection
+## C) Atomic Drills — cut / tr
 
-    od -bc file.txt
-    hexdump -C file.txt
+### C1 — cut fields
+
+    cut -d' ' -f1,3 data.txt
+    cut -d' ' -f2 data.txt
+
+### C2 — tr translate and delete
+
+    echo "a,b,c" | tr ',' ';'
+    printf "a\r\nb\r\n" | tr -d '\r'
 
 ---
 
-## 🏷️ 14) Renaming Files in Bulk
+## D) Atomic Drills — awk
 
-    rename -n 's/foo/bar/' *.txt
-    rename 's/foo/bar/' *.txt
+### D1 — Print fields
+
+    awk '{print $1, $3}' data.txt
+
+### D2 — Filter by condition
+
+    awk '$3 > 100 {print $2, $3}' data.txt
+
+### D3 — Line ranges
+
+    awk 'NR>=2 && NR<=4' data.txt
+
+### D4 — Accumulate
+
+    awk '{sum+=$3} END {print sum}' data.txt
+
+---
+
+## E) Atomic Drills — sed
+
+### E1 — Substitute
+
+    sed 's/alice/ALICE/' data.txt
+    sed 's/a/A/g' words.txt
+
+### E2 — In-place edit (use a copy)
+
+    cp words.txt words.work
+    sed -i 's/apple/APPLE/g' words.work
+    cat words.work
+
+### E3 — Delete lines and ranges
+
+    sed '2d' data.txt
+    sed '1,2d' data.txt
+
+---
+
+## F) Atomic Drills — sort / uniq / wc / head / tail
+
+### F1 — Sort and uniq
+
+    sort words.txt
+    sort words.txt | uniq
+    sort -u words.txt
+
+### F2 — Count and select
+
+    wc -l data.txt
+    sort -nr data.txt | head -n 3
+    tail -n 2 data.txt
+
+---
+
+## G) Timed Drills (Speed)
+
+### G1 — Largest file in 30 seconds
+
+    find . -type f -exec du -h {} + | sort -rh | head -n 1
+
+Pass: identifies `big2`.
+
+### G2 — Top consumers in 30 seconds
+
+    sort -nr -k3 data.txt | head -n 3
+
+### G3 — Count unique words in 20 seconds
+
+    sort words.txt | uniq -c
+
+---
+
+## H) Failure Injection Drills
+
+### H1 — grep vs find confusion
+
+Try:
+
+    grep conf tree
+
+Explain why it fails (grep needs file input; directory needs `-R` or a file list).
+
+Correct answers:
+
+    grep -R conf tree
+    find tree -type f -name "*.conf"
+
+### H2 — sed -i regret simulation
+
+    cp data.txt data.work
+    sed -i 's/20/XXX/' data.work
+
+Recover by recreating file from original.
+
+Rule: always backup or work on copy.
+
+### H3 — find -delete paranoia drill
+
+Preview:
+
+    find . -type f -name "*.txt"
+
+Only then:
+
+    find . -type f -name "*.txt" -delete
+
+Explain why preview is mandatory.
+
+---
+
+## I) Composition Drills (Exam Style)
+
+### I1 — Extract, transform, select
+Goal: show only names where value > 100
+
+    awk '$3 > 100 {print $2}' data.txt
+
+### I2 — IP-style extraction pattern (simulate)
+
+    printf "inet 10.0.0.1/24\ninet 192.168.1.5/24\n" | grep inet | awk '{print $2}' | cut -d/ -f1
+
+### I3 — Find and copy by pattern
+
+    mkdir -p dest
+    find tree -type f -name "*.conf" -exec cp -a {} dest/ \;
+    ls dest
+
+### I4 — Deduplicate file
+
+    sort words.txt | uniq > words.cleaned
+    cat words.cleaned
+
+### I5 — Find empty dirs and remove
+
+    mkdir -p empty/a empty/b
+    find empty -type d -empty
+    find empty -type d -empty -delete
+
+---
+
+## J) Diagnosis Drills
+
+### J1 — Why is this slow?
+
+    find / -type f -name "*.conf"
+
+Explain:
+- crossing filesystems
+- permissions noise
+- missing `2>/dev/null`
+
+Fix:
+
+    find / -type f -name "*.conf" 2>/dev/null
+
+### J2 — Why is this empty?
+
+    grep '^root' data.txt
+
+Explain: file has no such line.
 
 ---
 
@@ -350,11 +481,14 @@ Note: Perl regex (`grep -P`) may not be available everywhere. Prefer `-E`.
 
 You are done with this file when:
 
-- You can do all redirection patterns correctly without thinking
 - You never misorder `2>&1`
-- You can build 3–5 command pipelines reliably under time pressure
-- You can create files via here-docs without hesitating
-- You can use `tee` to observe and capture output cleanly
+- You can build 3–5 stage pipelines without hesitation
+- You use find with `-exec` and `-delete` safely (preview-first habit)
+- You can use grep anchors/alternation instinctively
+- You can use sed to replace and delete ranges safely (copy-before-`-i` habit)
+- You can use awk to extract fields and filter records
+- You can sort, dedupe, count, and select results quickly
+- You can solve “find → filter → transform → select” tasks in under 60 seconds
 
 ---
 
