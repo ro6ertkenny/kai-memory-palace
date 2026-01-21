@@ -6,17 +6,21 @@ Goal: Be able to **stand up, verify, and secure core Linux network services** th
 This is not a tutorial.  
 This is an **execution checklist**.
 
+Separation of concerns:
+- This file = configure specific services (SSH/DNS/HTTP/Proxy/DB)
+- services-and-logging.md = systemd mechanics, targets, journald, scheduling, recovery
+
 Notes:
 - Packages/services vary by distro. Each section includes “detect + install + verify”.
-- If a service is not available on your system, you still drill the *recognition + verification commands*.
-- Use loopback (127.0.0.1) when possible to avoid external dependencies.
+- If a service is not available, drill the *recognition + verification commands* anyway.
+- Prefer loopback (127.0.0.1) to avoid external dependencies.
 
 ---
 
 ## 🧭 0) Detect Platform and Package Manager
 
 - Confirm distro and init system
-- Confirm you’re using apt-get (Debian/Ubuntu)
+- Confirm apt-get and systemctl exist
 
     cat /etc/os-release
     uname -a
@@ -26,22 +30,23 @@ Notes:
 
 ---
 
-## 🔐 1) SSH Client + Server (Baseline Service Control)
+## 🔐 1) SSH Client + Server (Baseline)
 
 Objectives:
-- Configure SSH servers and clients
-- Verify configuration and access
+- Verify SSH is installed
+- Control ssh service
+- Validate config safely
 
 Detect/install:
 
     command -v ssh
-    command -v sshd || command -v sshd_config || true
+    command -v sshd || true
     sudo apt-get update
     sudo apt-get install -y openssh-server
 
-Service control:
+Verify service + port:
 
-    systemctl status ssh
+    systemctl status ssh --no-pager || true
     sudo systemctl enable --now ssh
     ss -lntup | grep ':22' || true
 
@@ -64,15 +69,20 @@ Safe change drill (choose one small change, then validate):
     sudo systemctl restart ssh
     systemctl status ssh --no-pager
 
+Rollback drill:
+
+    sudo cp /etc/ssh/sshd_config.bak /etc/ssh/sshd_config
+    sudo sshd -t
+    sudo systemctl restart ssh
+
 ---
 
 ## 🌐 2) Caching DNS Resolver (local caching)
 
 Objective:
-- Configure a caching DNS server
+- Configure a caching DNS server (dnsmasq or unbound)
 
-Preferred minimal option for Debian-based systems: dnsmasq.
-Alternative: unbound (also valid).
+Preferred minimal option: dnsmasq.
 
 Detect/install dnsmasq:
 
@@ -80,35 +90,33 @@ Detect/install dnsmasq:
     sudo apt-get update
     sudo apt-get install -y dnsmasq
 
-Service and port:
+Enable + verify port 53:
 
-    systemctl status dnsmasq || true
+    systemctl status dnsmasq --no-pager || true
     sudo systemctl enable --now dnsmasq
     ss -lnup | grep ':53' || true
 
-Resolver wiring (systemd-resolved vs resolv.conf):
+Resolver wiring:
 
-    resolvectl status || true
+    resolvectl status 2>/dev/null || true
     cat /etc/resolv.conf
 
-Drill: point resolver at local cache (choose one approach based on your system)
-
-If /etc/resolv.conf is directly managed:
+Drill (only if /etc/resolv.conf is directly managed):
 
     sudo cp /etc/resolv.conf /etc/resolv.conf.bak
-    printf "nameserver 127.0.0.1\n" | sudo tee /etc/resolv.conf
+    printf "nameserver 127.0.0.1\n" | sudo tee /etc/resolv.conf > /dev/null
 
-Verify cached resolution:
+Verify resolution:
 
     getent hosts github.com
     dig github.com 2>/dev/null || true
     resolvectl query github.com 2>/dev/null || true
 
-Drill: observe dnsmasq logs (journal):
+Observe dnsmasq logs:
 
     journalctl -u dnsmasq --since "10 minutes ago" --no-pager
 
-Rollback drill:
+Rollback:
 
     sudo cp /etc/resolv.conf.bak /etc/resolv.conf || true
 
@@ -117,25 +125,22 @@ Rollback drill:
 ## 🧾 3) DNS Zone Maintenance (authoritative DNS basics)
 
 Objective:
-- Maintain a DNS zone
+- Maintain a DNS zone (BIND9)
 
-This is typically BIND9 (named). You don’t need the internet; use a local test zone.
-
-Detect/install bind9:
+Detect/install:
 
     command -v named || true
     sudo apt-get update
     sudo apt-get install -y bind9 dnsutils
 
-Service control:
+Enable:
 
-    systemctl status bind9
+    systemctl status bind9 --no-pager || true
     sudo systemctl enable --now bind9
 
-Create a simple local zone (lab.invalid) and validate config.
-Paths may differ; Debian typically uses /etc/bind.
+Create a local test zone: lab.invalid
 
-Backup configs:
+Backup:
 
     sudo cp /etc/bind/named.conf.local /etc/bind/named.conf.local.bak
 
@@ -144,7 +149,7 @@ Create zone file:
     sudo mkdir -p /etc/bind/zones
     sudoedit /etc/bind/zones/db.lab.invalid
 
-Example zone contents (write in the file):
+Example contents:
 
     ;
     ; lab.invalid zone
@@ -173,22 +178,22 @@ Add:
         file "/etc/bind/zones/db.lab.invalid";
     };
 
-Validate BIND config:
+Validate:
 
     sudo named-checkconf
     sudo named-checkzone lab.invalid /etc/bind/zones/db.lab.invalid
 
-Restart and query locally:
+Restart + query:
 
     sudo systemctl restart bind9
     dig @127.0.0.1 www.lab.invalid
     dig @127.0.0.1 ns.lab.invalid
 
-Drill: update record and bump serial:
-
-    sudoedit /etc/bind/zones/db.lab.invalid
-    sudo named-checkzone lab.invalid /etc/bind/zones/db.lab.invalid
-    sudo systemctl reload bind9
+Update drill:
+- edit record
+- bump serial
+- re-checkzone
+- reload
 
 Rollback:
 
@@ -202,9 +207,7 @@ Rollback:
 Objective:
 - Configure email aliases
 
-Even without a full MTA, you can drill aliases management.
-
-Detect/install minimal tools:
+Install minimal tools:
 
     sudo apt-get update
     sudo apt-get install -y bsd-mailx postfix
@@ -214,7 +217,7 @@ Inspect aliases:
     sudo test -f /etc/aliases && sudo head -n 30 /etc/aliases || true
     sudo newaliases
 
-Create an alias (example: root -> your user):
+Create alias (example root -> your user):
 
     sudo cp /etc/aliases /etc/aliases.bak
     sudoedit /etc/aliases
@@ -223,22 +226,18 @@ Add line:
 
     root: ro6ert
 
-Rebuild aliases DB:
+Rebuild DB:
 
     sudo newaliases
+    ls -la /etc/aliases.db 2>/dev/null || true
 
-Verify alias DB exists:
-
-    ls -la /etc/aliases.db || true
-
-Drill: send a local test mail:
+Send a local test mail:
 
     echo "alias test" | mail -s "LFCS alias test" root
 
-Check local mail spool (path varies):
+Check local mail spool:
 
-    ls -la /var/mail || true
-    sudo ls -la /var/mail/root 2>/dev/null || true
+    ls -la /var/mail 2>/dev/null || true
     sudo tail -n 50 /var/mail/ro6ert 2>/dev/null || true
 
 Rollback:
@@ -253,43 +252,37 @@ Rollback:
 Objective:
 - Restrict access to an HTTP proxy server
 
-Detect/install squid:
+Install:
 
     sudo apt-get update
     sudo apt-get install -y squid
 
-Service control:
+Enable + verify port:
 
-    systemctl status squid
+    systemctl status squid --no-pager || true
     sudo systemctl enable --now squid
     ss -lntup | grep ':3128' || true
 
-Baseline proxy test (may require curl supports proxy):
+Baseline proxy test (may fail without outbound access; still drill the command):
 
     curl -I -x http://127.0.0.1:3128 http://example.com 2>/dev/null | head -n 5 || true
 
-Restrict proxy to localhost only (simple, high-signal drill):
+Restrict proxy to localhost only:
 
     sudo cp /etc/squid/squid.conf /etc/squid/squid.conf.bak
     sudoedit /etc/squid/squid.conf
 
-Add or modify rules near the top (order matters). Ensure:
-- allow localhost
-- deny all others
-
-Example minimal ACL logic:
+Ensure ordering allows localhost and denies all others:
 
     acl localnet src 127.0.0.1/32
     http_access allow localnet
     http_access deny all
 
-Validate and restart:
+Validate + restart:
 
     sudo squid -k parse
     sudo systemctl restart squid
     systemctl status squid --no-pager
-
-Verify blocked behavior (from non-localhost host if available) and allowed from localhost.
 
 Rollback:
 
@@ -301,15 +294,15 @@ Rollback:
 ## 🌍 6) HTTP Server + Log Files (nginx or apache2)
 
 Objectives:
-- Configure an HTTP server
-- Configure HTTP server log files
-- Restrict access to a web page
+- Configure HTTP server
+- Configure log files
+- Prove service is reachable locally
 
 Choose one: nginx (lightweight) or apache2.
 
 ### Option A: nginx
 
-Install and enable:
+Install + enable:
 
     sudo apt-get update
     sudo apt-get install -y nginx
@@ -319,21 +312,21 @@ Install and enable:
 
 Inspect logs:
 
-    sudo ls -ლა /var/log/nginx 2>/dev/null || ls -la /var/log/nginx
+    sudo ls -la /var/log/nginx 2>/dev/null || true
     sudo tail -n 50 /var/log/nginx/access.log 2>/dev/null || true
     sudo tail -n 50 /var/log/nginx/error.log 2>/dev/null || true
 
-Configure custom access/error logs (site config):
+Custom logs drill:
 
     sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.bak
     sudoedit /etc/nginx/sites-available/default
 
-Add inside the server block:
+Inside server block add:
 
     access_log /var/log/nginx/lab_access.log;
     error_log  /var/log/nginx/lab_error.log;
 
-Validate and reload:
+Validate + reload:
 
     sudo nginx -t
     sudo systemctl reload nginx
@@ -348,7 +341,7 @@ Rollback:
 
 ### Option B: apache2
 
-Install and enable:
+Install + enable:
 
     sudo apt-get update
     sudo apt-get install -y apache2
@@ -362,7 +355,7 @@ Inspect logs:
     sudo tail -n 50 /var/log/apache2/access.log 2>/dev/null || true
     sudo tail -n 50 /var/log/apache2/error.log 2>/dev/null || true
 
-Custom logs via vhost (drill):
+Config test + reload:
 
     sudo apache2ctl -t
     sudo systemctl reload apache2
@@ -372,9 +365,7 @@ Custom logs via vhost (drill):
 ## 🔒 7) Restrict Access to a Web Page (Basic Auth)
 
 Objective:
-- Restrict access to a web page
-
-This drill uses nginx + basic auth (high-signal) and tests end-to-end.
+- Restrict access to a web page (nginx pattern)
 
 Install auth tools:
 
@@ -386,12 +377,12 @@ Create password file:
     sudo mkdir -p /etc/nginx/auth
     sudo htpasswd -c /etc/nginx/auth/lab.htpasswd labuser
 
-Configure a protected location (nginx default site example):
+Protect /private:
 
     sudo cp /etc/nginx/sites-available/default /etc/nginx/sites-available/default.authbak
     sudoedit /etc/nginx/sites-available/default
 
-Add inside server block:
+Inside server block add:
 
     location /private {
         auth_basic "Restricted";
@@ -402,17 +393,16 @@ Add inside server block:
 Create protected content:
 
     sudo mkdir -p /var/www/html/private
-    echo "restricted" | sudo tee /var/www/html/private/index.html
+    echo "restricted" | sudo tee /var/www/html/private/index.html > /dev/null
 
-Validate and reload:
+Validate + reload:
 
     sudo nginx -t
     sudo systemctl reload nginx
 
-Verify behavior:
+Verify:
 
     curl -I http://127.0.0.1/private/ | head -n 5
-    curl -u labuser:password http://127.0.0.1/private/ 2>/dev/null || true
 
 Rollback:
 
@@ -425,70 +415,53 @@ Rollback:
 ## 🗄️ 8) Database Server (Basic Operations)
 
 Objective:
-- Configure a database server
-
-Choose one: MariaDB (MySQL) or PostgreSQL.
+- Configure a database server (MariaDB or PostgreSQL)
 
 ### Option A: MariaDB
-
-Install and enable:
 
     sudo apt-get update
     sudo apt-get install -y mariadb-server
     sudo systemctl enable --now mariadb
     systemctl status mariadb --no-pager
+    ss -lntup | grep ':3306' || true
 
-Secure baseline (interactive):
-
-    sudo mysql_secure_installation
-
-Basic SQL drills:
+SQL drills:
 
     sudo mysql -e "SELECT VERSION();"
     sudo mysql -e "CREATE DATABASE lfcs_lab;"
     sudo mysql -e "SHOW DATABASES;"
     sudo mysql -e "DROP DATABASE lfcs_lab;"
 
-Confirm listening socket/port:
-
-    ss -lntup | grep ':3306' || true
-
 ### Option B: PostgreSQL
-
-Install and enable:
 
     sudo apt-get update
     sudo apt-get install -y postgresql
     sudo systemctl enable --now postgresql
     systemctl status postgresql --no-pager
+    ss -lntup | grep ':5432' || true
 
-Basic SQL drills:
+SQL drills:
 
     sudo -u postgres psql -c "SELECT version();"
     sudo -u postgres createdb lfcs_lab
     sudo -u postgres psql -l | head -n 20
     sudo -u postgres dropdb lfcs_lab
 
-Confirm listening port:
-
-    ss -lntup | grep ':5432' || true
-
 ---
 
-## 🧪 9) Containers and Virtual Machines (Service Domain Tie-In)
+## 🧪 9) Containers and Virtual Machines (Domain Tie-In)
 
 Objective:
-- Manage and configure containers
-- Manage and configure virtual machines
+- Recognize container and virtualization surfaces
 
-You already have a dedicated execution drill file:
+You already have a dedicated drill file:
 - execution-drills/containers-and-virtualization.md
 
-Verification drill:
+Verification:
 
     test -f linux/LFCS-training/execution-drills/containers-and-virtualization.md && echo "containers drill present"
 
-Virtualization awareness drill:
+Virtualization awareness:
 
     systemd-detect-virt
     lscpu | grep -i virtualization || true
@@ -500,8 +473,11 @@ Virtualization awareness drill:
 
 You are done with this file when:
 
-- You can bring up SSH, DNS cache, a DNS zone, squid restrictions, HTTP logs, basic auth, and a DB service quickly
-- You can validate each service via: ports, config test, status, and a client query
-- You can roll back safely with backups and reloads (no panic edits)
+- You can stand up and validate core services quickly
+- You can verify each service via: ports, config test, status, and client query
+- You can roll back safely using backups + reloads/restarts (no panic edits)
+
+---
+EOF
 
 ---
