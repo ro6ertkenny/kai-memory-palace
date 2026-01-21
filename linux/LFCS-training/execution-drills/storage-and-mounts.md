@@ -1,7 +1,7 @@
 # 🧪 Storage and Mounts — Execution Drills (LFCS)
 
 Mental mode: Disk discipline.  
-Goal: Be able to **identify, partition, format, mount, persist, inspect, and repair storage** under time pressure.
+Goal: Be able to **identify, partition, format, mount, persist, inspect, repair, and safely move data** under time pressure.
 
 This is not a tutorial.  
 This is an **execution checklist**.
@@ -192,7 +192,212 @@ This is an **execution checklist**.
 
 ---
 
-## 🧱 13) LVM (Physical Volume → Volume Group → Logical Volume)
+## 📦 13) Archives, Compression, and Backups
+
+Mental mode: Move data fast without destroying it.
+
+### 🧱 Lab Setup (Do once)
+
+    mkdir -p ~/lfcs-labs/execution-drills/phase-3
+    cd ~/lfcs-labs/execution-drills/phase-3
+    mkdir -p data/src/projectA data/src/projectB logs backup restore mirror dest
+
+    echo "alpha" > data/src/projectA/a.txt
+    echo "beta"  > data/src/projectA/b.txt
+    echo "gamma" > data/src/projectB/c.txt
+
+    date > logs/log1.txt
+    date > logs/log2.txt
+
+    dd if=/dev/zero of=data/src/projectA/big1 bs=1K count=10 status=none
+    dd if=/dev/zero of=data/src/projectB/big2 bs=1K count=50 status=none
+
+---
+
+### 📦 A) tar drills (create, list, extract)
+
+Create and list:
+
+    tar cf backup/a1.tar data/src
+    tar tf backup/a1.tar
+
+Create compressed variants:
+
+    tar czf backup/a2.tar.gz data/src
+    tar cjf backup/a2.tar.bz2 data/src
+    tar cJf backup/a2.tar.xz data/src
+
+List one:
+
+    tar tzf backup/a2.tar.gz
+
+Extract to specific directory:
+
+    mkdir -p restore/a3
+    tar xf backup/a1.tar -C restore/a3
+    ls restore/a3/data/src
+
+Extract a single file:
+
+    tar tf backup/a1.tar
+    tar xf backup/a1.tar -C restore/a3 data/src/projectA/a.txt
+    cat restore/a3/data/src/projectA/a.txt
+
+Safety notes:
+- Prefer extracting into an empty restore directory
+- Be intentional with `-C` (extract location)
+
+---
+
+### 🧊 B) gzip / bzip2 / xz drills (keep originals)
+
+Compress while keeping original:
+
+    cp backup/a1.tar backup/test.tar
+    gzip -k backup/test.tar
+    bzip2 -k backup/test.tar
+    xz -k backup/test.tar
+
+Verify:
+
+    ls -la backup/test.tar*
+
+Decompress:
+
+    gunzip backup/test.tar.gz
+    bunzip2 backup/test.tar.bz2
+    unxz backup/test.tar.xz
+
+Verify original still exists:
+
+    test -f backup/test.tar && echo OK
+
+---
+
+### 🗜️ C) zip / unzip drills
+
+Create and extract zip:
+
+    command -v zip >/dev/null || sudo apt-get update && sudo apt-get install -y zip unzip
+
+    zip -r backup/c1.zip data/src
+    mkdir -p restore/c1
+    unzip backup/c1.zip -d restore/c1
+    ls restore/c1
+
+---
+
+### 🧠 D) Incremental/differential concept drill
+
+Full backup:
+
+    tar czf backup/full.tgz data/src
+
+Modify data:
+
+    echo "delta" >> data/src/projectA/a.txt
+
+Create “since time” diff (concept drill):
+
+    date -Iseconds > backup/last_full_time.txt
+    tar czf backup/diff.tgz --newer-mtime="$(cat backup/last_full_time.txt)" data/src
+    tar tzf backup/diff.tgz
+
+Restore order (say it out loud):
+1) restore full
+2) restore diffs
+
+Note:
+- This is a concept drill; real-world incremental strategies vary.
+
+---
+
+### 🔁 E) rsync drills (mirror + safety)
+
+Mirror copy:
+
+    rsync -av data/src/ mirror/
+
+Modify source:
+
+    rm data/src/projectA/b.txt
+    echo "new" > data/src/projectB/new.txt
+
+Dry-run delete (must be dry-run first):
+
+    rsync -av --delete --dry-run data/src/ mirror/
+
+Real run:
+
+    rsync -av --delete data/src/ mirror/
+
+Verify mirror matches:
+
+    diff -r data/src mirror
+
+Copy with relative paths (exam pattern):
+
+    mkdir -p backup/etc-like
+    find data/src -name "*.txt" -exec rsync -R {} backup/etc-like \;
+    find backup/etc-like
+
+Safety law:
+- Always do `--dry-run` before `--delete`
+- Always triple-check direction: `source/` then `dest/`
+
+---
+
+### 🧱 F) dd safety drills (FILES ONLY)
+
+⚠️ DO NOT use real disks. Use files.
+
+Create fake “disk” file:
+
+    dd if=/dev/zero of=fake-disk.img bs=1M count=20 status=progress
+
+Write pattern:
+
+    echo "HELLO" | dd of=fake-disk.img conv=notrunc
+
+Backup and compress:
+
+    dd if=fake-disk.img bs=4M status=progress | gzip > backup/fake-disk.img.gz
+
+Restore to new file:
+
+    gunzip -c backup/fake-disk.img.gz | dd of=fake-disk-restored.img bs=4M status=progress
+
+Verify:
+
+    cmp fake-disk.img fake-disk-restored.img && echo OK
+
+Safety law:
+- If you are not 100% sure what `if=` and `of=` point to, do not run dd.
+
+---
+
+### ✅ G) Backup, verify, restore (composition)
+
+Backup:
+
+    tar czf backup/comp.tgz data/src
+
+Verify archive:
+
+    tar tzf backup/comp.tgz
+
+Restore:
+
+    mkdir -p restore/comp
+    tar xf backup/comp.tgz -C restore/comp
+
+Verify restore:
+
+    diff -r data/src restore/comp/data/src
+
+---
+
+## 🧱 14) LVM (Physical Volume → Volume Group → Logical Volume)
 
 Goal: Create LVM storage, mount it, extend it, and prove it worked.
 
@@ -236,7 +441,7 @@ LVM rollback drill (only on lab devices):
 
 ---
 
-## 🧱 14) RAID (mdadm) — Create and Verify a Mirror
+## 🧱 15) RAID (mdadm) — Create and Verify a Mirror
 
 Goal: Create a RAID1 array, format, mount, and confirm RAID health.
 
@@ -278,7 +483,7 @@ Stop and remove RAID (lab cleanup):
 
 ---
 
-## 🔒 15) LUKS Encryption (cryptsetup)
+## 🔒 16) LUKS Encryption (cryptsetup)
 
 Goal: Encrypt a block device, open it, format it, mount it, and close it.
 
@@ -318,7 +523,7 @@ Persist at boot awareness (not required to enable, but recognize files):
 
 ---
 
-## 📏 16) Filesystem Quotas (User/Group Disk Quotas)
+## 📏 17) Filesystem Quotas (User/Group Disk Quotas)
 
 Goal: Enable quotas on a filesystem, run quotacheck, and set a limit.
 
@@ -362,7 +567,7 @@ Disable quotas and rollback mount options if needed:
 
 ---
 
-## 🧷 17) Automount (autofs)
+## 🧷 18) Automount (autofs)
 
 Goal: Configure on-demand mounting via autofs and prove it mounts when accessed.
 
@@ -412,7 +617,7 @@ Cleanup and rollback:
 
 ---
 
-## 🧯 18) Emergency Recovery Drills
+## 🧯 19) Emergency Recovery Drills
 
 - Boot into rescue/emergency mode
 - Remount root read-write
@@ -427,13 +632,18 @@ Cleanup and rollback:
 
 ## ✅ Completion Criteria
 
-You are **done with this file** when:
+You are done with this file when:
 
 - You can provision storage from scratch in minutes
 - You never break fstab
 - You can recover from a bad mount under pressure
+- You can create and extract archives in multiple formats
+- You can perform backup → verify → restore and prove integrity
+- You can use rsync safely with --delete and --dry-run
+- You can image/restore file targets safely with dd
 - You can build LVM volumes, RAID arrays, and encrypted volumes from scratch
 - You can enable and verify filesystem quotas
 - You can configure autofs and prove it mounts on access
 
 ---
+
