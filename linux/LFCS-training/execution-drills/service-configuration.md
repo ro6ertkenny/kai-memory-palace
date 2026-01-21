@@ -486,7 +486,7 @@ You already have a dedicated execution drill file:
 
 Verification drill:
 
-    test -f linux/LFCS-practice-questions/execution-drills/containers-and-virtualization.md && echo "containers drill present"
+    test -f linux/LFCS-training/execution-drills/containers-and-virtualization.md && echo "containers drill present"
 
 Virtualization awareness drill:
 

@@ -10,7 +10,7 @@ This is **structure and intent**.
 
 ## 🎯 What This Area Is
 
-`linux/LFCS-practice-questions/` is a **complete, hands-on training system** for LFCS.
+`linux/LFCS-training/` is a **complete, hands-on training system** for LFCS.
 
 It is built around two complementary skill surfaces:
 
@@ -149,7 +149,7 @@ You are ready for the exam when:
 
 ## 📁 Directory Map
 
-    LFCS-practice-questions/
+    LFCS-training/
     ├── index.md
     ├── README.md
     ├── guiding-principles.md

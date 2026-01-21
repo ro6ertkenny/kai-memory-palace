@@ -156,7 +156,7 @@ You are ready when:
 
 ## 📁 Directory Structure
 
-    LFCS-practice-questions/
+    LFCS-training/
     ├── execution-drills/
     │   └── index.md
     ├── failure-scenarios/
