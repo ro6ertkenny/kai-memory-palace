@@ -4,9 +4,118 @@ Mental mode: Muscle memory.
 Goal: Be able to execute every task below **without thinking**.
 
 This file is not a tutorial.  
-This is a **hands-on execution checklist**.
+This is a **hands-on execution checklist + drill pack**.
 
-You should be able to perform **every item** on a live system.
+If you need deeper redirection/pipeline reps, see:
+- `linux/LFCS-training/execution-drills/files-and-text.md`
+
+---
+
+## 🧰 Drill Framework (Applies to this file)
+
+Drill types:
+- **A: Atomic** — one skill, repeat until automatic
+- **B: Timed** — same skill under time pressure
+- **C: Failure Injection** — break intentionally; recover fast
+- **D: Diagnosis** — interpret output; choose the correct fix
+- **E: Composition** — 3–6 primitives chained (exam style)
+
+Scoring:
+- ✅ Correct result
+- ✅ No collateral damage
+- ✅ Uses a safe/clean pattern
+- ⏱️ Meets time target (when timed)
+
+Rules of engagement:
+- Prefer idempotent actions when possible
+- Always know `>` vs `>>`
+- Know when you need sudo and when you don’t
+- Verify outcomes (don’t assume)
+
+---
+
+## 🧪 Phase 0 — Shell Execution + Job Control (Drill Pack)
+
+### Setup (Do once)
+
+    mkdir -p ~/lfcs-labs/execution-drills/phase-0
+    cd ~/lfcs-labs/execution-drills/phase-0
+
+---
+
+### A) Atomic Drills (Repetition)
+
+#### A1 — Exit codes
+Goal: read success/failure immediately.
+
+    true
+    echo $?
+
+    false
+    echo $?
+
+Target: 10 reps, no hesitation.
+
+#### A2 — Safe chaining with && and ||
+Goal: use conditional chaining correctly.
+
+    mkdir -p a2 && echo "mkdir ok" || echo "mkdir failed"
+    test -f /etc/passwd && echo "exists" || echo "missing"
+    test -f /nope && echo "exists" || echo "missing"
+
+Target: 10 reps.
+
+#### A3 — Grouping and redirecting a command group
+Goal: redirect output of a group (not only one command).
+
+    { date; uptime; echo "OK"; } > report.txt
+    cat report.txt
+
+Target: 10 reps.
+
+---
+
+### D) Diagnosis Drills (Interpret + Choose)
+
+#### D1 — “No matches” vs “broken command”
+Goal: interpret grep exit codes correctly.
+
+    printf "%s\n" alpha beta gamma > input.txt
+
+    cat input.txt | grep zzz
+    echo $?
+
+    cat input.txt | grep beta
+    echo $?
+
+Pass condition: you can explain:
+- `grep` returns non-zero when no matches (not necessarily “error”)
+
+---
+
+### A4 — Job control muscle memory
+Goal: manage background/foreground without confusion.
+
+Start a long job:
+
+    sleep 3000 &
+
+Confirm jobs list:
+
+    jobs
+
+Bring to foreground, suspend, then background:
+
+    fg %1
+    (press Ctrl+Z)
+    bg %1
+
+Terminate safely:
+
+    jobs
+    kill %1
+
+Pass condition: no confusion between job spec (`%1`) vs PID.
 
 ---
 
@@ -128,32 +237,7 @@ You should be able to perform **every item** on a live system.
 
 ---
 
-## 🔁 8) Input / Output Redirection
-
-- Redirect stdout
-- Redirect stderr
-- Redirect both
-- Append output
-- Discard output
-- Use stdin redirection
-- Use pipes
-- Use here-doc
-
-    command > out.txt
-    command 2> err.txt
-    command > all.txt 2>&1
-    command >> out.txt
-    command > /dev/null 2>&1
-    grep root < /etc/passwd
-    ps aux | grep root
-    cat << EOF
-    hello
-    world
-    EOF
-
----
-
-## 🔎 9) Regex and Text Search (grep)
+## 🔎 8) Regex and Text Search (grep)
 
 - Basic grep
 - Case insensitive grep
@@ -161,7 +245,6 @@ You should be able to perform **every item** on a live system.
 - Recursive grep
 - Show line numbers
 - Use extended regex
-- Use Perl regex
 
     grep root /etc/passwd
     grep -i root /etc/passwd
@@ -169,11 +252,12 @@ You should be able to perform **every item** on a live system.
     grep -R "root" /etc
     grep -n root /etc/passwd
     grep -E "root|daemon" /etc/passwd
-    grep -P '(?<=root).*' /etc/passwd
+
+Note: Perl regex (`grep -P`) may not be available everywhere. Prefer `-E`.
 
 ---
 
-## 🧹 10) sed Basics
+## 🧹 9) sed Basics
 
 - Print specific lines
 - Delete lines
@@ -189,7 +273,7 @@ You should be able to perform **every item** on a live system.
 
 ---
 
-## 🧮 11) awk Basics
+## 🧮 10) awk Basics
 
 - Print columns
 - Filter by value
@@ -203,130 +287,13 @@ You should be able to perform **every item** on a live system.
 
 ---
 
-## 📦 12) Archives and Compression (tar, gzip, bzip2, xz)
-
-- Create tar archive
-- List archive
-- Extract archive
-- Create compressed tar
-- Extract compressed tar
-- Exclude files
-- Create incremental backup
-
-    tar cf test.tar dir/
-    tar tf test.tar
-    tar xf test.tar
-    tar czf test.tar.gz dir/
-    tar xzf test.tar.gz
-    tar --exclude="*.log" -czf test.tar.gz dir/
-
----
-
-## 🔁 13) rsync
-
-- Copy file locally
-- Sync directory locally
-- Sync to remote
-- Dry run
-- Delete extra files
-
-    rsync -a file1 /tmp/
-    rsync -a dir1/ dir2/
-    rsync -av --dry-run dir1/ dir2/
-    rsync -av --delete dir1/ dir2/
-
----
-
-## 📁 14) File and Directory Operations
-
-- Create directories
-- Remove directories
-- Copy files
-- Move files
-- Remove recursively
-- Jump to previous directory
-
-    mkdir test
-    rmdir test
-    cp a.txt b.txt
-    mv a.txt b.txt
-    rm -rf somedir
-    cd -
-
----
-
-## 🔗 15) Hard and Soft Links
-
-- Create hard link
-- Create symlink
-- Overwrite symlink
-- Remove link
-- Find files with multiple links
-
-    ln a.txt a-hard.txt
-    ln -s a.txt a-soft.txt
-    ln -sf new.txt a-soft.txt
-    unlink a-soft.txt
-    find . -type f -links +1
-
----
-
-## 🔐 16) Permissions
-
-- Read permissions
-- Change permissions numeric
-- Change permissions symbolic
-- Set suid
-- Set sgid
-- Set sticky bit
-- Find suid files
-
-    ls -l
-    chmod 750 file
-    chmod u+x,g+w,o-r file
-    chmod u+s file
-    chmod g+s dir
-    chmod +t dir
-    find / -perm -4000 -type f 2>/dev/null
-
----
-
-## 📖 17) System Documentation
-
-- Use man
-- Use info
-- Use help
-- Use apropos
-- Open specific man sections
-
-    man ls
-    info ls
-    help cd
-    apropos partition
-    man 5 passwd
-
----
-
-## 👑 18) Root Access
-
-- Get root shell
-- Run single command as root
-- Set root password
-- Lock root account
-
-    sudo -i
-    sudo command
-    sudo passwd root
-    sudo passwd -l root
-
----
-
 ## ✅ Completion Criteria
 
 You are **done with this file** when:
 
-- You can perform every section **without looking up syntax**
-- You can do it **under time pressure**
-- You make **no destructive mistakes**
+- Exit codes and chaining are automatic
+- Job control is automatic (`&`, `jobs`, `fg`, `bg`, Ctrl+Z, `kill`)
+- You can execute the listed command surfaces without looking anything up
 
 ---
+
