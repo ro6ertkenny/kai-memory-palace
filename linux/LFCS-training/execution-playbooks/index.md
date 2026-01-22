@@ -3,7 +3,7 @@
 **Path:** `linux/LFCS-training/execution-playbooks/index.md`  
 **Purpose:** Provide a **fast operator navigation surface** for the LFCS execution-playbooks layer.
 
-This directory contains **exam-style operator flows** that compose the canonical:
+This directory contains **exam-style operator algorithms** that compose:
 
 - `linux/LFCS-training/execution-drills/` (muscle memory)
 - `linux/LFCS-training/failure-scenarios/` (practice cases)
@@ -15,7 +15,7 @@ observe → isolate → decide → correct → verify → persist → rollback.
 
 ## ✅ Playbooks
 
-### 🧩 Core Operator Surfaces
+### 🧩 Core Operator Surfaces (Primary Incident Classes)
 
 - `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md`
 - `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md`
@@ -23,25 +23,41 @@ observe → isolate → decide → correct → verify → persist → rollback.
 - `linux/LFCS-training/execution-playbooks/account-access-playbook.md`
 - `linux/LFCS-training/execution-playbooks/process-control-playbook.md`
 
-### 🔐 Integrity and Trust
+### 🔐 Integrity and Trust (Control Plane Failures)
 
 - `linux/LFCS-training/execution-playbooks/package-repair-playbook.md`
 - `linux/LFCS-training/execution-playbooks/security-triage-playbook.md`
 - `linux/LFCS-training/execution-playbooks/tls-triage-playbook.md`
 
-### 🌱 Workflow Recovery
+### 🌱 Workflow Recovery (Local Tooling State)
 
 - `linux/LFCS-training/execution-playbooks/git-recovery-playbook.md`
 
 ---
 
+## 🧭 Symptom → Playbook Router
+
+Use this when the prompt is vague.
+
+- “Service down / fails to start” → `service-recovery-playbook.md`
+- “Running but unreachable” → start `network-diagnosis-playbook.md`, then `service-recovery-playbook.md`
+- “Disk full / read-only / won’t mount / emergency mode” → `storage-recovery-playbook.md`
+- “CPU pegged / memory pressure / process stuck” → `process-control-playbook.md`
+- “Permission denied / works as root only / SELinux AVC” → `security-triage-playbook.md`
+- “TLS cert expired / handshake fails / key mismatch” → `tls-triage-playbook.md`
+- “apt/dnf broken / locks / half-installed / deps” → `package-repair-playbook.md`
+- “User can’t login / sudo broken / SSH auth fails” → `account-access-playbook.md`
+- “Git state wrong / detached HEAD / undo commit” → `git-recovery-playbook.md`
+
+---
+
 ## 🧠 How to Use This Layer (Training Procedure)
 
-Recommended order for a given domain:
+Recommended order for a given incident class:
 
 1) Run the relevant drill surface(s) until mechanics are automatic  
-2) Run the relevant failure scenario(s) as a timed exercise  
-3) Run the relevant execution playbook end-to-end as an operator algorithm
+2) Run the relevant execution playbook end-to-end as a timed operator algorithm  
+3) Run the relevant failure scenario(s) as a timed break/fix exercise
 
 Operator objective:
 
@@ -100,7 +116,7 @@ No new scenarios are required to proceed, but adding these later improves covera
 
 These playbooks:
 
-- Are **operator flows** (diagnosis sequences + remediation patterns)
+- Are **operator algorithms** (diagnosis sequences + remediation patterns)
 - Contain **decision points**, **verification steps**, and **rollback paths**
 - Compose drills, but do **not** replace drills
 
@@ -111,3 +127,4 @@ These playbooks are not:
 - scenario narratives
 
 ---
+
