@@ -386,7 +386,3 @@ You are **done with this file** when:
 - You can operate cron/at/timers/logrotate confidently
 
 ---
-EOF
-
----
-

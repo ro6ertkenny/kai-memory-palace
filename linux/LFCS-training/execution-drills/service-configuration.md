@@ -478,6 +478,3 @@ You are done with this file when:
 - You can roll back safely using backups + reloads/restarts (no panic edits)
 
 ---
-EOF
-
----
