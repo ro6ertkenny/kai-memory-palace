@@ -51,12 +51,15 @@ Quick versions:
 
 ## 🧱 2) Lab Setup (Debian/Ubuntu)
 
+⚠️ Do this in a VM or lab machine.  
+⚠️ Do NOT run on a production host.
+
 Create workspace:
 
-    mkdir -p ~/lfcs-labs/execution-drills/phase-11
-    cd ~/lfcs-labs/execution-drills/phase-11
+    mkdir -p ~/lfcs-labs/execution-drills/containers-and-virtualization
+    cd ~/lfcs-labs/execution-drills/containers-and-virtualization
 
-Install tools (safe defaults; install what you plan to use):
+Install tools (install what you plan to use):
 
     sudo apt-get update
     sudo apt-get install -y docker.io libvirt-clients libvirt-daemon-system virtinst
@@ -179,7 +182,7 @@ Podman:
 # 🌐 7) Networking Basics
 # =========================
 
-## 7.1 Publish ports + verify with curl
+## 7.1 Publish ports + verify with curl (exam favorite)
 
 Docker:
 
@@ -267,47 +270,48 @@ Podman:
 # 🧾 10) Build an Image (Dockerfile)
 # =========================
 
-## 10.1 Minimal build
+## 10.1 Minimal build (Docker or Podman)
 
 Create build context:
 
-    mkdir -p ~/lfcs-labs/execution-drills/phase-11/imglab
-    cd ~/lfcs-labs/execution-drills/phase-11/imglab
+    mkdir -p ~/lfcs-labs/execution-drills/containers-and-virtualization/imglab
+    cd ~/lfcs-labs/execution-drills/containers-and-virtualization/imglab
 
 Write Dockerfile:
 
     printf "%s\n" \
       "FROM nginx" \
-      "COPY index.html /usr/share/nginx/html/index.html" \
+      "RUN echo \"LFCS TEST\" > /usr/share/nginx/html/index.html" \
       > Dockerfile
-
-Create content:
-
-    echo "PHASE 11 TEST" > index.html
 
 Build:
 
 Docker:
 
-    docker build -t myimage:1.0 .
+    docker build -t lfcs-nginx:1.0 .
 
 Podman:
 
-    podman build -t myimage:1.0 .
+    podman build -t lfcs-nginx:1.0 .
 
 Run + verify:
 
 Docker:
 
-    docker run -d -p 8181:80 --name mycontainer myimage:1.0
-    curl http://127.0.0.1:8181
-    docker rm -f mycontainer
+    docker run -d -p 8181:80 --name lfcs_web lfcs-nginx:1.0
+    curl http://127.0.0.1:8181 2>/dev/null || true
+    docker rm -f lfcs_web
 
 Podman:
 
-    podman run -d -p 8181:80 --name mycontainer myimage:1.0
-    curl http://127.0.0.1:8181
-    podman rm -f mycontainer
+    podman run -d -p 8181:80 --name lfcs_web lfcs-nginx:1.0
+    curl http://127.0.0.1:8181 2>/dev/null || true
+    podman rm -f lfcs_web
+
+Cleanup build context:
+
+    cd ~
+    rm -rf ~/lfcs-labs/execution-drills/containers-and-virtualization/imglab
 
 ---
 
@@ -346,22 +350,15 @@ Podman:
 ## 11.3 “Container unreachable” checklist
 
 Checklist:
-- Is it running?
+- is it running?
+- was a port published?
+- is the host listening?
+
+Examples:
 
     docker ps 2>/dev/null || true
-    podman ps 2>/dev/null || true
-
-- Was port published?
-
     docker port web 2>/dev/null || true
-    podman port web 2>/dev/null || true
-
-- Is host listening?
-
     ss -tlnp | head
-
-- Validate curl to published port:
-
     curl -I http://127.0.0.1:8080 2>/dev/null | head -n 5 || true
 
 ---
@@ -370,8 +367,12 @@ Checklist:
 # 🧷 12) Persistence Awareness (systemd)
 # =========================
 
+Docker engine:
+
     systemctl is-enabled docker 2>/dev/null || true
     sudo systemctl enable --now docker 2>/dev/null || true
+
+containerd:
 
     systemctl is-enabled containerd 2>/dev/null || true
     sudo systemctl enable --now containerd 2>/dev/null || true
@@ -409,8 +410,8 @@ Goal: Recognize whether you are inside a VM/container, and identify virtualizati
     virsh destroy VM1
 
 Meaning:
-- shutdown = graceful
-- destroy = power off (hard)
+- shutdown = graceful OS shutdown
+- destroy  = power off (hard)
 
 ## 14.3 Autostart
 
@@ -434,9 +435,10 @@ Meaning:
 
     virsh setmaxmem VM2 80M --config
     virsh setmem VM2 80M --config
+    virsh dominfo VM2 | grep -i memory || true
 
 Meaning:
-- --config = persistent (next boot)
+- --config = persistent (affects next boot)
 
 ---
 
@@ -447,7 +449,7 @@ Meaning:
 Example flow (if you already have an image):
 
     virt-install \
-      --name mockexam1 \
+      --name lfcs-testvm \
       --memory 1024 \
       --vcpus 1 \
       --disk path=/var/lib/libvirt/images/ubuntu.img \
@@ -456,26 +458,36 @@ Example flow (if you already have an image):
       --graphics none \
       --network network=default
 
+Then:
+
+    virsh list --all
+    virsh autostart lfcs-testvm
+
 ---
 
 # =========================
 # ⏱️ 16) Timed Drills
 # =========================
 
-## 16.1 Run nginx on 1234 in 20 seconds
-
-Docker:
-
-    docker run -d -p 1234:80 --name website nginx
-
-Podman:
-
-    podman run -d -p 1234:80 --name website nginx
-
-## 16.2 List all containers in 5 seconds
+## 16.1 List all containers (5 seconds)
 
     docker ps -a 2>/dev/null || true
     podman ps -a 2>/dev/null || true
+
+## 16.2 Run nginx on port 1234 (15 seconds)
+
+Docker:
+
+    docker run -d -p 1234:80 --name testweb nginx
+
+Podman:
+
+    podman run -d -p 1234:80 --name testweb nginx
+
+Cleanup:
+
+    docker rm -f testweb 2>/dev/null || true
+    podman rm -f testweb 2>/dev/null || true
 
 ## 16.3 Remove all containers (lab only)
 
@@ -487,33 +499,75 @@ Podman:
 
     podman rm -f $(podman ps -a -q) 2>/dev/null || true
 
-## 16.4 List all VMs in 5 seconds
+## 16.4 List all VMs (5 seconds)
 
     virsh list --all 2>/dev/null || true
 
 ---
 
 # =========================
-# 🧯 17) Failure Injection Drills (Mental)
+# 💣 17) Failure Injection Drills
 # =========================
 
-- destroy vs shutdown
-  - destroy = power cut
-  - shutdown = graceful OS shutdown
+## 17.1 Forgot -d (foreground run)
 
-- docker rm vs docker rmi
-  - rm  = remove container
-  - rmi = remove image
+Run:
 
-- “port published” mistakes
-  - container runs, curl fails
-  - confirm: published port, host listener, correct port number
+    docker run nginx
+
+Problem:
+- terminal blocks
+
+Fix:
+- Ctrl+C, rerun with -d
+
+## 17.2 Forgot port mapping
+
+Run:
+
+    docker run -d --name webtest nginx
+
+Problem:
+- curl 127.0.0.1:80 does not hit container
+
+Diagnosis:
+
+    docker inspect webtest
+
+Fix:
+- remove + recreate with -p
+
+## 17.3 Confusing VM commands
+
+Explain:
+- virsh shutdown = graceful
+- virsh destroy  = hard power-off
 
 ---
 
 # =========================
-# ✅ Completion Criteria
+# 🧠 18) Composition (Exam Style)
 # =========================
+
+## 18.1 Full container lifecycle
+
+    docker pull nginx
+    docker run -d -p 8088:80 --restart always --name examweb nginx
+    docker ps
+    docker inspect examweb
+    docker rm -f examweb
+    docker rmi nginx
+
+## 18.2 VM lifecycle (if available)
+
+    virsh list --all
+    virsh start VM1
+    virsh autostart VM1
+    virsh shutdown VM1
+
+---
+
+# ✅ Completion Criteria
 
 You are done with this file when:
 
@@ -537,10 +591,11 @@ If you can’t control workloads, you can’t control compute.
 Docker:
 
     docker rm -f $(docker ps -a -q) 2>/dev/null || true
-    docker rmi myimage:1.0 2>/dev/null || true
+    docker rmi lfcs-nginx:1.0 2>/dev/null || true
 
 Podman:
 
     podman rm -f $(podman ps -a -q) 2>/dev/null || true
-    podman rmi myimage:1.0 2>/dev/null || true
+    podman rmi lfcs-nginx:1.0 2>/dev/null || true
 
+---
