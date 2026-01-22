@@ -1,6 +1,6 @@
 # 🧭 LFCS Training Progression Guide
 
-**Path:** `linux/LFCS-training/LFCS-training-progression-guide.md`  
+**Path:** `linux/LFCS-training/training-progression/LFCS-training-progression-guide.md`  
 **Purpose:** Define the **canonical, learner-facing progression** for building real Linux sysadmin competence and passing LFCS.
 
 This guide is the **curriculum spine**.  
@@ -35,6 +35,22 @@ For each Building Block:
 Rule:
 
 > **Never skip a Building Block. Each one assumes mastery of all previous blocks.**
+
+---
+
+## 🧱 What Each Building Block Must Contain (Contract)
+
+Each Building Block must explicitly define:
+
+- **Linked drill surfaces** (mechanics)
+- **Linked failure scenarios** (recognition)
+- **Linked execution playbook(s)** (procedure)
+- **Explicit exit criteria** (gate)
+
+If any of these are missing, the Building Block is **incomplete**.
+
+Building Blocks must **not** embed tutorials or encyclopedic command lists.  
+They reference the canonical layers and define **what mastery means**.
 
 ---
 
