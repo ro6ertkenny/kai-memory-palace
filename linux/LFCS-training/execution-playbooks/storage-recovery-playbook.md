@@ -1,7 +1,9 @@
 # 🗄️ Storage Recovery Playbook (LFCS)
 
 **Path:** `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md`  
-**Purpose:** Restore a system to a **writable, mounted, and healthy** storage state using a **safe, exam-ready operator flow**.
+**Purpose:** Restore a system to a **writable, mounted, and healthy** storage state using a **safe, exam-ready operator algorithm**.
+
+This is not a tutorial. This is a procedure.
 
 ---
 
@@ -16,13 +18,13 @@ Use this playbook when:
 - Permissions vs mount options confusion
 - Suspected filesystem inconsistency
 
-This playbook orchestrates the following canonical drill surfaces:
+This playbook composes the following drill surfaces:
 
 - `linux/LFCS-training/execution-drills/storage-and-mounts.md`
 - `linux/LFCS-training/execution-drills/files-and-text.md`
 - `linux/LFCS-training/execution-drills/essential-commands.md`
 
-Related scenarios (for practice validation):
+Related scenario (practice input):
 
 - `linux/LFCS-training/failure-scenarios/scenario-b-disk-is-full.md`
 
@@ -45,6 +47,16 @@ Never start with `fsck` or editing `/etc/fstab` blindly.
 
 ---
 
+## 🧭 Global Safety Rules
+
+- **Preserve evidence first.** Observe before changing fstab or running fsck.
+- **Never fsck a mounted filesystem.**
+- **Prefer smallest reversible change.**
+- **Always validate with `mount -a` before reboot.**
+- **Every action requires verification.**
+
+---
+
 ## 0) Inputs
 
 You must know or determine:
@@ -58,7 +70,7 @@ You must know or determine:
 
 ---
 
-## 1) Observe Current State
+## 1) Observe Current State (No Changes)
 
 Check mounts:
 
@@ -70,9 +82,10 @@ Check disk usage:
     df -h
     df -i
 
-Check block devices:
+Check block devices and filesystems:
 
     lsblk -f
+    blkid
 
 Branch:
 
@@ -85,23 +98,25 @@ Branch:
 
 ## 2) Disk Full Triage
 
-Find top consumers:
+Find top consumers (start broad, then narrow):
 
     du -xh / | sort -h | tail -n 20
 
-Or more focused:
+Common hotspots:
 
     du -xh /var | sort -h | tail -n 20
+    du -xh /home | sort -h | tail -n 20
 
 Check deleted-but-open files:
 
     lsof | grep deleted
 
-Branch:
+Actions:
 
-- If **obvious large files** → delete/move → go to **Section 3**
-- If **logs exploded** → truncate → go to **Section 3**
-- If **mystery usage** → continue inspection
+- Delete or move obviously large, unnecessary files
+- Truncate runaway logs if appropriate
+
+Then go to **Section 3**.
 
 ---
 
@@ -112,19 +127,19 @@ Re-check:
     df -h
     df -i
 
-If space OK:
+If space is now sufficient:
 
-- End incident
+- Proceed to **Section 8** (Persistence Check)
 
 If still full:
 
-- Return to **Section 2**
+- Return to **Section 2** and continue investigation
 
 ---
 
 ## 4) Mount Missing or Wrong
 
-Check fstab:
+Inspect fstab:
 
     cat /etc/fstab
 
@@ -137,15 +152,15 @@ Try manual mount:
 
     mount /mountpoint
 
-If fails, try:
+Or:
 
     mount -a
 
 Branch:
 
-- If **UUID wrong / device missing** → fix fstab → go to **Section 5**
+- If **UUID wrong / device missing** → go to **Section 5**
 - If **mount works manually** → go to **Section 8**
-- If **fs error** → go to **Section 9**
+- If **filesystem error** → go to **Section 9**
 
 ---
 
@@ -154,6 +169,12 @@ Branch:
 Edit:
 
     vi /etc/fstab
+
+Rules:
+
+- Do not guess device names
+- Prefer UUIDs
+- Ensure filesystem type and options are correct
 
 Validate without reboot:
 
@@ -169,13 +190,13 @@ If errors:
 
 ---
 
-## 6) Filesystem Read-Only
+## 6) Filesystem Is Read-Only
 
 Check:
 
     mount | grep " ro,"
 
-Check dmesg:
+Check kernel messages:
 
     dmesg | tail -n 50
 
@@ -184,35 +205,37 @@ Likely causes:
 - I/O error
 - Filesystem inconsistency
 
-Proceed to **Section 9**
+Proceed to **Section 9**.
 
 ---
 
 ## 7) Emergency / Recovery Mode
 
-Identify root:
+Identify current root and devices:
 
     lsblk
     mount
 
-Check fstab:
+Inspect fstab:
 
     cat /etc/fstab
 
 Common causes:
 
 - Bad UUID
-- Bad fs type
+- Wrong filesystem type
 - Missing device
 
-Fix fstab or comment bad line, then:
+Fix fstab or comment out the bad line.
+
+Attempt recovery:
 
     mount -o remount,rw /
     mount -a
 
 Then:
 
-- Exit shell / reboot
+- Exit recovery shell or reboot
 
 ---
 
@@ -223,11 +246,11 @@ Confirm:
     findmnt
     df -h
 
-Ensure mounts survive reboot:
+Validate fstab:
 
     mount -a
 
-If allowed:
+If allowed and safe, test reboot:
 
     systemctl reboot
 
@@ -242,7 +265,7 @@ After reboot:
 
 WARNING: Only run fsck on **unmounted** filesystems.
 
-Find device:
+Identify device:
 
     lsblk
 
@@ -254,27 +277,31 @@ Run check:
 
     fsck /dev/sdXN
 
-Then:
+If clean or repaired:
 
     mount /mountpoint
 
-Return to **Section 8**
+Return to **Section 8**.
 
 ---
 
 ## 🔁 Rollback Strategy
 
-If fstab edit breaks boot:
+If an fstab edit breaks boot:
 
 - Boot to recovery
 - Comment offending line
-- Re-run:
+- Validate:
 
     mount -a
 
 Restore from backup if available:
 
     cp /etc/fstab.bak /etc/fstab
+
+Re-test:
+
+    mount -a
 
 ---
 
@@ -285,6 +312,13 @@ Restore from backup if available:
 - `df -h` and `findmnt` look correct
 - `mount -a` produces **no errors**
 - Survives reboot (if tested)
+
+You can explain:
+
+- What failed
+- Why it failed
+- Why your fix was safe
+- How you verified recovery
 
 ---
 
@@ -306,3 +340,4 @@ Restore from backup if available:
 
 This is a **composition layer**, not a source of primitives.
 
+---
