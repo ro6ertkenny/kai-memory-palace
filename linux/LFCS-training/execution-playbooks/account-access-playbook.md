@@ -1,7 +1,9 @@
 # 🔐 Account Access Playbook (LFCS)
 
 **Path:** `linux/LFCS-training/execution-playbooks/account-access-playbook.md`  
-**Purpose:** Restore **legitimate user access** (login, sudo, SSH) using a **safe, exam-ready operator flow**.
+**Purpose:** Restore **legitimate user access** (login, sudo, SSH) using a **safe, exam-ready operator algorithm**.
+
+This is not a tutorial. This is a procedure.
 
 ---
 
@@ -15,14 +17,14 @@ Use this playbook when:
 - Account is **locked / expired**
 - Permissions or ownership prevent access
 
-This playbook orchestrates the following canonical drill surfaces:
+This playbook composes the following drill surfaces:
 
 - `linux/LFCS-training/execution-drills/users-and-permissions.md`
 - `linux/LFCS-training/execution-drills/files-and-text.md`
 - `linux/LFCS-training/execution-drills/security-and-selinux.md`
 - `linux/LFCS-training/execution-drills/essential-commands.md`
 
-Related scenarios (for practice validation):
+Related scenarios (practice inputs):
 
 - (Future) no-access / broken-auth scenario
 
@@ -36,12 +38,22 @@ Always proceed in this order:
 2. **Observe failure mode**
 3. **Verify account state**
 4. **Verify auth mechanism**
-5. **Correct**
+5. **Apply minimal correction**
 6. **Verify**
 7. **Make persistent**
 8. **Rollback if needed**
 
 Never start by editing config blindly.
+
+---
+
+## 🧭 Global Safety Rules
+
+- **Never lock yourself out of root.**
+- **Always keep one recovery path available.**
+- **Prefer minimal, reversible changes.**
+- **Use `visudo` for sudoers.**
+- **Every action requires verification.**
 
 ---
 
@@ -60,7 +72,7 @@ You must know or determine:
 
 ## 1) Identify Failure Mode
 
-Attempt login or sudo and observe:
+Attempt login or sudo and observe the exact error:
 
 - “Permission denied”
 - “Account locked”
@@ -73,16 +85,17 @@ Branch:
 - If **cannot log in at all** → go to **Section 2**
 - If **can log in but no sudo** → go to **Section 5**
 - If **SSH only fails** → go to **Section 7**
+- If **root access lost** → go to **Section 6**
 
 ---
 
 ## 2) Verify Account Exists and Is Usable
 
-Check:
+Check existence:
 
     getent passwd <user>
 
-Check shell:
+Check login shell:
 
     getent passwd <user> | cut -d: -f7
 
@@ -97,6 +110,8 @@ Check lock / expiry:
 
 If locked or expired → go to **Section 3**
 
+If account looks normal → continue to **Section 8** to test access.
+
 ---
 
 ## 3) Unlock or Unexpire Account
@@ -109,11 +124,11 @@ Set new password:
 
     passwd <user>
 
-Check expiry:
+Remove expiry:
 
     chage -E -1 <user>
 
-Return to **Section 8**
+Return to **Section 8**.
 
 ---
 
@@ -123,7 +138,7 @@ Fix shell:
 
     chsh -s /bin/bash <user>
 
-Check home:
+Check home directory:
 
     ls -ld /home/<user>
 
@@ -133,7 +148,7 @@ If missing:
     chown <user>:<user> /home/<user>
     chmod 700 /home/<user>
 
-Return to **Section 8**
+Return to **Section 8**.
 
 ---
 
@@ -143,41 +158,41 @@ Check groups:
 
     groups <user>
 
-Check sudoers:
+Check sudo groups:
 
     getent group sudo
     getent group wheel
 
-Add user to group:
+Add user to appropriate group:
 
     usermod -aG sudo <user>
     usermod -aG wheel <user>
 
-Or via visudo:
+Or edit sudoers safely:
 
     visudo
 
-Add line:
+Add line if required:
 
     <user> ALL=(ALL) ALL
 
-Return to **Section 8**
+Return to **Section 8**.
 
 ---
 
-## 6) Root Access Lost (Emergency)
+## 6) Root Access Lost (Emergency Path)
 
 Boot to single-user / recovery mode.
 
-Remount root RW:
+Remount root read-write:
 
     mount -o remount,rw /
 
-Then:
+Then perform one of:
 
 - Reset root password
-- Or fix sudoers
-- Or unlock account
+- Fix sudoers via `visudo`
+- Unlock the required account
 
 Then reboot.
 
@@ -187,13 +202,13 @@ Then reboot.
 
 Check SSH service:
 
-    systemctl status sshd
+    systemctl status sshd --no-pager
 
-Check config:
+Check config syntax:
 
     sshd -t
 
-Check:
+Check relevant settings:
 
     grep -E "PermitRootLogin|PasswordAuthentication" /etc/ssh/sshd_config
 
@@ -213,7 +228,7 @@ Restart SSH:
 
     systemctl restart sshd
 
-Return to **Section 8**
+Return to **Section 8**.
 
 ---
 
@@ -225,13 +240,13 @@ Test:
     sudo -l
     ssh <user>@localhost
 
-If all work:
+If all required paths work:
 
 - Proceed to **Section 9**
 
 If not:
 
-- Return to relevant section
+- Return to the relevant section.
 
 ---
 
@@ -243,13 +258,17 @@ Confirm:
     passwd -S <user>
     groups <user>
 
-Ensure no temporary hacks remain.
+Ensure:
+
+- No temporary hacks remain
+- No unsafe sudoers changes remain
+- No insecure permission changes remain
 
 ---
 
 ## 🔁 Rollback Strategy
 
-If sudoers broken:
+If sudoers is broken:
 
 - Use recovery shell
 - Run:
@@ -258,7 +277,7 @@ If sudoers broken:
 
 Restore from backup if needed.
 
-If SSH broken:
+If SSH config breaks access:
 
 - Revert config
 - Restart sshd
@@ -271,7 +290,14 @@ If SSH broken:
 - User can sudo (if intended)
 - SSH works (if required)
 - Account is not locked or expired
-- Home and shell are valid
+- Home directory and shell are valid
+
+You can explain:
+
+- What blocked access
+- Why it blocked access
+- Why your fix was minimal and safe
+- How you verified recovery
 
 ---
 
@@ -280,7 +306,7 @@ If SSH broken:
 - Never lock yourself out of root
 - Always keep one working root path
 - Always test in a second session if possible
-- Never hand-edit sudoers without visudo
+- Never hand-edit sudoers without `visudo`
 
 ---
 
@@ -293,3 +319,4 @@ If SSH broken:
 
 This is a **composition layer**, not a source of primitives.
 
+---
