@@ -1,7 +1,9 @@
 # 🛡️ Security Triage Playbook (LFCS)
 
 **Path:** `linux/LFCS-training/execution-playbooks/security-triage-playbook.md`  
-**Purpose:** Restore **intended access and behavior** when security controls (permissions, ownership, SELinux) block operations, using a **safe, exam-ready operator flow**.
+**Purpose:** Restore **intended access and behavior** when security controls (permissions, ownership, SELinux) block operations, using a **safe, exam-ready operator algorithm**.
+
+This is not a tutorial. This is a procedure.
 
 ---
 
@@ -15,16 +17,16 @@ Use this playbook when:
 - SELinux **silently blocks** or logs denials
 - Behavior changed after **file moves, restores, or package installs**
 
-This playbook orchestrates the following canonical drill surfaces:
+This playbook composes the following drill surfaces:
 
 - `linux/LFCS-training/execution-drills/security-and-selinux.md`
 - `linux/LFCS-training/execution-drills/users-and-permissions.md`
 - `linux/LFCS-training/execution-drills/files-and-text.md`
 - `linux/LFCS-training/execution-drills/essential-commands.md`
 
-Related scenarios (for practice validation):
+Related scenarios (practice inputs):
 
-- (Future) selinux-denial-breaks-service
+- (Future) selinux-denial-breaks-service  
 - (Future) permissions-regression-after-restore
 
 ---
@@ -35,14 +37,24 @@ Always proceed in this order:
 
 1. **Reproduce and observe**
 2. **Classify: DAC vs MAC**
-3. **Inspect ownership/permissions**
-4. **Inspect SELinux state and denials**
-5. **Correct minimally**
+3. **Inspect DAC (ownership / permissions)**
+4. **Inspect MAC (SELinux)**
+5. **Apply minimal correction**
 6. **Verify**
 7. **Make persistent**
 8. **Rollback if needed**
 
 Never disable security permanently to “make it work”.
+
+---
+
+## 🧭 Global Safety Rules
+
+- **Preserve evidence first.** Read errors and logs before changing anything.
+- **Decide DAC vs MAC early.** Do not mix fixes blindly.
+- **Prefer minimal, targeted changes.**
+- **Never leave SELinux disabled.**
+- **Every action requires verification.**
 
 ---
 
@@ -63,14 +75,14 @@ Re-run the failing action and capture the error.
 
 If service-related:
 
-    systemctl status <service>
-    journalctl -u <service> --no-pager -n 50
+    systemctl status <service> --no-pager
+    journalctl -u <service> --no-pager -n 80
 
 If command-line:
 
     <command>
 
-Note:
+Record:
 
 - Path being accessed
 - User identity
@@ -80,28 +92,30 @@ Note:
 
 ## 2) Classify: DAC vs MAC
 
-First check SELinux mode:
+Check SELinux mode:
 
     getenforce
 
-If:
+Interpretation:
 
 - Enforcing → both DAC and MAC may apply
-- Permissive → only DAC blocks, but denials are logged
+- Permissive → only DAC blocks, but MAC denials are logged
 - Disabled → only DAC applies
 
 Check for SELinux denials:
 
     ausearch -m avc -ts recent
 
-If denials exist → go to **Section 5**  
-If no denials or SELinux disabled → go to **Section 3**
+Branch:
+
+- If **AVC denials exist** → go to **Section 5**
+- If **no AVC denials or SELinux disabled** → go to **Section 3**
 
 ---
 
 ## 3) Inspect Ownership and Permissions (DAC)
 
-Inspect the path:
+Inspect the target path:
 
     ls -ld /path
     ls -l /path
@@ -117,14 +131,14 @@ Check:
 - Mode bits
 - Execute bit on all parent directories
 
-If service-related, check runtime user:
+If service-related, confirm runtime user:
 
     ps -eo pid,user,comm | grep <service>
 
 Branch:
 
-- If ownership/mode incorrect → go to **Section 4**
-- If ownership/mode looks correct → go to **Section 5**
+- If **ownership/mode is incorrect** → go to **Section 4**
+- If **ownership/mode looks correct** → go to **Section 5**
 
 ---
 
@@ -135,15 +149,15 @@ Fix owner/group:
     chown user:group /path
     chown -R user:group /path
 
-Fix modes:
+Fix modes (be minimal):
 
     chmod 755 /dir
     chmod 644 /file
 
 Re-test the failing action.
 
-If fixed → go to **Section 7**  
-If still failing → go to **Section 5**
+- If fixed → go to **Section 7**
+- If still failing → go to **Section 5**
 
 ---
 
@@ -154,25 +168,23 @@ Check context:
     ls -Z /path
     ls -Z /path/to/file
 
-Compare to expected location type.
-
 Check recent denials:
 
     ausearch -m avc -ts recent
 
-If files were moved or restored:
+If files were moved or restored, reset to defaults:
 
     restorecon -Rv /path
 
-If a specific context is wrong:
+If a path requires a custom context, inspect existing rules:
 
     semanage fcontext -l | grep /path
 
-Temporarily test (ONLY for diagnosis):
+Temporary diagnostic ONLY (never leave it this way):
 
     setenforce 0
 
-Re-test action.
+Re-test the action.
 
 If it works in permissive:
 
@@ -180,7 +192,7 @@ If it works in permissive:
 
     setenforce 1
 
-- Fix contexts properly using restorecon or fcontext rules.
+- Fix contexts properly using `restorecon` or a precise `semanage fcontext` rule.
 
 If it still does not work:
 
@@ -192,7 +204,7 @@ If it still does not work:
 
 If a service still fails:
 
-    systemctl status <service>
+    systemctl status <service> --no-pager
     journalctl -u <service> --no-pager -n 100
 
 Common causes:
@@ -211,6 +223,8 @@ Then restart:
 
     systemctl restart <service>
 
+Return to **Section 7**.
+
 ---
 
 ## 7) Verification
@@ -220,7 +234,7 @@ Re-test:
 - The original command or workflow
 - The service, if applicable:
 
-    systemctl status <service>
+    systemctl status <service> --no-pager
 
 Confirm:
 
@@ -238,11 +252,11 @@ Ensure:
 
 - Fix survives reboot
 - No temporary hacks remain:
-  - SELinux still Enforcing (if it was)
-  - No over-broad chmod 777
+  - SELinux is Enforcing (if applicable)
+  - No over-broad modes (e.g., 777)
   - No unnecessary ownership changes
 
-If fcontext rules were added, confirm:
+If custom fcontext rules were added, confirm:
 
     semanage fcontext -l | grep /path
 
@@ -252,15 +266,14 @@ If fcontext rules were added, confirm:
 
 If you over-loosened permissions:
 
-- Restore tighter modes
-- Restore ownership
-- Re-run:
+- Restore tighter modes and ownership
+- Re-apply defaults:
 
     restorecon -Rv /path
 
-If SELinux policy changes cause new issues:
+If SELinux changes cause new issues:
 
-- Remove custom fcontext rule
+- Remove the custom fcontext rule
 - Re-apply default contexts
 
 ---
@@ -273,14 +286,21 @@ If SELinux policy changes cause new issues:
 - No new denials appear
 - Behavior is stable
 
+You can explain:
+
+- Whether the block was DAC or MAC
+- What specifically was wrong
+- Why your fix was minimal and safe
+- How you verified recovery
+
 ---
 
 ## 🧠 Exam Safety Rules
 
 - Never leave SELinux disabled
-- Never use chmod 777 as a “solution”
-- Always identify whether the block is DAC or MAC
-- Prefer restorecon before inventing new contexts
+- Never use `chmod 777` as a “solution”
+- Always classify DAC vs MAC first
+- Prefer `restorecon` before inventing new contexts
 - Verify after every change
 
 ---
@@ -295,3 +315,4 @@ If SELinux policy changes cause new issues:
 This is a **composition layer**, not a source of primitives.
 
 ---
+
