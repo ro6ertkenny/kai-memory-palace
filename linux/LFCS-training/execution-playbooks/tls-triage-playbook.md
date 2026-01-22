@@ -1,7 +1,9 @@
 # 🔒 TLS Triage Playbook (LFCS)
 
 **Path:** `linux/LFCS-training/execution-playbooks/tls-triage-playbook.md`  
-**Purpose:** Restore **valid, trusted TLS operation** for a service using a **safe, exam-ready operator flow**.
+**Purpose:** Restore **valid, trusted TLS operation** for a service using a **safe, exam-ready operator algorithm**.
+
+This is not a tutorial. This is a procedure.
 
 ---
 
@@ -15,7 +17,7 @@ Use this playbook when:
 - Wrong **key, cert, or chain** is configured
 - A recent cert change broke the service
 
-This playbook orchestrates the following canonical drill surfaces:
+This playbook composes the following drill surfaces:
 
 - `linux/LFCS-training/execution-drills/ssl-certificates.md`
 - `linux/LFCS-training/execution-drills/services-and-logging.md`
@@ -23,9 +25,9 @@ This playbook orchestrates the following canonical drill surfaces:
 - `linux/LFCS-training/execution-drills/files-and-text.md`
 - `linux/LFCS-training/execution-drills/essential-commands.md`
 
-Related scenarios (for practice validation):
+Related scenarios (practice inputs):
 
-- (Future) tls-expired-cert
+- (Future) tls-expired-cert  
 - (Future) bad-chain-config
 
 ---
@@ -37,14 +39,25 @@ Always proceed in this order:
 1. **Reproduce and observe**
 2. **Identify the TLS endpoint**
 3. **Inspect certificate material**
-4. **Validate chain and dates**
-5. **Verify service configuration**
-6. **Correct minimally**
-7. **Verify**
-8. **Make persistent**
-9. **Rollback if needed**
+4. **Validate certificate, key, and dates**
+5. **Validate chain**
+6. **Verify service configuration**
+7. **Apply minimal correction**
+8. **Verify**
+9. **Make persistent**
+10. **Rollback if needed**
 
 Never regenerate keys or certs blindly.
+
+---
+
+## 🧭 Global Safety Rules
+
+- **Preserve evidence first.** Inspect before replacing files.
+- **Never loosen private key permissions.**
+- **Do not guess chain order.**
+- **Prefer smallest, reversible change.**
+- **Every action requires verification.**
 
 ---
 
@@ -54,7 +67,7 @@ You must know or determine:
 
 - Service name
 - Port
-- Path to:
+- Paths to:
   - certificate
   - private key
   - chain (if applicable)
@@ -66,8 +79,8 @@ You must know or determine:
 
 Check service:
 
-    systemctl status <service>
-    journalctl -u <service> --no-pager -n 50
+    systemctl status <service> --no-pager
+    journalctl -u <service> --no-pager -n 80
 
 Test locally:
 
@@ -77,24 +90,25 @@ Or:
 
     openssl s_client -connect localhost:<port>
 
-Capture:
+Record:
 
 - Error message
-- Which cert is presented (if any)
+- Whether a cert is presented
+- Which cert is presented
 
 ---
 
 ## 2) Identify TLS Endpoint and Files
 
-Inspect service config:
+Inspect service configuration:
 
     grep -R "ssl\|tls\|cert" /etc/<service>/
 
-Or open config directly:
+Or open the main config:
 
     vi /etc/<service>/<config>
 
-Note paths to:
+Identify and write down paths to:
 
 - cert file
 - key file
@@ -104,7 +118,7 @@ Note paths to:
 
 ## 3) Inspect Certificate Material
 
-Check files exist and are readable:
+Check files exist and are readable by the service:
 
     ls -l /path/to/cert.pem
     ls -l /path/to/key.pem
@@ -112,13 +126,15 @@ Check files exist and are readable:
 
 Check ownership and modes:
 
-- Key should usually be readable only by service user/root
+- Private key should usually be:
+  - owned by root or service user
+  - mode 600 or similarly restrictive
 
 ---
 
 ## 4) Validate Certificate and Key
 
-Check cert dates:
+Check certificate dates:
 
     openssl x509 -in /path/to/cert.pem -noout -dates
 
@@ -133,7 +149,12 @@ Check key matches cert:
 
 The hashes must match.
 
-If expired or mismatched → go to **Section 7**.
+If:
+
+- Cert is expired
+- Or key does not match
+
+→ Go to **Section 7**.
 
 ---
 
@@ -149,23 +170,23 @@ Test verification:
 
 If verification fails:
 
-- Wrong chain
 - Missing intermediate
 - Wrong file order
+- Wrong CA file
 
-Correct chain and continue.
+Fix the chain file, then continue.
 
 ---
 
 ## 6) Verify Service Configuration
 
-Check:
+Confirm:
 
 - Config points to the correct files
 - No typos in paths
-- No stale paths to old certs
+- No stale references to old certs
 
-Validate service config if supported:
+Validate config if supported:
 
     nginx -t
     httpd -t
@@ -174,22 +195,24 @@ Restart service:
 
     systemctl restart <service>
 
-If it still fails → return to **Section 1**.
+If it still fails:
+
+- Return to **Section 1** and re-observe.
 
 ---
 
 ## 7) Replace or Fix Certificate Material
 
-If cert is expired or wrong:
+If cert is expired, wrong, or mismatched:
 
-- Obtain or generate correct cert (exam scope: assume provided or self-signed if instructed)
+- Obtain or generate the correct cert (exam scope: assume provided or self-signed if instructed)
 - Place files in correct paths
 - Fix ownership and modes:
 
     chown root:root /path/to/key.pem
     chmod 600 /path/to/key.pem
 
-Then:
+Restart service:
 
     systemctl restart <service>
 
@@ -209,11 +232,11 @@ Or:
 
 Confirm:
 
-- No cert errors
-- Correct cert is presented
+- No certificate errors
+- Correct certificate is presented
 - Service is running:
 
-    systemctl status <service>
+    systemctl status <service> --no-pager
 
 ---
 
@@ -221,25 +244,27 @@ Confirm:
 
 Ensure:
 
-- Files are in stable paths
+- Files are in stable, non-temporary paths
 - Config does not reference temp locations
 - Permissions and ownership are correct
-- Service survives restart:
+
+Restart test:
 
     systemctl restart <service>
-    systemctl status <service>
+    systemctl status <service> --no-pager
 
 ---
 
 ## 🔁 Rollback Strategy
 
-If a new cert breaks things:
+If a new cert or config breaks things:
 
-- Restore previous cert and config paths
+- Restore previous cert/key/chain
+- Restore previous config
 - Restart service
 - Re-verify
 
-Keep backups of:
+Always keep backups of:
 
 - cert
 - key
@@ -251,12 +276,19 @@ Keep backups of:
 
 - Service starts cleanly
 - Clients connect without TLS errors
-- Certificate is:
-  - valid
-  - not expired
-  - matches key
-  - has correct chain
-- Configuration is clean and stable
+- Certificate:
+  - is valid
+  - is not expired
+  - matches the private key
+  - has a correct chain (if used)
+- Configuration is stable
+
+You can explain:
+
+- What was wrong
+- Why it broke TLS
+- Why your fix was minimal and safe
+- How you verified recovery
 
 ---
 
