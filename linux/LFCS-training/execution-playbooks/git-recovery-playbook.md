@@ -1,7 +1,9 @@
 # 🌱 Git Recovery Playbook (LFCS)
 
 **Path:** `linux/LFCS-training/execution-playbooks/git-recovery-playbook.md`  
-**Purpose:** Restore a **clean, consistent, and intended Git working state** using a **safe, exam-ready operator flow**.
+**Purpose:** Restore a **clean, consistent, and intended Git working state** using a **safe, exam-ready operator algorithm**.
+
+This is not a tutorial. This is a procedure.
 
 ---
 
@@ -15,14 +17,14 @@ Use this playbook when:
 - Files were **accidentally modified, deleted, or staged**
 - You need to **safely reset, revert, or recover** history
 
-This playbook orchestrates the following canonical drill surfaces:
+This playbook composes the following drill surfaces:
 
 - `linux/LFCS-training/execution-drills/git.md`
 
-Related scenarios (for practice validation):
+Related scenarios (practice inputs):
 
-- (Future) bad-commit
-- (Future) detached-head
+- (Future) bad-commit  
+- (Future) detached-head  
 - (Future) accidental-reset
 
 ---
@@ -32,14 +34,24 @@ Related scenarios (for practice validation):
 Always proceed in this order:
 
 1. **Observe repository state**
-2. **Identify what is wrong**
-3. **Decide recovery strategy**
-4. **Apply minimal safe operation**
+2. **Classify the failure mode**
+3. **Select the minimal safe recovery**
+4. **Apply**
 5. **Verify**
 6. **Make persistent**
 7. **Rollback if needed**
 
 Never run destructive commands without checking `git status` first.
+
+---
+
+## 🧭 Global Safety Rules
+
+- **Always start and end with `git status`.**
+- **Prefer `revert` over `reset` for committed history.**
+- **Use `git reflog` as your safety net.**
+- **Do not guess. Inspect first.**
+- **Prefer minimal, reversible actions.**
 
 ---
 
@@ -84,12 +96,13 @@ If this prints nothing → you are in **detached HEAD** → go to **Section 5**.
 
 ## 2) Classify the Problem
 
-From `git status`, determine:
+From `git status` and `git log`, decide:
 
-- Uncommitted changes only → go to **Section 3**
-- Bad commit(s) exist → go to **Section 4**
-- Detached HEAD → go to **Section 5**
-- History rewrite or reset mistake → go to **Section 6**
+- Only **uncommitted changes** → go to **Section 3**
+- **Bad commit(s)** exist → go to **Section 4**
+- **Detached HEAD** → go to **Section 5**
+- **History reset/rewrite mistake** → go to **Section 6**
+- **Accidental file deletion/modification** → go to **Section 7**
 
 ---
 
@@ -106,16 +119,16 @@ Verify:
 
 ### B) You want to keep them
 
-Stage and commit:
+Commit them:
 
     git add .
     git commit -m "WIP: save work"
 
-Or stash:
+Or stash them:
 
     git stash
 
-Then verify:
+Verify:
 
     git status
 
@@ -137,7 +150,7 @@ Use revert:
 
 ### B) Commit should be removed locally (not pushed)
 
-Reset to previous commit:
+Reset to a known-good commit:
 
     git reset --hard <good-commit>
 
@@ -155,18 +168,14 @@ Confirm:
 
     git status
 
-Create a branch to save work:
+If you have work you want to keep:
 
     git branch rescue-work
     git checkout rescue-work
 
-Or switch back to main branch:
+Or return to main branch:
 
     git checkout main
-
-If you had commits in detached state:
-
-- Create a branch pointing to them first.
 
 Verify:
 
@@ -183,9 +192,9 @@ Use reflog:
 
     git reflog
 
-Find the lost commit or state.
+Find the last known-good state.
 
-Restore:
+Restore it:
 
     git reset --hard <reflog-entry>
 
@@ -203,10 +212,6 @@ Restore from HEAD:
 
     git restore <file>
 
-Or:
-
-    git checkout -- <file>
-
 If staged but wrong:
 
     git restore --staged <file>
@@ -214,6 +219,8 @@ If staged but wrong:
 Verify:
 
     git status
+
+Return to **Section 1**.
 
 ---
 
@@ -228,14 +235,14 @@ Always confirm:
 Ensure:
 
 - You are on the correct branch
-- Working tree is clean (or intentionally dirty)
+- Working tree state matches your intent
 - History matches your intent
 
 ---
 
 ## 9) Persistence Check
 
-If you fixed a local-only issue:
+If the issue was local-only:
 
 - You are done.
 
@@ -248,14 +255,14 @@ If history was rewritten and already pushed:
 
 ## 🔁 Rollback Strategy
 
-Almost everything in Git is recoverable via:
+Almost everything is recoverable via:
 
     git reflog
 
 If you make a mistake:
 
 - Stop
-- Inspect reflog
+- Inspect `git reflog`
 - Reset back to a known-good state
 
 ---
@@ -264,9 +271,16 @@ If you make a mistake:
 
 - You are on the correct branch
 - `git status` shows the intended state
-- History (`git log`) matches your intent
-- No accidental detached HEAD
-- No unintended dirty state
+- `git log` matches your intended history
+- No unintended detached HEAD
+- No unintended dirty working tree
+
+You can explain:
+
+- What went wrong
+- Which recovery path you chose
+- Why it was the safest minimal action
+- How you verified success
 
 ---
 
