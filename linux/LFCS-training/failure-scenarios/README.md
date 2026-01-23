@@ -1,12 +1,21 @@
-# 🧯 Failure Scenarios (LFCS)
+# 🧯 Failure Scenarios — README (LFCS)
 
-**Path:** `linux/LFCS-training/failure-scenarios/README.md`
+**Path:** `linux/LFCS-training/failure-scenarios/`
 
-This directory is the **integration and pressure-testing layer** of the LFCS training system.
+Mental mode: **Diagnosis, judgment, and recovery under pressure**  
+Purpose: Train you to **classify failures, choose the correct playbook, and recover systems correctly under time constraints**.
 
-It exists to answer one question:
+---
 
-> Can you diagnose a broken system, choose the right recovery algorithm, and fix it correctly under stress?
+## 🎯 What This Layer Exists To Prove
+
+This directory exists to answer one question:
+
+> **Can you diagnose a broken system, choose the right recovery algorithm, and fix it correctly under stress?**
+
+If the answer is “yes” for every scenario in this directory:
+
+- You are ready for the LFCS exam.
 
 ---
 
@@ -27,34 +36,11 @@ They are designed to train:
 - Correct playbook selection
 - Calm, ordered recovery
 - Verification discipline
+- Proof, not hope
 
 ---
 
-## 🧱 How This Fits Into the LFCS Training System
-
-The full system has four layers:
-
-1) **Building Blocks**  
-   Mental models, invariants, and gates.
-
-2) **Execution Drills**  
-   Muscle memory and command fluency.
-
-3) **Execution Playbooks**  
-   Operator algorithms and decision trees.
-
-4) **Failure Scenarios** (this directory)  
-   Integration, pressure, and realism.
-
-Relationship:
-
-- Drills = how to execute
-- Playbooks = how to decide and route
-- Scenarios = prove you can do both together
-
----
-
-## 🧪 What Failure Scenarios Are Not
+## 🚫 What This Layer Is NOT
 
 They are not:
 
@@ -65,49 +51,127 @@ They are not:
 
 They assume:
 
-- You already know the commands (from drills)
-- You already know the playbooks
+- You already know the commands (from `execution-drills/`)
+- You already know the playbooks (from `execution-playbooks/`)
 - You are being tested on **judgment and flow**
 
 ---
 
-## 🧠 How You Should Train With This Directory
+## 🧱 How This Fits Into the LFCS Training System
 
-Recommended loop:
+The full system has four layers:
 
-1) Pick a scenario
-2) Do not read the answer path
-3) Start from the symptom
-4) Inspect the system
-5) Classify the failure
-6) Choose the correct playbook
-7) Execute recovery
-8) Verify the system
-9) Be able to explain:
-   - What the root cause was
-   - What signal revealed it
-   - Why the chosen playbook was correct
+1) **Training Progression (Building Blocks)** — gates and prerequisites  
+2) **Execution Drills** — muscle memory and mechanics  
+3) **Execution Playbooks** — operator algorithms and decision trees  
+4) **Failure Scenarios** (this directory) — **integration + pressure testing**
+
+Relationship:
+
+- Drills = how to execute  
+- Playbooks = how to decide and route  
+- Scenarios = prove you can do both together under stress
 
 ---
 
-## ⏱️ Training Modes
+## 🧭 The Router Surface (Start Here)
 
-- **Cold start**: Random scenario, no notes
-- **Timed**: 15–20 minutes per scenario
-- **Playbook selection drills**: Focus only on classification speed
-- **Post-mortem mode**: Write or verbalize the root cause chain
+If you do not know which scenario to run or what maps to what:
+
+- Use: `linux/LFCS-training/failure-scenarios/index.md`
+
+Rule:
+
+> The index is the **coverage and routing map**.  
+> The scenario files are the **training inputs**.
 
 ---
 
-## 🎯 Completion Standard
+# 🚀 How To Use This Directory (Operationally)
 
-You are ready for the LFCS exam when:
+---
 
-- You can solve every scenario calmly
-- You classify before acting
-- You never “try random fixes”
-- You always verify
-- You always stop when the requirement is satisfied
+## ⏱️ The 15–30 Minute Daily Rule
+
+Every training day:
+
+1) Run **one failure scenario** (timed)
+2) Do not use notes
+3) Do not jump to fixes
+4) Classify → choose playbook → run algorithm
+5) Do the proof ritual
+6) Log what slowed you down (then drill it tomorrow)
+
+---
+
+## 🧪 The Canonical Scenario Run (Non-Negotiable)
+
+When you run a scenario, you must do this **out loud** or in writing:
+
+1) State the **symptom**
+2) State the **incident class**
+3) State the **chosen playbook**
+4) Then follow the playbook order:
+   - measure
+   - classify
+   - isolate
+   - correct minimally
+   - verify
+   - persist
+   - rollback plan
+5) End with a **proof ritual**
+
+You are not allowed to:
+
+- “try something”
+- domain-hop
+- or fix before classifying
+
+---
+
+## ✅ Proof Ritual (Do Not Skip)
+
+A scenario is only complete when you can prove:
+
+- the original failure is gone
+- there are no new errors
+- the fix is minimal
+- the change is correct and persistent
+- you can explain:
+  - what the root cause was
+  - what signal revealed it
+  - why the chosen playbook was correct
+
+If you cannot explain the classification, you failed the scenario.
+
+---
+
+## 🏁 What “Pass” Looks Like
+
+You have passed a scenario when:
+
+- you classify before touching anything
+- you choose the correct playbook quickly
+- you follow it without skipping steps
+- you reach a verified known-good state
+- you can explain the entire causal chain
+
+---
+
+## 🛑 Build Freeze Rule (During Bootcamp)
+
+Once you are actively prepping for LFCS:
+
+> ❗ Do not rewrite scenarios unless they are wrong.
+
+Only allowed edits:
+
+- fix incorrect assumptions
+- fix broken logic
+- fix incorrect commands
+- tighten proof rituals or references
+
+If you keep adding scenarios or rewriting them, you are not training.
 
 ---
 
@@ -115,4 +179,15 @@ You are ready for the LFCS exam when:
 
 > **The exam does not test commands. It tests judgment under time pressure.**  
 > This directory trains exactly that.
+
+---
+
+## 🏁 Bottom Line
+
+> If failure scenarios feel boring and mechanical, you are ready.  
+> If they feel stressful or confusing, you are not.
+
+That is the calibration tool.
+
+---
 
