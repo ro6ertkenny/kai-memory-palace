@@ -54,10 +54,11 @@ You must master:
 - `linux/LFCS-training/execution-drills/ssl-certificates.md`
 - `linux/LFCS-training/execution-drills/services-and-logging.md`
 - `linux/LFCS-training/execution-drills/files-and-text.md`
+- `linux/LFCS-training/execution-drills/essential-commands.md`
 
 Rule:
 
-> You should be able to inspect certs, keys, and chains **without guessing**.
+> You should be able to inspect certs, keys, paths, permissions, and chains **without guessing**.
 
 ---
 
@@ -180,3 +181,4 @@ You must:
 Without this block, **TLS incidents become panic-driven and risky**.
 
 ---
+
