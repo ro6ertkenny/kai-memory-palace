@@ -49,6 +49,7 @@ Invariants:
 
 You must be fluent with **all** prior drill surfaces, especially:
 
+- `linux/LFCS-training/execution-drills/essential-commands.md`
 - `linux/LFCS-training/execution-drills/processes-logs-and-scheduling.md`
 - `linux/LFCS-training/execution-drills/services-and-logging.md`
 - `linux/LFCS-training/execution-drills/networking.md`
@@ -198,3 +199,4 @@ You must:
 Without this block, **you will know many tools but fail under integration pressure**.
 
 ---
+
