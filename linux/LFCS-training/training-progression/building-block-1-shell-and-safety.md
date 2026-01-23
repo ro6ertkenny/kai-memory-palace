@@ -46,6 +46,7 @@ Invariants:
 You must master:
 
 - `linux/LFCS-training/execution-drills/essential-commands.md`
+- `linux/LFCS-training/execution-drills/shell-execution-and-redirection.md`
 
 Definition of mastery for this block:
 
@@ -164,7 +165,10 @@ If at any later point you:
 
 You must:
 
-> Return here and re-run `essential-commands.md` until safety and intent are automatic.
+> Return here and re-run:
+> - `linux/LFCS-training/execution-drills/essential-commands.md`
+> - `linux/LFCS-training/execution-drills/shell-execution-and-redirection.md`
+> until safety and intent are automatic.
 
 ---
 
