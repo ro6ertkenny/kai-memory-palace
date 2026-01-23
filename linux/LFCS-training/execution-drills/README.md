@@ -43,7 +43,7 @@ These files are **not**:
 
 Those live elsewhere:
 
-- Concepts → Building Blocks
+- Concepts → Training Progression (Building Blocks)
 - Diagnosis → Failure Scenarios
 - Recovery algorithms → Execution Playbooks
 
@@ -53,11 +53,11 @@ Those live elsewhere:
 
 Your training system has **four layers**:
 
-### 1) Building Blocks (Training Progression)
+### 1) Training Progression (Building Blocks)
 
 > “What mental models and skills must I master?”
 
-These define:
+Defines:
 - Gates
 - Required capabilities
 - When you’re allowed to move forward
@@ -68,12 +68,12 @@ These define:
 
 > “Can I execute the basics **without thinking**?”
 
-These build:
+Builds:
 - Speed
 - Accuracy
 - Mechanical confidence
 
-They remove **typing and syntax** from the list of things that can slow you down.
+Removes **typing and syntax** from the list of things that can slow you down.
 
 ---
 
@@ -115,44 +115,69 @@ These drills make **Execute automatic**.
 
 ---
 
-## 🧭 How To Use This Directory
+# 🚀 How To Use This Directory (Operationally)
 
-### The non-negotiable rules
+---
 
-- **Type the commands**
-- Do **not** copy/paste
-- Always:
-  - Inspect
-  - Act
-  - Verify
+## ⏱️ The 15–30 Minute Daily Rule
 
-### The workflow
+Every training day, **no matter what else you do**:
+
+1) Pick **1–2 drill files**
+2) Run them **top to bottom**
+3) Type **every command**
+4) Verify **every result**
+
+This is your **warm-up and maintenance layer**.
+
+---
+
+## 🧭 The Only Allowed Workflow
 
 1) Pick one drill file  
 2) Run it **top to bottom**  
-3) Type every command  
+3) Type every command (no copy/paste)  
 4) Verify every result  
 5) If something breaks:
    - Fix it
    - Understand why
    - Continue
-6) Reset and repeat
+6) Reset the environment and repeat
+
+---
+
+## 🧪 Proof Ritual (Do Not Skip)
+
+A drill is **not complete** until:
+
+- The command did what you expected
+- You inspected the result
+- You can explain:
+  - what changed
+  - how you verified it
+  - how to undo it
+
+If you cannot explain it, you **did not master it**.
 
 ---
 
 ## 🏋️ Training Modes
 
-### Daily reps
+### Daily reps (default)
 
 - Pick 1–2 drills
 - Run them end-to-end
 - Goal: **zero hesitation**
 
+---
+
 ### Weakness targeting
 
 - When a failure scenario exposes a weakness:
   - Come back here
-  - Drill that exact file
+  - Drill that exact file until it is automatic
+
+---
 
 ### Mock exam warmup
 
@@ -163,9 +188,9 @@ These drills make **Execute automatic**.
 
 ---
 
-## ✅ What “Good” Looks Like
+## ✅ What “Pass” Looks Like
 
-You are “done” with a drill when:
+You have **passed** a drill when:
 
 - You do not pause to remember commands
 - You do not second-guess syntax
@@ -173,6 +198,8 @@ You are “done” with a drill when:
 - You naturally:
   - inspect first
   - verify after
+
+If you hesitate, you **have not passed** the drill yet.
 
 ---
 
@@ -201,6 +228,22 @@ Not on:
 
 ---
 
+## 🛑 Build Freeze Rule (During Bootcamp)
+
+Once you are in active LFCS prep:
+
+> ❗ **Do not rewrite drills. Do not reorganize. Do not polish.**
+
+Only allowed changes:
+
+- Fixing **incorrect commands**
+- Fixing **broken procedures**
+- Clarifying **ambiguous steps**
+
+If you keep editing, you are **not training**.
+
+---
+
 ## 🧠 The Prime Directive
 
 > **These drills exist to eliminate thinking time for basic operations.**  
@@ -224,7 +267,7 @@ You must return to execution drills if:
 - **Execution Drills** = mechanical skill  
 - **Playbooks** = algorithms  
 - **Failure Scenarios** = judgment + diagnosis  
-- **Building Blocks** = training gates  
+- **Training Progression** = gates  
 
 All four are required to pass LFCS calmly and reliably.
 
