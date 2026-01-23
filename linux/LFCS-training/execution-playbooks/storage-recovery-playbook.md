@@ -1,32 +1,56 @@
 # 🗄️ Storage Recovery Playbook (LFCS)
 
 **Path:** `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md`  
-**Purpose:** Restore a system to a **writable, mounted, and healthy** storage state using a **safe, exam-ready operator algorithm**.
+Mental mode: **Measure → Classify → Stabilize → Repair → Verify → Persist**  
+Purpose: Restore a system to a **writable, mounted, and healthy** storage state using a **safe, exam-grade operator algorithm**.
 
-This is not a tutorial. This is a procedure.
+This is **not** a tutorial.  
+This is a **live-system decision and recovery playbook**.
 
 ---
 
-## 🎯 Scope
+## 🧠 When To Use This Playbook
 
 Use this playbook when:
 
-- Disk is **full**
-- Filesystem **won’t mount**
-- System boots **read-only** or drops to **emergency**
-- Wrong **UUID / device / mountpoint**
-- Permissions vs mount options confusion
-- Suspected filesystem inconsistency
+- A filesystem is **full**
+- A filesystem **won’t mount**
+- The system boots **read-only** or drops to **emergency mode**
+- A mount fails due to **wrong UUID / device / fs type**
+- There is **suspected filesystem corruption**
+- Services fail because paths are missing
 
-This playbook composes the following drill surfaces:
+Do **not** use this playbook if the **first evidence** points to:
+
+- a process runaway or D-state backlog → `process-control-playbook.md`
+- a pure service lifecycle failure → `service-recovery-playbook.md`
+- SELinux or policy root cause → `security-triage-playbook.md`
+- network or DNS root cause → `network-diagnosis-playbook.md`
+
+---
+
+## 🧭 Scenarios That Validate This Playbook
+
+This playbook is exercised by:
+
+- `linux/LFCS-training/failure-scenarios/scenario-2-disk-is-full.md`
+- `linux/LFCS-training/failure-scenarios/scenario-12-filesystem-wont-mount.md`
+- `linux/LFCS-training/failure-scenarios/scenario-13-system-wont-boot.md`
+
+If you cannot solve those scenarios **cleanly and repeatably**, this playbook is not yet fluent.
+
+---
+
+## 🧪 Drills Required For Fluency
+
+You should be mechanically fluent with:
 
 - `linux/LFCS-training/execution-drills/storage-and-mounts.md`
 - `linux/LFCS-training/execution-drills/files-and-text.md`
 - `linux/LFCS-training/execution-drills/essential-commands.md`
+- `linux/LFCS-training/execution-drills/services-and-logging.md` (for boot and dependency fallout)
 
-Related scenario (practice input):
-
-- `linux/LFCS-training/failure-scenarios/scenario-2-disk-is-full.md`
+This playbook is a **composition layer**, not a source of primitives.
 
 ---
 
@@ -34,310 +58,298 @@ Related scenario (practice input):
 
 Always proceed in this order:
 
-1. **Observe**
-2. **Identify**
-3. **Diagnose**
-4. **Stabilize**
-5. **Correct**
-6. **Verify**
-7. **Make persistent**
-8. **Rollback if needed**
+1. Measure
+2. Identify
+3. Classify
+4. Stabilize
+5. Repair
+6. Verify
+7. Make persistent
+8. Roll back if needed
 
-Never start with `fsck` or editing `/etc/fstab` blindly.
+> **Never start with `fsck` or editing `/etc/fstab` blindly.**
 
 ---
 
 ## 🧭 Global Safety Rules
 
-- **Preserve evidence first.** Observe before changing fstab or running fsck.
+- Preserve evidence first.
 - **Never fsck a mounted filesystem.**
-- **Prefer smallest reversible change.**
-- **Always validate with `mount -a` before reboot.**
-- **Every action requires verification.**
+- Prefer smallest reversible change.
+- Always validate with `mount -a` before reboot.
+- Every action requires verification.
 
 ---
 
-## 0) Inputs
+## 🧭 Classification Buckets (Pick One Before Acting)
 
-You must know or determine:
+You must place the incident into **exactly one** bucket:
 
-- Affected path or mountpoint (e.g. `/`, `/var`, `/home`, `/data`)
-- Symptoms:
-  - Full?
-  - Not mounted?
-  - Read-only?
-  - Boot failure?
+1) Disk or inode exhaustion  
+2) Mount identity failure (UUID / device / fstab)  
+3) Filesystem corruption or I/O error  
+4) Read-only remount due to error  
+5) Boot / emergency-mode mount failure  
+6) Not actually a storage problem (exit this playbook)
 
 ---
 
-## 1) Observe Current State (No Changes)
+## 🧪 Phase 1 — Observe Current State (No Changes)
 
 Check mounts:
 
-    findmnt
-    mount
+  findmnt  
+  mount  
 
-Check disk usage:
+Check space:
 
-    df -h
-    df -i
+  df -h  
+  df -i  
 
-Check block devices and filesystems:
+Check devices and filesystems:
 
-    lsblk -f
-    blkid
+  lsblk -f  
+  blkid  
 
-Branch:
+If boot/emergency related:
 
-- If **disk full** → go to **Section 2**
-- If **mount missing or wrong** → go to **Section 4**
-- If **filesystem read-only** → go to **Section 6**
-- If **boot/emergency** → go to **Section 7**
+  systemctl status local-fs.target --no-pager || true  
+  journalctl -xb --no-pager | rg -i "mount|uuid|superblock|failed" || true  
+
+Decision gate:
+
+- If disk/inodes are full → Bucket 1  
+- If mount missing or wrong → Bucket 2  
+- If read-only or I/O errors → Bucket 3 or 4  
+- If boot blocked → Bucket 5  
+- If mounts are fine → exit this playbook
 
 ---
 
-## 2) Disk Full Triage
+## 🧪 Phase 2 — Route Selection
 
-Find top consumers (start broad, then narrow):
+### Route A — Disk or inode exhaustion (Bucket 1)
 
-    du -xh / | sort -h | tail -n 20
+Find top consumers (broad first, then narrow):
 
-Common hotspots:
-
-    du -xh /var | sort -h | tail -n 20
-    du -xh /home | sort -h | tail -n 20
+  du -xh / | sort -h | tail -n 20  
+  du -xh /var | sort -h | tail -n 20  
+  du -xh /home | sort -h | tail -n 20  
 
 Check deleted-but-open files:
 
-    lsof | grep deleted
+  lsof | grep deleted || true  
 
-Actions:
+Stabilize:
 
-- Delete or move obviously large, unnecessary files
+- Remove or move clearly safe, large data
 - Truncate runaway logs if appropriate
 
-Then go to **Section 3**.
+Then verify:
+
+  df -h  
+  df -i  
+
+If still full → continue investigation  
+If recovered → go to **Phase 6**
 
 ---
 
-## 3) Verify Space Recovery
+### Route B — Mount identity failure (Bucket 2)
 
-Re-check:
+Inspect:
 
-    df -h
-    df -i
+  cat /etc/fstab  
+  lsblk -f  
+  blkid  
 
-If space is now sufficient:
+Test manually:
 
-- Proceed to **Section 8** (Persistence Check)
+  mount -v /mountpoint || true  
+  mount -a || true  
 
-If still full:
+If UUID/device/fs type is wrong:
 
-- Return to **Section 2** and continue investigation
+- Edit fstab (do not guess)
+- Prefer UUIDs
+- Fix fs type or options
 
----
+Validate:
 
-## 4) Mount Missing or Wrong
+  mount -a  
 
-Inspect fstab:
-
-    cat /etc/fstab
-
-Validate devices:
-
-    lsblk -f
-    blkid
-
-Try manual mount:
-
-    mount /mountpoint
-
-Or:
-
-    mount -a
-
-Branch:
-
-- If **UUID wrong / device missing** → go to **Section 5**
-- If **mount works manually** → go to **Section 8**
-- If **filesystem error** → go to **Section 9**
+If clean → go to **Phase 6**
 
 ---
 
-## 5) Fix /etc/fstab
+### Route C — Filesystem corruption or I/O error (Bucket 3)
 
-Edit:
+Signals:
 
-    vi /etc/fstab
+- superblock errors
+- I/O errors
+- forced read-only remount
 
 Rules:
 
-- Do not guess device names
-- Prefer UUIDs
-- Ensure filesystem type and options are correct
+> **Never fsck a mounted filesystem.**
 
-Validate without reboot:
+Procedure:
 
-    mount -a
+  lsblk  
+  umount /mountpoint  
+  fsck /dev/XXX  
 
-If no errors:
+If repaired or clean:
 
-- Go to **Section 8**
+  mount /mountpoint  
 
-If errors:
+Then → **Phase 6**
 
-- Re-check device names, UUIDs, filesystem types
-
----
-
-## 6) Filesystem Is Read-Only
-
-Check:
-
-    mount | grep " ro,"
-
-Check kernel messages:
-
-    dmesg | tail -n 50
-
-Likely causes:
-
-- I/O error
-- Filesystem inconsistency
-
-Proceed to **Section 9**.
+If cannot unmount (busy) → may need single-user or emergency mode
 
 ---
 
-## 7) Emergency / Recovery Mode
-
-Identify current root and devices:
-
-    lsblk
-    mount
-
-Inspect fstab:
-
-    cat /etc/fstab
-
-Common causes:
-
-- Bad UUID
-- Wrong filesystem type
-- Missing device
-
-Fix fstab or comment out the bad line.
-
-Attempt recovery:
-
-    mount -o remount,rw /
-    mount -a
-
-Then:
-
-- Exit recovery shell or reboot
-
----
-
-## 8) Persistence Check
+### Route D — Read-only remount (Bucket 4)
 
 Confirm:
 
-    findmnt
-    df -h
+  mount | grep " ro,"  
+  dmesg | tail -n 50  
 
-Validate fstab:
+Treat as:
 
-    mount -a
-
-If allowed and safe, test reboot:
-
-    systemctl reboot
-
-After reboot:
-
-    findmnt
-    df -h
+- I/O error or corruption → Route C
 
 ---
 
-## 9) Filesystem Check and Repair
+### Route E — Boot / emergency-mode mount failure (Bucket 5)
 
-WARNING: Only run fsck on **unmounted** filesystems.
+Inspect:
 
-Identify device:
+  lsblk  
+  mount  
+  cat /etc/fstab  
 
-    lsblk
+Fix:
 
-Unmount:
+- wrong UUID
+- wrong fs type
+- missing device
+- bad options
 
-    umount /mountpoint
+Test:
 
-Run check:
+  mount -o remount,rw / || true  
+  mount -a  
 
-    fsck /dev/sdXN
+If boot dependencies are involved → may also need `service-recovery-playbook.md`
 
-If clean or repaired:
+---
 
-    mount /mountpoint
+## 🧯 Phase 3 — Stabilization Principles
 
-Return to **Section 8**.
+- Prefer:
+  - identity fixes over destructive actions
+  - unmount + repair over reformat
+- Never:
+  - reformat “to make it mount”
+  - comment out fstab entries blindly
+  - guess device names
+
+---
+
+## 🧪 Phase 4 — Verification Gate
+
+Required proof:
+
+  findmnt  
+  df -h  
+  mount -a  
+
+If boot-related:
+
+  systemctl status local-fs.target --no-pager  
+
+There must be:
+
+- no mount failures
+- no read-only surprises
+- no missing critical paths
+
+---
+
+## 🧪 Phase 5 — Persistence Check
+
+If safe and allowed:
+
+  reboot  
+
+After reboot:
+
+  findmnt  
+  df -h  
+  systemctl --failed  
 
 ---
 
 ## 🔁 Rollback Strategy
 
-If an fstab edit breaks boot:
+If an fstab edit breaks things:
 
 - Boot to recovery
-- Comment offending line
+- Restore backup:
+
+  cp /etc/fstab.bak /etc/fstab  
+
 - Validate:
 
-    mount -a
+  mount -a  
 
-Restore from backup if available:
+---
 
-    cp /etc/fstab.bak /etc/fstab
+## 🚫 Anti-Patterns (Auto-Fail)
 
-Re-test:
+- Running fsck on mounted filesystems
+- Reformatting instead of repairing
+- Guessing device names
+- Editing fstab before checking devices
+- Rebooting without `mount -a` validation
 
-    mount -a
+---
+
+## 🧭 Exit Conditions
+
+Exit this playbook if you discover:
+
+- process storm or D-state backlog → `process-control-playbook.md`
+- service dependency chain failure → `service-recovery-playbook.md`
+- SELinux/policy block → `security-triage-playbook.md`
+- network or DNS root cause → `network-diagnosis-playbook.md`
 
 ---
 
 ## ✅ Completion Criteria
 
-- Filesystem is **mounted**
-- Filesystem is **writable**
-- `df -h` and `findmnt` look correct
+- Filesystems are **mounted**
+- Filesystems are **writable**
+- `df -h` and `findmnt` are correct
 - `mount -a` produces **no errors**
-- Survives reboot (if tested)
+- System survives reboot (if tested)
 
 You can explain:
 
 - What failed
 - Why it failed
-- Why your fix was safe
+- Why your fix was minimal and safe
 - How you verified recovery
 
 ---
 
-## 🧠 Exam Safety Rules
+## 🧠 Operator Loop (Reinforced)
 
-- Never fsck a mounted filesystem
-- Never guess device names
-- Always validate with `mount -a`
-- Prefer UUIDs in fstab
-- Always verify before reboot
+Symptom → Measure → Classify → Stabilize → Repair → Verify → Persist
 
----
-
-## 🧱 This Playbook Composes From
-
-- storage-and-mounts.md
-- files-and-text.md
-- essential-commands.md
-
-This is a **composition layer**, not a source of primitives.
+Never skip identity checks.
 
 ---
