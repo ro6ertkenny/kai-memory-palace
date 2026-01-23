@@ -51,6 +51,7 @@ Invariants:
 You must master:
 
 - `linux/LFCS-training/execution-drills/git.md`
+- `linux/LFCS-training/execution-drills/essential-commands.md`
 
 Rule:
 
@@ -166,3 +167,4 @@ You must:
 Without this block, **version control becomes a source of risk instead of safety**.
 
 ---
+
