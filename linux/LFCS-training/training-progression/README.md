@@ -1,148 +1,152 @@
-ro6ert@ro6bx:~/kai-memory-palace/linux/LFCS-training/training-progression$ cat LFCS-training-progression-guide.md 
-# 🧭 LFCS Training Progression Guide
+# 🧱 Training Progression — README (LFCS)
 
-**Path:** `linux/LFCS-training/training-progression/LFCS-training-progression-guide.md`  
-**Purpose:** Define the **canonical, learner-facing progression** for building real Linux sysadmin competence and passing LFCS.
+**Path:** `linux/LFCS-training/training-progression/`
 
-This guide is the **curriculum spine**.  
-All *content* lives elsewhere:
+This directory is the **curriculum control layer** of the LFCS training system.
 
-- `linux/LFCS-training/execution-drills/` — instruction set (muscle memory)
-- `linux/LFCS-training/failure-scenarios/` — pattern recognition (break/fix)
-- `linux/LFCS-training/execution-playbooks/` — operator algorithms (procedures)
+It does **not** contain drills, playbooks, or scenarios.
 
-This guide defines **order**, **gates**, and **how to train**.
+It defines:
 
----
+- **What must be learned**
+- **In what order**
+- **With what dependencies**
+- **And what “done” means**
 
-## 🧠 The Training Loop (How You Study)
-
-For each Building Block:
-
-1) **Drills (Mechanics)**
-   - Run the linked drill surfaces until commands are automatic.
-
-2) **Scenarios (Recognition)**
-   - Run the linked failure scenarios as timed exercises.
-   - Goal: pick the right approach under pressure.
-
-3) **Playbooks (Operator Mode)**
-   - Execute the linked playbook end-to-end.
-   - Goal: follow a safe procedure with verification and rollback.
-
-4) **Gate**
-   - If you cannot pass the exit criteria, **do not advance**.
-
-Rule:
-
-> **Never skip a Building Block. Each one assumes mastery of all previous blocks.**
+This is the **gate system** that prevents gaps, randomness, and skill holes.
 
 ---
 
-## 🧱 What Each Building Block Must Contain (Contract)
+## 🧠 Role in the LFCS Training System
 
-Each Building Block must explicitly define:
+The full system has four layers:
 
-- **Linked drill surfaces** (mechanics)
-- **Linked failure scenarios** (recognition)
-- **Linked execution playbook(s)** (procedure)
-- **Explicit exit criteria** (gate)
+- `training-progression/` → **curriculum, order, and gates** (this directory)
+- `execution-drills/` → mechanical skill and command fluency
+- `execution-playbooks/` → operator algorithms and recovery procedures
+- `failure-scenarios/` → integration, diagnosis, and pressure testing
+
+This directory is the **authority** for:
+
+- sequence
+- dependency
+- scope
+- and advancement rules
+
+---
+
+## 🧱 What Is a Building Block?
+
+A **Building Block** is a **competence gate**.
+
+It represents one coherent operator capability, such as:
+
+- process control
+- storage recovery
+- networking
+- services and systemd
+- security and access
+- etc.
+
+A Building Block is **not**:
+
+- a chapter
+- a topic list
+- a notes file
+- a tutorial
+
+It is a **proof-of-competence unit**.
+
+You either **pass it** or you **do not advance**.
+
+---
+
+## 🧱 The Building Block Contract (Non-Negotiable)
+
+Every Building Block **must** explicitly define:
+
+- ✅ Linked **execution drills** (mechanics)
+- ✅ Linked **execution playbook(s)** (procedure)
+- ✅ Linked **failure scenarios** (recognition + integration)
+- ✅ Explicit **exit criteria** (the gate)
 
 If any of these are missing, the Building Block is **incomplete**.
 
-Building Blocks must **not** embed tutorials or encyclopedic command lists.  
-They reference the canonical layers and define **what mastery means**.
-
----
-
-## 🧱 The Building Blocks (Canonical Order)
-
-The learner-facing progression lives in:
-
-`linux/LFCS-training/training-progression/`
-
-01  building-block-01-shell-and-safety.md  
-02  building-block-02-files-and-text.md  
-03  building-block-03-permissions-and-identity.md  
-04  building-block-04-process-model.md  
-05  building-block-05-logs-and-observation.md  
-06  building-block-06-services-and-systemd.md  
-07  building-block-07-service-configuration.md  
-08  building-block-08-networking.md  
-09  building-block-09-scheduling-and-automation.md  
-10  building-block-10-storage-fundamentals.md  
-11  building-block-11-storage-recovery.md  
-12  building-block-12-package-management.md  
-13  building-block-13-security-and-selinux.md  
-14  building-block-14-tls-and-certificates.md  
-15  building-block-15-containers-and-virtualization.md  
-16  building-block-16-git-as-an-operator-tool.md  
-17  building-block-17-incident-response.md  
-18  building-block-18-exam-simulation.md  
-
----
-
-## 🧭 How to Use This Guide
-
-- Start at **Building Block 01**.
-- Do **not** read ahead.
-- Treat each block as a **gate**.
-- If a later block exposes weakness:
-  - Return to the referenced earlier block
-  - Re-run drills and scenarios
-  - Re-run the playbook
-
----
-
-## 🧱 Design Contract
-
 Building Blocks:
 
-- Are **conceptual + operational units**
-- Do **not** contain command encyclopedias
-- Only reference:
-  - drills
-  - scenarios
-  - playbooks
-- Define:
-  - what you must understand
-  - what you must be able to do
-  - what “done” means
+- Do **not** embed tutorials
+- Do **not** embed encyclopedic command lists
+- Do **not** duplicate drill or playbook content
 
-They are **not**:
+They define:
 
-- tutorials
-- notes
-- historical documents
-- phase logs
+- what you must understand
+- what you must be able to do
+- and how mastery is proven
 
 ---
 
-## 🧪 Relationship to Legacy Phase Files
+## 🗂️ Canonical Order
 
-If legacy `phase-*` files exist, they are:
+The **authoritative ordered list** of Building Blocks lives in:
 
-- **internal scaffolding**
-- **audit input only**
+> `linux/LFCS-training/training-progression/index.md`
 
-They should be mined for:
+That file is the **only supported navigation order**.
 
-- missing topics
-- ordering corrections
-- conceptual gaps
+The order is:
 
-After migration into Building Blocks, they should be **deleted**.
+- intentional
+- dependency-driven
+- and non-negotiable
+
+---
+
+## 🧭 How This Directory Is Used
+
+- You always start at **Building Block 01**
+- You never skip ahead
+- You never partially complete a block
+- You never advance without passing the exit criteria
+
+If a later block exposes weakness:
+
+> You must return to the earlier block and **re-earn the gate**.
 
 ---
 
-## 🎯 Final Objective
+## 🎯 Design Goals
 
-By the end of Building Block 18:
+This progression is designed so that:
 
-- You can operate under time pressure
-- You can diagnose multi-domain incidents
-- You can execute safe recovery procedures
-- You can pass LFCS **and** function as a real sysadmin
+- There are no gaps
+- There is no redundancy
+- There is no “topic soup”
+- There is only **increasing operator competence**
 
 ---
+
+## 🧠 Relationship to the Training Guide
+
+The **method for how to study and train** is defined in:
+
+> `linux/LFCS-training/training-progression/LFCS-training-progression-guide.md`
+
+This README defines:
+
+- the **structure**
+- the **rules**
+- and the **contract**
+
+The guide defines:
+
+- the **training process**
+- the **daily workflow**
+- and the **discipline**
+
+---
+
+## 🧠 Core Rule
+
+> **The order is not negotiable. The gates are not optional.**
 
