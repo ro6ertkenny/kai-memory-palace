@@ -1,205 +1,298 @@
-# 🧪 LFCS Practice Scenario F — Memory Pressure
+# 🧯 Scenario 6 — Memory Pressure (LFCS)
 
-**Mental mode:** Incident response under resource exhaustion  
-**Skill:** Prove or disprove memory pressure using signals, not guesses.
+**File:** `linux/LFCS-training/failure-scenarios/scenario-6-memory-pressure.md`  
+Mental mode: **Pressure → measure → classify → route → recover → prove**  
+Primary playbook: `linux/LFCS-training/execution-playbooks/process-control-playbook.md`  
+Secondary playbooks (as needed):
+- `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md` (if swap or disk I/O is part of the collapse)
+- `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md` (if a service is the offender)
 
 ---
 
-## 🎯 Scenario
+## 📌 Incident Brief (Symptom-First)
 
-The system is **slow, laggy, or timing out**.
+The system is:
 
-Some processes are still running.
+- slow
+- laggy
+- intermittently timing out
+- sometimes killing processes
 
-Nothing obvious is “crashed”.
+Nothing is obviously “crashed”.
 
 You are told:
 
 > “We think it’s a memory problem.”
 
-Your job is to **prove or disprove that claim using evidence.**
+Your job is to:
+- **prove or disprove** that claim using evidence
+- classify the **type of memory failure**
+- identify the **real consumers**
+- stabilize the system
+- prove it is healthy
 
 ---
 
-## 🧠 The Golden Rule
+## 🎯 Objectives (What “Done” Means)
+
+You are done when you can:
+
+- State whether **real memory pressure exists**
+- Classify the incident as:
+  - global memory pressure
+  - cgroup / container limit pressure
+  - or “not a memory problem”
+- Identify the **top real consumers (RSS)**
+- Apply the **minimal safe intervention**
+- Prove:
+  - pressure signals are gone
+  - the system is stable
+  - OOM or thrash is not recurring
+
+---
+
+## 🧠 Operator Rule
 
 > **Never decide based on “used memory”.**  
-> Decide based on **pressure signals**.
-
-You trust:
-
-- `MemAvailable`
-- `vmstat` (si/so)
-- PSI (`/proc/pressure/memory`)
-- `memory.events`
-- `memory.pressure`
-- RSS (per-process real usage)
-
-You ignore:
-
-- `MemFree`
-- VSZ / VmSize
-- “It looks big”
+> Decide based on **pressure signals and reclaim activity**.
 
 ---
 
-## 🧭 Phase 1 — Is the system under memory pressure?
+## 🧭 Classification Buckets
 
-### Step 1 — Check global memory health
+You must place the incident into one bucket before acting:
 
-    free -h
-
-Interpretation:
-
-- Look at **MemAvailable**
-- If MemAvailable is healthy → memory is probably not the problem
-
----
-
-### Step 2 — Check swap and reclaim activity
-
-    vmstat 1 5
-
-Focus on:
-
-- `si` = swap in
-- `so` = swap out
-- `swpd` = swap used
-- `wa` = IO wait
-- `r` = run queue
-
-Interpretation:
-
-- If `si` and `so` are **0** → memory is not under pressure
-- If `si/so` are **non-zero** → real memory pressure exists
+1) **No real memory pressure** (symptom is elsewhere)
+2) **Global memory pressure with swap thrash**
+3) **Global memory pressure leading to OOM**
+4) **Cgroup / container memory limit pressure**
+5) **Runaway process or memory leak**
+6) **Memory pressure as a secondary effect** (e.g., disk or I/O collapse)
 
 ---
 
-### Step 3 — Check PSI (Pressure Stall Information)
+## 🧪 Required Evidence (Global Snapshot)
 
-    cat /proc/pressure/memory
+Capture at least one snapshot:
 
-Focus on:
+  free -h
+  vmstat 1 5
+  cat /proc/pressure/memory
 
-- `some avg10/60/300`
-- `full avg10/60/300`
+Interpretation anchors:
 
-Interpretation:
+- `free -h`
+  - Look at **MemAvailable**, not MemFree.
 
-- If averages are **0.00** → no active memory pressure
-- If averages are **non-zero** → tasks are being stalled due to memory
+- `vmstat`
+  - `si/so` > 0 means active swap thrash.
+  - sustained non-zero = real pressure.
 
-> PSI answers: “Is the kernel struggling to satisfy memory right now?”
+- `/proc/pressure/memory`
+  - non-zero `some` or `full` averages = tasks are stalling due to memory.
 
----
+Decision gate:
 
-## 🧭 Phase 2 — Is this global or local (cgroup/container)?
-
-### Step 4 — Check cgroup pressure if applicable
-
-    cat /sys/fs/cgroup/memory.pressure
-    cat /sys/fs/cgroup/memory.events
-    cat /sys/fs/cgroup/memory.max
-    cat /sys/fs/cgroup/memory.current
-    cat /sys/fs/cgroup/memory.peak
-
-Interpretation:
-
-- `memory.events: max > 0` → hitting the budget
-- `oom_kill > 0` → hard OOM happened
-- `memory.peak == memory.max` → the wall was hit
-- `memory.pressure` non-zero → real cgroup pressure occurred
-
-> You can have **severe cgroup memory pressure even if the machine has tons of free RAM.**
+- If **si/so = 0** and **PSI = 0** → this is **not a memory incident**.
+- If **si/so > 0** or **PSI > 0** → real memory pressure exists.
 
 ---
 
-## 🧭 Phase 3 — Find the actual memory consumers
+## 🧩 Check for Scoped (cgroup) Pressure
 
-### Step 5 — Find top RSS users
+If this is a containerized or limited environment:
 
-    ps aux --sort=-%mem | head -n 15
+  cat /sys/fs/cgroup/memory.pressure || true
+  cat /sys/fs/cgroup/memory.events || true
+  cat /sys/fs/cgroup/memory.current || true
+  cat /sys/fs/cgroup/memory.max || true
 
-Remember:
+Interpretation anchors:
 
-- Trust **RSS**, not VSZ
-- VSZ is virtual address space, not real RAM usage
+- `memory.events` shows `max` or `oom_kill` → limit was hit.
+- `memory.pressure` non-zero → scoped pressure even if host is fine.
+
+Meaning:
+
+- You can have **severe memory pressure inside a cgroup** even if the machine has free RAM.
 
 ---
 
-### Step 6 — Inspect a specific process deeply
+## 🔎 Identify the Real Consumers
 
-    cat /proc/<PID>/status | egrep -i "VmRSS|VmSize|RssAnon|RssFile|VmSwap"
+List top RSS users:
 
-Interpretation:
+  ps aux --sort=-%mem | head -n 15
+
+For a suspect:
+
+  cat /proc/<PID>/status | egrep -i "VmRSS|RssAnon|RssFile|VmSwap"
+
+Interpretation anchors:
 
 - `VmRSS` = real RAM usage
-- `RssAnon` = heap/stack
-- `RssFile` = mapped files
-- `VmSwap` > 0 = swapped out pages → pressure
+- `VmSwap` > 0 = this process is being swapped
+- VSZ / VmSize are **not** real memory usage
+
+If service-managed:
+
+  systemctl status <unit> --no-pager || true
+  journalctl -u <unit> -b --no-pager | tail -n 80 || true
 
 ---
 
-## 🧭 Phase 4 — Decide what kind of memory incident this is
+## 🧭 Decision Forks (Evidence → Classification)
 
-### Decision Matrix
+### Fork A — Not a memory problem
+Signals:
+- MemAvailable healthy
+- si/so = 0
+- PSI = 0
+Route:
+- This is CPU, I/O, or service degradation → exit to correct scenario/playbook.
+Proof:
+- memory signals show no pressure
 
-| What you see | What it means | What you do |
-|--------------|---------------|-------------|
-| High usage, no PSI, no swap | Healthy | Do nothing |
-| PSI > 0, si/so > 0 | Real memory pressure | Find hogs, reduce load |
-| memory.events max++, no oom_kill | Hitting cgroup limit | Raise limit or fix app |
-| oom_kill > 0 | Hard OOM | Fix memory leak or limit |
-| Global fine, local PSI | Container budget issue | Adjust limits |
+### Fork B — Global memory pressure with thrash
+Signals:
+- si/so > 0
+- PSI non-zero
+- system sluggish but alive
+Route:
+- `process-control-playbook.md`
+Goal:
+- reduce load or stop offender
+- restore headroom
+Proof:
+- si/so returns to 0
+- PSI decays to 0
+- system stabilizes
+
+### Fork C — OOM events
+Signals:
+- dmesg / logs show OOM kills
+- processes dying
+Route:
+- `process-control-playbook.md`
+Goal:
+- stop the offender
+- prevent recurrence
+Proof:
+- no further OOM kills
+- memory headroom restored
+
+### Fork D — Cgroup / container limit
+Signals:
+- memory.events shows `max` or `oom_kill`
+- host may look healthy
+Route:
+- `process-control-playbook.md` or service-specific fix
+Goal:
+- fix leak or raise limit intentionally
+Proof:
+- pressure stops inside the cgroup
+
+### Fork E — Memory pressure as secondary effect
+Signals:
+- pressure appears after disk, I/O, or service failures
+Route:
+- classify and fix the **real** incident
+Proof:
+- fixing root cause clears memory pressure
 
 ---
 
-## 🧭 Phase 5 — Verify after changes
+## 🚫 Forbidden Actions (Diagnosis Phase)
 
-After mitigation:
+- Do not decide based on “used memory”.
+- Do not reboot before classification.
+- Do not kill processes before identifying the real consumers.
+- Do not treat cache usage as a problem.
 
-    free -h
-    vmstat 1 5
-    cat /proc/pressure/memory
+---
 
-You want to see:
+## 🧯 Recovery Principles
+
+- Always remove **pressure**, not just symptoms.
+- Prefer:
+  - stopping or fixing the offender
+  - not just adding swap or rebooting
+- If it’s scoped:
+  - fix the **limit or the app**, not the host
+
+---
+
+## ✅ Verification (Required Proof)
+
+After intervention:
+
+  free -h
+  vmstat 1 5
+  cat /proc/pressure/memory
+
+You want:
 
 - `si/so` back to 0
-- PSI averages decaying to 0
+- PSI averages trending to 0
 - MemAvailable stable
+- No new OOM events
+
+Optional:
+
+  dmesg -T | tail -n 100
 
 ---
 
-## 🧠 One-Sentence Operator Summary
+## 🧾 Post-Incident Debrief
 
-> “When a system feels slow, first prove whether memory is under pressure using PSI and swap activity. If not, it’s not a memory problem.”
+Answer:
 
----
-
-## ✅ What This Scenario Trains
-
-- You do not panic
-- You do not guess
-- You prove pressure
-- You identify scope (global vs cgroup)
-- You identify real consumers (RSS)
-- You make a **correct** decision
-
-This is **exactly** how real production memory incidents are triaged.
+- Did real memory pressure exist?
+- Was it global or scoped?
+- Which process or service caused it?
+- Which failure bucket was this?
+- What was the minimal safe fix?
+- What prevents recurrence?
 
 ---
 
-## 🏁 Pass Condition
+## 🧠 Anti-Patterns (Auto-Fail)
 
-You can:
-
-- Prove whether memory pressure exists
-- Prove whether it is global or scoped
-- Identify the actual consumers
-- Choose the correct remediation path
-- Verify recovery using signals
-
-That is memory incident fluency.
+- Deciding from “used memory”
+- Ignoring PSI and swap signals
+- Killing random processes
+- Adding swap to hide a leak
+- Rebooting without understanding cause
 
 ---
 
+## 📎 Remediation & Reinforcement (After Action)
+
+Only complete this section **after** recovery and verification.
+
+Do **not** use this section while solving the incident.
+
+### If you misread memory signals:
+- Drill:
+  - `linux/LFCS-training/execution-drills/processes-logs-and-scheduling.md`
+- Building block:
+  - `linux/LFCS-training/training-progression/building-block-17-incident-response.md`
+
+### If the root cause was a runaway process or leak:
+- Drill:
+  - `linux/LFCS-training/execution-drills/processes-logs-and-scheduling.md`
+- Building block:
+  - `linux/LFCS-training/training-progression/building-block-4-process-model.md`
+
+### If this was a cgroup / container limit issue:
+- Drill:
+  - `linux/LFCS-training/execution-drills/containers-and-virtualization.md`
+- Building block:
+  - `linux/LFCS-training/training-progression/building-block-17-incident-response.md`
+
+Purpose of this section:
+- improve pressure-signal interpretation
+- prevent “guessing” memory incidents
+- strengthen root-cause discipline
+
+---
