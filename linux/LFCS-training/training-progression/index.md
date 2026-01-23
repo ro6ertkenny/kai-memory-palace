@@ -1,42 +1,25 @@
 # 🧱 Training Progression — Index (LFCS)
 
 **Path:** `linux/LFCS-training/training-progression/index.md`  
-Purpose: Provide the **canonical navigation surface** for the LFCS Building Blocks curriculum.
+Purpose: Define the **only supported order** of Building Blocks and the **rules for advancement**.
 
-This directory defines the **only supported learning order**.
-
----
-
-## 🧠 How This Directory Fits
-
-This is the **curriculum control layer**.
-
-- Drills live elsewhere
-- Playbooks live elsewhere
-- Scenarios live elsewhere
-
-This directory defines:
-
-- order
-- dependency
-- scope
-- gates
+This file is the **authoritative navigation surface** for the LFCS curriculum.
 
 ---
 
-## 🧱 The Building Blocks (Canonical Order)
+## 🗂️ The Building Blocks (Canonical Order)
 
-You must follow these **in order**.
+You must complete these **in order**.
 
-01  building-block-1-shell-and-safety.md  
-02  building-block-2-files-and-text.md  
-03  building-block-3-permissions-and-identity.md  
-04  building-block-4-process-model.md  
-05  building-block-5-logs-and-observation.md  
-06  building-block-6-services-and-systemd.md  
-07  building-block-7-service-configuration.md  
-08  building-block-8-networking.md  
-09  building-block-9-scheduling-and-automation.md  
+01  building-block-01-shell-and-safety.md  
+02  building-block-02-files-and-text.md  
+03  building-block-03-permissions-and-identity.md  
+04  building-block-04-process-model.md  
+05  building-block-05-logs-and-observation.md  
+06  building-block-06-services-and-systemd.md  
+07  building-block-07-service-configuration.md  
+08  building-block-08-networking.md  
+09  building-block-09-scheduling-and-automation.md  
 10  building-block-10-storage-fundamentals.md  
 11  building-block-11-storage-recovery.md  
 12  building-block-12-package-management.md  
@@ -49,51 +32,29 @@ You must follow these **in order**.
 
 ---
 
-## 🧱 Contract: What Every Building Block Must Contain
-
-Every Building Block must explicitly define:
-
-- Linked **execution drills**
-- Linked **failure scenarios**
-- Linked **execution playbook(s)**
-- Explicit **exit criteria**
-
-If any of these are missing, the block is **incomplete**.
-
----
-
-## 🧭 How You Advance
+## 🧭 Advancement Rules
 
 For each Building Block:
 
-1) Run the referenced drills until mechanics are automatic  
-2) Run the referenced playbooks end-to-end  
-3) Run the referenced failure scenarios as timed exercises  
-4) Pass the exit criteria  
-5) Only then advance
+1) You must complete the block’s:
+   - linked execution drills
+   - linked execution playbook(s)
+   - linked failure scenarios
+2) You must pass the block’s **exit criteria**
+3) Only then may you advance to the next block
 
 ---
 
-## 🧠 Regression Rule
+## 🔁 Regression Rule
 
 If any later block exposes weakness:
 
-> You must return to the earlier block and re-earn the gate.
+> You must return to the earlier block and **re-pass its exit criteria**.
 
 ---
 
-## 🎯 Design Goal
+## 🧠 Core Rules
 
-This progression is designed so that:
-
-- There are no gaps
-- There is no redundancy
-- There is no “topic soup”
-- There is only **increasing operator competence**
-
----
-
-## 🧠 Core Rule
-
-> **The order is not negotiable. The gates are not optional.**
+> **The order is not negotiable.**  
+> **The gates are not optional.**
 
