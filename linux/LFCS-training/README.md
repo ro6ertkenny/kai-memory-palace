@@ -2,11 +2,9 @@
 
 **Path:** `linux/LFCS-training/README.md`
 
-This directory is a **purpose-built, professional-grade training system** for the  
+This directory is a **purpose-built training system** for the  
 **Linux Foundation Certified System Administrator (LFCS)** exam.
-
-It is not a notes folder.  
-It is not a tutorial collection.  
+  
 It is a **multi-layer competence engine** designed to train you to:
 
 - operate Linux systems safely
@@ -247,22 +245,6 @@ A scenario is **not complete** until:
   - why
   - how you knew what class of problem it was
   - why your fix was minimal and safe
-
----
-
-## 🛑 Build Freeze Rule
-
-Once bootcamp starts:
-
-> ❗ **No new docs. No refactors. No reorganizing.**
-
-Only allowed changes:
-
-- Fixing **incorrect commands**
-- Fixing **broken procedures**
-- Clarifying **ambiguous steps**
-
-If you keep building, you are **not training**.
 
 ---
 
