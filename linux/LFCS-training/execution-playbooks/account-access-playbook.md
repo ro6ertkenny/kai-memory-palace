@@ -26,7 +26,9 @@ This playbook composes the following drill surfaces:
 
 Related scenarios (practice inputs):
 
-- (Future) no-access / broken-auth scenario
+- `linux/LFCS-training/failure-scenarios/scenario-7-cant-ssh-lost-access.md` (primary)
+- `linux/LFCS-training/failure-scenarios/scenario-8-dns-resolution-failing.md` (secondary, when SSH by hostname fails)
+- `linux/LFCS-training/failure-scenarios/scenario-11-selinux-denial-breaks-service.md` (secondary, when MAC/DAC blocks sshd or home dirs)
 
 ---
 
@@ -66,7 +68,7 @@ You must know or determine:
   - console
   - SSH
   - sudo
-- What *used to* work vs what fails now
+- What used to work vs what fails now
 
 ---
 
@@ -208,9 +210,13 @@ Check config syntax:
 
     sshd -t
 
+If connecting by hostname, confirm DNS first (or temporarily try by IP):
+
+    getent hosts <hostname>
+
 Check relevant settings:
 
-    grep -E "PermitRootLogin|PasswordAuthentication" /etc/ssh/sshd_config
+    grep -E "PermitRootLogin|PasswordAuthentication|PubkeyAuthentication" /etc/ssh/sshd_config
 
 Check permissions:
 
@@ -223,6 +229,12 @@ Fix:
     chmod 700 /home/<user>/.ssh
     chmod 600 /home/<user>/.ssh/authorized_keys
     chown -R <user>:<user> /home/<user>/.ssh
+
+If SELinux is enforcing and denials are suspected:
+
+    getenforce
+    ausearch -m avc -ts recent
+    restorecon -Rv /home/<user>/.ssh
 
 Restart SSH:
 
@@ -263,6 +275,7 @@ Ensure:
 - No temporary hacks remain
 - No unsafe sudoers changes remain
 - No insecure permission changes remain
+- SELinux (if present) is enforcing and contexts are correct
 
 ---
 
