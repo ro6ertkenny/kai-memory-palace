@@ -68,6 +68,25 @@ These drills are the **mechanical skill layer** under:
 
 ---
 
+### 0) shell-execution-and-redirection.md
+
+Scope:
+- Exit codes and safe chaining (`&&`, `||`)
+- Redirection correctness (`>`, `>>`, `2>`, `2>&1`, `&>`)
+- Pipelines and output capture (`tee`, `tee -a`)
+- Group redirection (`{ ...; } > file`)
+- Job control (`&`, `jobs`, `fg`, `bg`, Ctrl+Z, `kill %job`)
+- Timed reps + failure-injection (ordering mistakes, clobber risk)
+
+LFCS domains:
+- Essential Commands
+
+Use this when:
+- You want **zero hesitation** with pipelines, redirection, and job control
+- You want to eliminate the most common shell mistakes under time pressure
+
+---
+
 ### 1) essential-commands.md
 
 Scope:
@@ -325,3 +344,4 @@ You are “ready” here when:
 > **These drills are about eliminating thinking time for basic operations.**  
 > Save your thinking time for diagnosis and playbook selection.
 
+---
