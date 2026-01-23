@@ -1,7 +1,9 @@
 # 📦 Package Repair Playbook (LFCS)
 
 **Path:** `linux/LFCS-training/execution-playbooks/package-repair-playbook.md`  
-**Purpose:** Restore a **working, consistent package manager and installed software set** using a **safe, exam-ready operator flow**.
+**Purpose:** Restore a **working, consistent package manager and installed software set** using a **safe, exam-ready operator algorithm**.
+
+This is not a tutorial. This is a procedure.
 
 ---
 
@@ -10,20 +12,22 @@
 Use this playbook when:
 
 - Package manager is **broken or locked**
-- Install/remove operations **fail or hang**
+- Install/remove/update operations **fail or hang**
 - Packages are **half-installed / inconsistent**
 - A required binary is **missing or corrupted**
 - Repository configuration is **broken**
 
-This playbook orchestrates the following canonical drill surfaces:
+This playbook composes the following drill surfaces:
 
 - `linux/LFCS-training/execution-drills/package-management.md`
 - `linux/LFCS-training/execution-drills/files-and-text.md`
 - `linux/LFCS-training/execution-drills/essential-commands.md`
 
-Related scenarios (for practice validation):
+Related scenarios (practice inputs):
 
-- (Future) package-manager-broken / dependency-failure scenario
+- `linux/LFCS-training/failure-scenarios/scenario-9-package-manager-broken.md` (primary)
+- `linux/LFCS-training/failure-scenarios/scenario-2-disk-is-full.md` (secondary, when failures are caused by no space / read-only fs)
+- `linux/LFCS-training/failure-scenarios/scenario-12-filesystem-wont-mount.md` (secondary, when root or var is not mounted correctly)
 
 ---
 
@@ -43,11 +47,23 @@ Never start by deleting random package databases.
 
 ---
 
+## 🧭 Global Safety Rules
+
+- **Read the exact error message first.**
+- **Never delete package database directories.**
+- **Prefer repair commands before removals.**
+- **Never remove core system packages blindly.**
+- **Every action requires verification.**
+
+---
+
 ## 0) Inputs
 
 You must know or determine:
 
-- Distro family (apt/dpkg or dnf/rpm)
+- Distro family:
+  - Debian/Ubuntu → apt / dpkg
+  - RHEL/Fedora → dnf / rpm
 - Exact error message
 - Operation that fails (install, remove, update)
 
@@ -60,18 +76,22 @@ Attempt a safe operation:
     apt-get update
     dnf makecache
 
-Or reproduce failure:
+Or reproduce the failing action:
 
     apt-get install <pkg>
     dnf install <pkg>
 
-Classify:
+Classify the error:
 
 - Lock error
 - Dependency error
-- Broken/half-installed packages
+- Broken / half-installed packages
 - Repo/config error
-- Missing/corrupt binary
+- Missing or corrupt binary
+
+If the filesystem is read-only or full, **exit this playbook** and go to:
+
+- `storage-recovery-playbook.md`
 
 ---
 
@@ -81,11 +101,13 @@ Check for running package processes:
 
     ps aux | grep -E "apt|dpkg|dnf|rpm"
 
-If a package process is legitimately running:
+If a real package process is running:
 
-- Wait for it.
+- **Do nothing. Wait.**
 
-If no real process but lock exists:
+If no real process is running but locks exist:
+
+For apt/dpkg:
 
     ls -l /var/lib/dpkg/lock*
     ls -l /var/lib/apt/lists/lock
@@ -95,14 +117,14 @@ For dnf:
 
     ls -l /var/run/dnf.pid
 
-Only if no process is running:
+Only if **no process is running**:
 
     rm -f /var/lib/dpkg/lock*
     rm -f /var/lib/apt/lists/lock
     rm -f /var/cache/apt/archives/lock
     rm -f /var/run/dnf.pid
 
-Then return to **Section 1**.
+Return to **Section 1**.
 
 ---
 
@@ -117,13 +139,11 @@ Re-test:
 
     apt-get update
 
-If still failing:
-
-- Identify broken packages:
+If still failing, list broken packages:
 
     dpkg -l | grep -E "^..r|^..iF|^..iU"
 
-Then:
+Then (only if safe):
 
     apt-get remove <pkg>
     apt-get install <pkg>
@@ -134,7 +154,7 @@ Return to **Section 1**.
 
 ## 4) Dependency Resolution Failures
 
-Attempt repair:
+For apt:
 
     apt-get -f install
 
@@ -145,36 +165,40 @@ For dnf:
 
 If a specific package is blocking progress:
 
-- Remove it (if safe):
+- Remove it (only if you understand impact):
 
     apt-get remove <pkg>
     dnf remove <pkg>
 
-Then retry install or update.
+Then retry the original operation.
+
+Return to **Section 1**.
 
 ---
 
 ## 5) Repository / Configuration Errors
 
-Check repo files:
+Inspect repo config:
 
 For apt:
 
     ls -l /etc/apt/sources.list
     ls -l /etc/apt/sources.list.d/
+    cat /etc/apt/sources.list
+    cat /etc/apt/sources.list.d/*
 
 For dnf:
 
     ls -l /etc/yum.repos.d/
-
-Inspect for obvious mistakes:
-
-    cat /etc/apt/sources.list
     cat /etc/yum.repos.d/*.repo
 
-Temporarily disable a suspect repo:
+Look for:
 
-- Move file aside or comment lines
+- Typos
+- Wrong distro version
+- Dead mirrors
+
+Temporarily disable a suspect repo (move file aside or comment lines).
 
 Then:
 
@@ -216,7 +240,7 @@ For rpm/dnf:
 
 For apt/dpkg:
 
-- Usually resolved via:
+- Usually resolved by:
 
     dpkg --configure -a
     apt-get -f install
@@ -227,16 +251,17 @@ Then retry normal operations.
 
 ## 8) Verification
 
-Confirm:
+Confirm normal operation:
 
     apt-get update
     apt-get install <known-good-package>
 
 Or:
 
+    dnf makecache
     dnf install <known-good-package>
 
-Confirm no errors.
+Ensure no errors appear.
 
 ---
 
@@ -263,8 +288,8 @@ If a repo change caused breakage:
 
 If a package removal broke a service:
 
-- Reinstall package
-- Use service recovery playbook if needed
+- Reinstall the package
+- Use `service-recovery-playbook.md` if needed
 
 ---
 
@@ -275,11 +300,18 @@ If a package removal broke a service:
 - No broken or half-installed packages remain
 - No stale locks exist
 
+You can explain:
+
+- What broke
+- Why it broke
+- Why your fix was minimal and safe
+- How you verified recovery
+
 ---
 
 ## 🧠 Exam Safety Rules
 
-- Never delete package DB directories
+- Never delete package database directories
 - Never remove core packages blindly
 - Always read the error message
 - Prefer repair commands before removal
