@@ -27,8 +27,9 @@ This playbook composes the following drill surfaces:
 
 Related scenarios (practice inputs):
 
-- (Future) tls-expired-cert  
-- (Future) bad-chain-config
+- `linux/LFCS-training/failure-scenarios/scenario-10-tls-certificate-failure.md` (primary)
+- `linux/LFCS-training/failure-scenarios/scenario-3-service-is-down.md` (secondary, when TLS prevents startup)
+- `linux/LFCS-training/failure-scenarios/scenario-11-selinux-denial-breaks-service.md` (secondary, when MAC blocks cert/key paths)
 
 ---
 
@@ -96,6 +97,12 @@ Record:
 - Whether a cert is presented
 - Which cert is presented
 
+If the service is not running at all, you may need to **temporarily** switch to:
+
+- `service-recovery-playbook.md`
+
+Then return here once the service starts.
+
 ---
 
 ## 2) Identify TLS Endpoint and Files
@@ -129,6 +136,15 @@ Check ownership and modes:
 - Private key should usually be:
   - owned by root or service user
   - mode 600 or similarly restrictive
+
+If access is denied and SELinux is enforcing, check:
+
+    getenforce
+    ausearch -m avc -ts recent
+
+And consider:
+
+    restorecon -Rv /path/to/
 
 ---
 
