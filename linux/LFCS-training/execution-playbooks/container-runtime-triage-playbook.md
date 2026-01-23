@@ -29,9 +29,9 @@ This playbook composes the following drill surfaces:
 
 Related scenarios (practice inputs):
 
-- (Future) container-runtime-down
-- (Future) container-networking-broken
-- (Future) image-pull-fails
+- `linux/LFCS-training/failure-scenarios/scenario-14-container-runtime-down.md`
+- `linux/LFCS-training/failure-scenarios/scenario-15-container-networking-broken.md`
+- `linux/LFCS-training/failure-scenarios/scenario-16-image-pull-fails.md`
 
 ---
 
@@ -440,4 +440,19 @@ You can explain:
 This is a **composition layer**, not a source of primitives.
 
 ---
+
+## 🔁 Scenario Coverage (Validation Map)
+
+- `scenario-14-container-runtime-down.md`
+  - Primary: this playbook
+  - Secondary: `service-recovery-playbook.md`
+
+- `scenario-15-container-networking-broken.md`
+  - Primary: this playbook
+  - Secondary: `network-diagnosis-playbook.md`
+  - Secondary: `security-triage-playbook.md` (if policy blocks traffic)
+
+- `scenario-16-image-pull-fails.md`
+  - Primary: this playbook
+  - Secondary: `network-diagnosis-playbook.md`
 
