@@ -75,170 +75,96 @@ You should **not** jump to the fix.
 
 ### 1) scenario-1-system-feels-slow.md
 
-Symptom focus:
-- The machine is responsive but **everything feels sluggish**
-
-Primary signals:
-- Load average
-- CPU saturation
-- I/O wait
-- Runaway processes
-
-Core skills trained:
-- top / htop
-- ps
-- load average interpretation
-- Distinguishing CPU vs I/O vs memory pressure
-
 Primary playbook:
 - `linux/LFCS-training/execution-playbooks/process-control-playbook.md`
-
-Use this when:
-- You want to **quickly explain why a system is slow**
 
 ---
 
 ### 2) scenario-2-disk-is-full.md
 
-Symptom focus:
-- Writes fail
-- Services crash
-- Logs won’t rotate
-- “No space left on device”
-
-Primary signals:
-- df
-- du
-- Inode exhaustion
-- Log growth
-- Deleted-but-open files
-
-Core skills trained:
-- df, du, find
-- lsof
-- Log cleanup
-- Emergency space recovery
-
 Primary playbook:
 - `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md`
-
-Use this when:
-- You want to **recover a dead system caused by disk exhaustion**
 
 ---
 
 ### 3) scenario-3-service-is-down.md
 
-Symptom focus:
-- A service is not running
-- A port is not listening
-- A website/API is unreachable
-
-Primary signals:
-- systemctl status
-- journalctl
-- ss
-- Exit codes and dependency failures
-
-Core skills trained:
-- systemd service control
-- Log inspection
-- Dependency reasoning
-- Rapid restart and validation
-
 Primary playbook:
 - `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md`
 
-Secondary playbooks (if needed):
+Secondary playbooks:
 - `linux/LFCS-training/execution-playbooks/network-diagnosis-playbook.md`
 - `linux/LFCS-training/execution-playbooks/security-triage-playbook.md`
-
-Use this when:
-- You want to **bring dead services back to life under pressure**
 
 ---
 
 ### 4) scenario-4-process-wont-die.md
 
-Symptom focus:
-- A process is stuck
-- Won’t respond to SIGTERM
-- Keeps respawning or won’t exit
-
-Primary signals:
-- ps
-- top
-- Process states
-- Zombie vs uninterruptible sleep
-
-Core skills trained:
-- Signals
-- kill, killall, pkill
-- Understanding process states
-- Knowing when a reboot is the only option
-
 Primary playbook:
 - `linux/LFCS-training/execution-playbooks/process-control-playbook.md`
-
-Use this when:
-- You want to **control and reason about misbehaving processes**
 
 ---
 
 ### 5) scenario-5-cpu-pegged.md
 
-Symptom focus:
-- CPU is at or near 100%
-- Fans spinning
-- Everything is slow
-
-Primary signals:
-- top / htop
-- Load average
-- Per-process CPU usage
-- Nice levels
-
-Core skills trained:
-- Identifying CPU hogs
-- Renicing or killing processes
-- Distinguishing real load vs blocked I/O
-
 Primary playbook:
 - `linux/LFCS-training/execution-playbooks/process-control-playbook.md`
-
-Use this when:
-- You want to **quickly isolate and stop CPU runaway conditions**
 
 ---
 
 ### 6) scenario-6-memory-pressure.md
 
-Symptom focus:
-- OOM kills
-- Random process deaths
-- System thrashing or freezing
-
-Primary signals:
-- free
-- vmstat
-- dmesg
-- OOM killer logs
-- Swap activity
-
-Core skills trained:
-- Memory accounting
-- Swap analysis
-- Finding memory hogs
-- Stabilizing the system
-
 Primary playbook:
 - `linux/LFCS-training/execution-playbooks/process-control-playbook.md`
 
-Secondary playbook (if disk or swap I/O is involved):
+Secondary playbook:
 - `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md`
 
-Use this when:
-- You want to **recover a system under memory collapse**
+---
+
+## 🐳 Container & Runtime Scenarios
+
+### 14) scenario-14-container-runtime-down.md
+
+Symptom focus:
+- `docker` / `podman` commands fail
+- Runtime service is not running
+- No containers can start
+
+Primary playbook:
+- `linux/LFCS-training/execution-playbooks/container-runtime-triage-playbook.md`
+
+Secondary playbook:
+- `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md`
+
+---
+
+### 15) scenario-15-container-networking-broken.md
+
+Symptom focus:
+- Containers run but **ports are not reachable**
+- `-p 8080:80` does not work
+- Networking or firewall breaks access
+
+Primary playbook:
+- `linux/LFCS-training/execution-playbooks/container-runtime-triage-playbook.md`
+
+Secondary playbook:
+- `linux/LFCS-training/execution-playbooks/network-diagnosis-playbook.md`
+
+---
+
+### 16) scenario-16-image-pull-fails.md
+
+Symptom focus:
+- `docker pull` / `podman pull` fails
+- DNS, routing, or registry access problems
+
+Primary playbook:
+- `linux/LFCS-training/execution-playbooks/container-runtime-triage-playbook.md`
+
+Secondary playbook:
+- `linux/LFCS-training/execution-playbooks/network-diagnosis-playbook.md`
 
 ---
 
@@ -275,4 +201,3 @@ You are “ready” with failure scenarios when:
 > **Stabilize → Identify → Execute → Verify → Persist → Rollback if needed.**  
 > **Never skip classification.**
 
----
