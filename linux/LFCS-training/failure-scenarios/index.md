@@ -1,12 +1,33 @@
 # 🧯 Failure Scenarios — Index (LFCS)
 
+**Path:** `linux/LFCS-training/failure-scenarios/index.md`  
 Mental mode: **Diagnosis, recovery, and proof**.  
-Purpose: This directory contains **scenario-driven incident drills** that train you to **reason under pressure**, not just type commands.
+Purpose: This directory contains **scenario-driven incident simulations** that train you to **reason under pressure**, not just type commands.
 
 If the system is already broken and you must **figure out why and fix it**, it belongs here.
 
 This is not a tutorial set.  
 This is a **simulate → diagnose → fix → verify** training surface.
+
+---
+
+## 🧠 Where This Fits in the LFCS Training System
+
+The LFCS training system has **four layers**:
+
+1) **Building Blocks** — mental models, invariants, gates  
+2) **Execution Drills** — muscle memory and command fluency  
+3) **Execution Playbooks** — operator algorithms and decision flow  
+4) **Failure Scenarios** — **integration + pressure testing** (this directory)
+
+In other words:
+
+- **Drills** teach you how to type  
+- **Playbooks** teach you how to think and route problems  
+- **Scenarios** test whether you can do both under stress  
+
+Failure scenarios are **not** about new commands.  
+They are about **correct diagnosis, correct playbook choice, and clean recovery**.
 
 ---
 
@@ -18,8 +39,9 @@ Each scenario:
 
 - Starts from a **symptom**
 - Forces you to **gather evidence**
-- Requires you to **form a hypothesis**
-- Then **apply a fix**
+- Requires you to **classify the failure**
+- Requires you to **choose the correct playbook**
+- Then **execute a recovery**
 - And finally **prove the system is healthy**
 
 You should **not** jump to the fix.
@@ -35,10 +57,11 @@ You should **not** jump to the fix.
    - Processes
    - Services
    - Logs
-4) Decide **what is actually wrong**
-5) Fix it
-6) Prove it is fixed
-7) Write down (mentally) what signal led you there
+4) Decide **what class of failure this is**
+5) Choose the **correct execution playbook**
+6) Execute recovery
+7) Prove the system is fixed
+8) Be able to explain **what signal led you to the correct classification**
 
 ### Study modes
 
@@ -62,10 +85,13 @@ Primary signals:
 - Runaway processes
 
 Core skills trained:
-- top/htop
+- top / htop
 - ps
 - load average interpretation
 - Distinguishing CPU vs I/O vs memory pressure
+
+Primary playbook:
+- `linux/LFCS-training/execution-playbooks/process-control-playbook.md`
 
 Use this when:
 - You want to **quickly explain why a system is slow**
@@ -93,6 +119,9 @@ Core skills trained:
 - Log cleanup
 - Emergency space recovery
 
+Primary playbook:
+- `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md`
+
 Use this when:
 - You want to **recover a dead system caused by disk exhaustion**
 
@@ -116,6 +145,13 @@ Core skills trained:
 - Log inspection
 - Dependency reasoning
 - Rapid restart and validation
+
+Primary playbook:
+- `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md`
+
+Secondary playbooks (if needed):
+- `linux/LFCS-training/execution-playbooks/network-diagnosis-playbook.md`
+- `linux/LFCS-training/execution-playbooks/security-triage-playbook.md`
 
 Use this when:
 - You want to **bring dead services back to life under pressure**
@@ -141,6 +177,9 @@ Core skills trained:
 - Understanding process states
 - Knowing when a reboot is the only option
 
+Primary playbook:
+- `linux/LFCS-training/execution-playbooks/process-control-playbook.md`
+
 Use this when:
 - You want to **control and reason about misbehaving processes**
 
@@ -154,7 +193,7 @@ Symptom focus:
 - Everything is slow
 
 Primary signals:
-- top/htop
+- top / htop
 - Load average
 - Per-process CPU usage
 - Nice levels
@@ -163,6 +202,9 @@ Core skills trained:
 - Identifying CPU hogs
 - Renicing or killing processes
 - Distinguishing real load vs blocked I/O
+
+Primary playbook:
+- `linux/LFCS-training/execution-playbooks/process-control-playbook.md`
 
 Use this when:
 - You want to **quickly isolate and stop CPU runaway conditions**
@@ -189,27 +231,29 @@ Core skills trained:
 - Finding memory hogs
 - Stabilizing the system
 
+Primary playbook:
+- `linux/LFCS-training/execution-playbooks/process-control-playbook.md`
+
+Secondary playbook (if disk or swap I/O is involved):
+- `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md`
+
 Use this when:
 - You want to **recover a system under memory collapse**
 
 ---
 
-## 🧭 Relationship to Execution Drills
+## 🧭 Relationship to Drills and Playbooks
 
-Failure scenarios answer:
+- **Execution drills** answer:
+  “What do I type to perform a task?”
 
-> “What do I do when the system is already broken?”
+- **Execution playbooks** answer:
+  “What algorithm do I follow to recover this class of failure?”
 
-Execution drills answer:
+- **Failure scenarios** answer:
+  “Can I recognize the failure, choose the right playbook, and fix it under pressure?”
 
-> “What do I type to perform a task?”
-
-Both are required for LFCS:
-
-- **Execution drills** build speed and accuracy
-- **Failure scenarios** build judgment and diagnosis
-
-You should alternate between them.
+All three are required.
 
 ---
 
@@ -219,7 +263,15 @@ You are “ready” with failure scenarios when:
 
 - You never panic at a broken system
 - You always start by **measuring, not guessing**
-- You can explain **why** you chose a diagnostic path
+- You can classify the failure **before** touching anything
+- You choose the correct playbook quickly
 - You can recover the system and **prove it’s healthy**
+- You can explain **why** your diagnostic path was correct
 
 ---
+
+## 🧠 Core Operator Rule
+
+> **Stabilize → Identify → Execute → Verify → Persist → Rollback if needed.**  
+> **Never skip classification.**
+
