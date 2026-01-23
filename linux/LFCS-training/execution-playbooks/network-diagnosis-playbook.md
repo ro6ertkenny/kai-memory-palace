@@ -25,7 +25,7 @@ This playbook composes the following drill surfaces:
 
 Related scenario (practice input):
 
-- `linux/LFCS-training/failure-scenarios/scenario-c-service-is-down.md`
+- `linux/LFCS-training/failure-scenarios/scenario-3-service-is-down.md`
 
 ---
 

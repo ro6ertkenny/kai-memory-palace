@@ -114,27 +114,27 @@ This map ensures every existing failure scenario has a corresponding operator al
 
 ### Existing failure scenarios
 
-- `linux/LFCS-training/failure-scenarios/scenario-a-system-feels-slow.md`
+- `linux/LFCS-training/failure-scenarios/scenario-1-system-feels-slow.md`
   - Primary: `linux/LFCS-training/execution-playbooks/process-control-playbook.md`
   - Secondary: `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md` (if I/O or disk pressure signals appear)
   - Secondary: `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md` (if a specific service is the offender)
 
-- `linux/LFCS-training/failure-scenarios/scenario-b-disk-is-full.md`
+- `linux/LFCS-training/failure-scenarios/scenario-2-disk-is-full.md`
   - Primary: `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md`
   - Secondary: `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md` (if service fails due to disk/log growth)
 
-- `linux/LFCS-training/failure-scenarios/scenario-c-service-is-down.md`
+- `linux/LFCS-training/failure-scenarios/scenario-3-service-is-down.md`
   - Primary: `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md`
   - Secondary: `linux/LFCS-training/execution-playbooks/network-diagnosis-playbook.md` (if “down” is actually reachability)
   - Secondary: `linux/LFCS-training/execution-playbooks/security-triage-playbook.md` (if permissions/SELinux block startup)
 
-- `linux/LFCS-training/failure-scenarios/scenario-d-process-wont-die.md`
+- `linux/LFCS-training/failure-scenarios/scenario-4-process-wont-die.md`
   - Primary: `linux/LFCS-training/execution-playbooks/process-control-playbook.md`
 
-- `linux/LFCS-training/failure-scenarios/scenario-e-cpu-pegged.md`
+- `linux/LFCS-training/failure-scenarios/scenario-5-cpu-pegged.md`
   - Primary: `linux/LFCS-training/execution-playbooks/process-control-playbook.md`
 
-- `linux/LFCS-training/failure-scenarios/scenario-f-memory-pressure.md`
+- `linux/LFCS-training/failure-scenarios/scenario-6-memory-pressure.md`
   - Primary: `linux/LFCS-training/execution-playbooks/process-control-playbook.md`
   - Secondary: `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md` (if swap/disk I/O contributes to pressure)
 

@@ -63,7 +63,7 @@ Rule:
 
 These are exercised after this block:
 
-- `linux/LFCS-training/failure-scenarios/scenario-b-disk-is-full.md` (when caused by wrong mount or missing mount)
+- `linux/LFCS-training/failure-scenarios/scenario-2-disk-is-full.md` (when caused by wrong mount or missing mount)
 
 ---
 

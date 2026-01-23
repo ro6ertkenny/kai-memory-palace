@@ -65,7 +65,7 @@ Rule:
 
 These are exercised after this block:
 
-- `linux/LFCS-training/failure-scenarios/scenario-c-service-is-down.md` (when caused by config errors)
+- `linux/LFCS-training/failure-scenarios/scenario-3-service-is-down.md` (when caused by config errors)
 
 ---
 

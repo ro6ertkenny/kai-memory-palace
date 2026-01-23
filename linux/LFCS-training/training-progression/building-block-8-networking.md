@@ -66,7 +66,7 @@ Rule:
 
 These are exercised after this block:
 
-- `linux/LFCS-training/failure-scenarios/scenario-c-service-is-down.md` (when it is actually reachability)
+- `linux/LFCS-training/failure-scenarios/scenario-3-service-is-down.md` (when it is actually reachability)
 - Any “can’t connect” variant in exam-style tasks
 
 ---

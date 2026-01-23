@@ -64,7 +64,7 @@ Rule:
 
 These are exercised in this block:
 
-- `linux/LFCS-training/failure-scenarios/scenario-b-disk-is-full.md`
+- `linux/LFCS-training/failure-scenarios/scenario-2-disk-is-full.md`
 
 Also overlaps with:
 

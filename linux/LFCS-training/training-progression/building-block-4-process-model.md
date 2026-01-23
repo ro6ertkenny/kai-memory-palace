@@ -65,10 +65,10 @@ Rule:
 
 These are exercised after this block:
 
-- `linux/LFCS-training/failure-scenarios/scenario-a-system-feels-slow.md`
-- `linux/LFCS-training/failure-scenarios/scenario-d-process-wont-die.md`
-- `linux/LFCS-training/failure-scenarios/scenario-e-cpu-pegged.md`
-- `linux/LFCS-training/failure-scenarios/scenario-f-memory-pressure.md`
+- `linux/LFCS-training/failure-scenarios/scenario-1-system-feels-slow.md`
+- `linux/LFCS-training/failure-scenarios/scenario-4-process-wont-die.md`
+- `linux/LFCS-training/failure-scenarios/scenario-5-cpu-pegged.md`
+- `linux/LFCS-training/failure-scenarios/scenario-6-memory-pressure.md`
 
 ---
 

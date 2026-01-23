@@ -69,7 +69,7 @@ Rule:
 
 These are exercised after this block:
 
-- `linux/LFCS-training/failure-scenarios/scenario-a-system-feels-slow.md` (when caused by scheduled jobs)
+- `linux/LFCS-training/failure-scenarios/scenario-1-system-feels-slow.md` (when caused by scheduled jobs)
 - Any “this happens every X minutes/hours” variant
 
 ---
