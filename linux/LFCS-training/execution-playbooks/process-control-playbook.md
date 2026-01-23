@@ -1,35 +1,57 @@
 # ⚙️ Process Control Playbook (LFCS)
 
 **Path:** `linux/LFCS-training/execution-playbooks/process-control-playbook.md`  
-**Purpose:** Stabilize a system by diagnosing and controlling **runaway, stuck, or pathological processes** using a **safe, exam-ready operator algorithm**.
+Mental mode: **Measure → Classify → Stabilize → Fix Source → Verify → Prevent**  
+Purpose: Stabilize a system by diagnosing and controlling **runaway, stuck, or pathological processes** using a **safe, exam-grade operator algorithm**.
 
-This is not a tutorial. This is a procedure.
+This is **not** a tutorial.  
+This is a **live-system decision and action playbook**.
 
 ---
 
-## 🎯 Scope
+## 🧠 When To Use This Playbook
 
-Use this playbook when:
+Use this playbook when the **primary symptom** is:
 
 - CPU is pegged
-- Memory pressure / OOM risk
-- Process won’t die / appears stuck
-- System feels slow due to process behavior
+- Memory pressure or OOM risk
+- A process won’t die or appears stuck
+- The system feels slow due to process behavior
 - Too many processes / fork-like behavior
 - Zombie processes observed
 
-This playbook composes the following drill surfaces:
+Do **not** use this playbook if the **first evidence** points to:
 
-- `linux/LFCS-training/execution-drills/processes-logs-and-scheduling.md`
-- `linux/LFCS-training/execution-drills/services-and-logging.md`
-- `linux/LFCS-training/execution-drills/essential-commands.md`
+- disk, mount, or I/O blockage → `storage-recovery-playbook.md`
+- a service lifecycle failure → `service-recovery-playbook.md`
+- network or DNS → `network-diagnosis-playbook.md`
+- SELinux or policy → `security-triage-playbook.md`
 
-Related scenarios (practice inputs):
+---
+
+## 🧭 Scenarios That Validate This Playbook
+
+This playbook is exercised by:
 
 - `linux/LFCS-training/failure-scenarios/scenario-1-system-feels-slow.md`
 - `linux/LFCS-training/failure-scenarios/scenario-4-process-wont-die.md`
 - `linux/LFCS-training/failure-scenarios/scenario-5-cpu-pegged.md`
 - `linux/LFCS-training/failure-scenarios/scenario-6-memory-pressure.md`
+
+If you cannot solve those scenarios **cleanly and repeatably**, this playbook is not yet fluent.
+
+---
+
+## 🧪 Drills Required For Fluency
+
+You should be mechanically fluent with:
+
+- `linux/LFCS-training/execution-drills/processes-logs-and-scheduling.md`
+- `linux/LFCS-training/execution-drills/services-and-logging.md`
+- `linux/LFCS-training/execution-drills/essential-commands.md`
+- `linux/LFCS-training/execution-drills/storage-and-mounts.md` (for D-state and I/O wait cases)
+
+This playbook is a **composition layer**, not a source of primitives.
 
 ---
 
@@ -37,336 +59,198 @@ Related scenarios (practice inputs):
 
 Always proceed in this order:
 
-1. **Observe**
-2. **Identify the offender**
-3. **Inspect**
-4. **Classify**
-5. **Stabilize (minimum safe action)**
-6. **Correct root cause**
-7. **Verify**
-8. **Make persistent (if required)**
-9. **Rollback if needed**
+1. Measure
+2. Identify the offender
+3. Inspect
+4. Classify
+5. Stabilize (minimum safe action)
+6. Fix root cause
+7. Verify
+8. Make persistent (if required)
+9. Roll back if needed
 
-Never start by killing random PIDs.
+> **Never start by killing random PIDs.**
 
 ---
 
 ## 🧭 Global Safety Rules
 
-- **Preserve evidence first.** Do not restart or kill before you inspect.
-- **If the PID is systemd-managed, prefer `systemctl` over signals.**
-- **If a suspect process is in `D` state, stop using signals and switch to storage/I/O diagnosis.**
-- **Prefer smallest safe action (renice → TERM → KILL).**
-- **Every action requires verification.**
+- Preserve evidence first.
+- If a PID is systemd-managed, prefer `systemctl` over signals.
+- If a suspect process is in `D` state, **stop using signals** and switch to storage/I/O diagnosis.
+- Prefer smallest safe action: renice → TERM → KILL.
+- Every action requires verification.
 
 ---
 
-## 0) Inputs
+## 🧭 Classification Buckets (Pick One Before Acting)
 
-You must know or determine:
+You must place the incident into **exactly one** bucket:
 
-- Symptom class: CPU / memory / “won’t die” / general slowness
-- Offending process name or PID (if known)
-- Whether the process is **systemd-managed** or standalone
-
----
-
-## 1) Observe System State (Low-Risk, Always First)
-
-CPU / load:
-
-    uptime
-
-Memory:
-
-    free -h
-
-Quick process view (portable, exam-safe):
-
-    ps aux --sort=-%cpu | head -n 15
-    ps aux --sort=-%mem | head -n 15
-
-Optional helpers if available (not guaranteed on exam images):
-
-    top
-    vmstat 1 5
-    iostat
-
-Branch:
-
-- If **CPU pegged** → go to **Section 2**
-- If **memory pressure** → go to **Section 3**
-- If **process won’t die** → go to **Section 4**
-- If **general slowness** → go to **Section 5**
+1) Single runaway process  
+2) Process storm / fork loop  
+3) Service-managed respawn loop  
+4) Uninterruptible sleep (D-state) / blocked I/O  
+5) Zombie accumulation  
+6) Memory pressure driven by a process  
+7) Not actually a process problem (exit this playbook)
 
 ---
 
-## 2) CPU Pegged Flow
+## 🧪 Phase 1 — Global Triage (Always First)
 
-Identify top CPU consumers:
+Capture at least one snapshot:
 
-    ps -eo pid,ppid,comm,%cpu,%mem --sort=-%cpu | head -n 15
+  uptime  
+  free -h  
+  top || true  
+  vmstat 1 5 || true  
 
-Select the primary suspect PID.
+Quick offender scan:
 
-Inspect it:
+  ps aux --sort=-%cpu | head -n 15  
+  ps aux --sort=-%mem | head -n 15  
 
-    ps -o pid,ppid,user,stat,etime,%cpu,%mem,cmd -p <pid>
+Interpretation gates:
 
-If it looks like a service:
-
-    systemctl status <service> --no-pager
-
-Stabilize (least destructive first):
-
-- Reduce priority:
-
-    renice +10 -p <pid>
-
-Verify effect:
-
-    ps -o pid,ni,%cpu,cmd -p <pid>
-
-If still pegged and action is justified:
-
-- Send TERM:
-
-    kill -TERM <pid>
-
-Verify:
-
-    ps -p <pid> -o pid,stat,etime,cmd
-
-If still alive and clearly pathological:
-
-- Send KILL:
-
-    kill -KILL <pid>
-
-Verify again:
-
-    ps -p <pid> -o pid,stat,etime,cmd
-
-Then go to **Section 6** (Root Cause).
+- If `wa` is high or processes are in D-state → exit to `storage-recovery-playbook.md`
+- If `si/so` or PSI indicates memory pressure → memory-driven path
+- If one or many processes dominate CPU → process path
+- If this does not look process-shaped → exit this playbook
 
 ---
 
-## 3) Memory Pressure Flow
+## 🧪 Phase 2 — Identify the Offender Class
 
-Confirm pressure:
+Record for suspects:
 
-    free -h
-    ps -eo pid,ppid,comm,%mem,%cpu --sort=-%mem | head -n 15
+- PID
+- user
+- %CPU / %MEM
+- elapsed time
+- command
+- whether it is service-managed
 
-Optional signal of OOM activity:
-
-    dmesg | tail -n 50
-
-Select the primary suspect PID and inspect it:
-
-    ps -o pid,ppid,user,stat,etime,%mem,rss,cmd -p <pid>
-
-Stabilize (least destructive first):
-
-- Reduce priority:
-
-    renice +10 -p <pid>
-
-If one process is clearly leaking / exploding:
-
-- TERM, then KILL if needed:
-
-    kill -TERM <pid>
-    kill -KILL <pid>
-
-Verify recovery:
-
-    free -h
-    ps aux --sort=-%mem | head -n 10
-
-Then go to **Section 6** (Root Cause).
+If many similar processes appear → suspect **storm** or **respawn loop**.
 
 ---
 
-## 4) Process Won’t Die Flow
+## 🧩 Phase 3 — Inspect a Specific Process
 
-Attempt graceful stop:
+For a candidate PID:
 
-    kill -TERM <pid>
+  ps -o pid,ppid,stat,etime,%cpu,%mem,cmd -p PID  
 
-If still alive:
+Interpret `STAT`:
 
-    kill -KILL <pid>
+- R / S → normal userspace (killable)
+- Z → zombie (already dead, parent problem)
+- D → uninterruptible sleep (kernel I/O wait, not killable)
+- T → stopped
 
-If KILL does not work, inspect state:
+Decision gate:
 
-    ps -o pid,ppid,stat,etime,cmd -p <pid>
-
-Interpretation:
-
-- `D` (uninterruptible sleep): signals will not help → switch to storage/I/O diagnosis.
-- `Z` (zombie): process is already dead → fix the parent.
-- `T` (stopped): may need CONT or parent control.
-- Respawning rapidly: you are killing children, not the supervisor.
-
-If zombie:
-
-- Identify parent:
-
-    ps -o pid,ppid,stat,cmd -p <ppid>
-
-- If parent is a service: restart the service.
-- If parent is a user job runner: stop the parent.
-
-If uninterruptible sleep (`D`):
-
-- Do not escalate signals.
-- Check for I/O or storage trouble (switch playbook if needed).
-
-After stabilization, go to **Section 6** (Root Cause).
+- Z → fix the **parent**
+- D → fix **I/O or kernel condition** (exit playbook)
+- R/S/T → you may act on the process
 
 ---
 
-## 5) General “System Feels Slow” Flow
+## 🧭 Phase 4 — Route Selection
 
-Check load vs CPU:
+### Route A — Single runaway process
+- One PID dominates CPU or memory
+- Not a service, or clearly misbehaving
 
-    uptime
+### Route B — Process storm / fork loop
+- Many similar PIDs
+- Killing one does not reduce the count
 
-Quickly identify the dominant pressure:
+### Route C — Service-managed respawn
+- PID returns immediately
+- systemd restart policy involved  
+→ Exit to `service-recovery-playbook.md`
 
-- CPU:
+### Route D — D-state / blocked I/O  
+→ Exit to `storage-recovery-playbook.md`
 
-    ps -eo pid,ppid,comm,%cpu,%mem --sort=-%cpu | head -n 15
+### Route E — Zombies
+- Many Z processes  
+→ Fix or restart the parent
 
-- Memory:
-
-    ps -eo pid,ppid,comm,%mem,%cpu --sort=-%mem | head -n 15
-
-- Process explosion:
-
-    ps -e --no-headers | wc -l
-
-If offender looks like a service:
-
-    systemctl status <service> --no-pager
-
-Stabilize using the appropriate branch (Sections 2–4), then go to **Section 6**.
-
----
-
-## 6) Root Cause Classification (After Stabilization)
-
-Do not attempt root cause fixes until the system is stable.
-
-Classify the offender:
-
-### A) Standalone user process
-
-Actions:
-
-- Stop/kill the process.
-- Fix:
-  - user behavior
-  - environment
-  - cron / timer / scheduler
-
-Check for schedulers:
-
-    crontab -l
-    ls -l /etc/cron.*
+### Route F — Memory pressure driven by a process
+- Swap, PSI, OOM risk  
+→ Contain top RSS offender first
 
 ---
 
-### B) systemd service process
+## 🗡️ Phase 5 — Controlled Intervention
 
-Actions:
+Escalation ladder (for killable processes):
 
-- Use systemd, not raw signals:
+1) Graceful:
 
-    systemctl status <service> --no-pager
-    journalctl -u <service> --no-pager -n 100
+  kill PID  
 
-- Restart or stop as appropriate:
+2) Verify:
 
-    systemctl restart <service>
+  ps -p PID || echo "gone"  
 
-- If recurring:
-  - inspect config
-  - fix config
-  - re-verify
+3) Force:
 
----
+  kill -9 PID  
 
-### C) Fork storm / process explosion
+4) Verify again:
 
-Signals:
+  ps -p PID || echo "gone"  
 
-- Process count spikes
-- Many children with same parent
+Rules:
 
-Actions:
+- Never spam `kill -9`
+- Never kill multiple things at once
+- Always observe system impact after each step
 
-- Identify parent:
+If the process is service-managed:
 
-    ps -eo pid,ppid,comm --sort=ppid | head -n 50
-
-- Stop the parent first:
-
-    kill -TERM <parent_pid>
-    kill -KILL <parent_pid>
-
-- Verify normalization:
-
-    ps -e --no-headers | wc -l
+- Stop the service, not the PID
+- Then fix the service
 
 ---
 
-## 7) Escalation and System Stabilization
+## 🧯 Phase 6 — Stabilize and Prove
 
-If the system is becoming unusable:
+After intervention:
 
-- Stop non-critical services (carefully):
+  uptime  
+  top || true  
+  ps aux --sort=-%cpu | head -n 10  
+  free -h  
+  vmstat 1 3  
 
-    systemctl stop <service>
+If a service was involved:
 
-Reboot is a last resort and only after:
+  systemctl --failed --no-pager  
+  systemctl status <unit> --no-pager  
 
-- You understand what will be lost
-- You have fixed any cron/service/config that would re-trigger the incident
+Define “stable” as:
 
----
-
-## 8) Verification (Mandatory Exit Ritual)
-
-Run:
-
-    uptime
-    free -h
-    ps aux --sort=-%cpu | head -n 10
-    ps aux --sort=-%mem | head -n 10
-
-If services were involved:
-
-    systemctl --failed --no-pager
-    systemctl status <service> --no-pager
-
-Confirm:
-
-- Original symptom is gone
-- No new failure cascade exists
+- load trending to normal
+- no storm or respawn loop
+- no swap thrash
+- no growing D-state backlog
 
 ---
 
-## 9) Persistence Check
+## 🧾 Phase 7 — Root Cause Capture
 
-If root cause was:
+You must be able to answer:
 
-- cron / scheduling → fix and re-verify
-- service config → correct, restart, re-verify
-- user limits or policy → apply (if in exam scope)
+- What started the offender?
+- Why did it run this long or spawn this much?
+- Why was it not bounded or supervised?
+- What change prevents recurrence?
 
-Ensure no temporary hacks remain (e.g., leaving critical services stopped unintentionally).
+If you cannot answer these, the incident is **not finished**.
 
 ---
 
@@ -376,25 +260,46 @@ If you stopped or reniced the wrong thing:
 
 - Restart service:
 
-    systemctl start <service>
+  systemctl start <service>  
 
 - Reset nice value:
 
-    renice 0 -p <pid>
+  renice 0 -p <pid>  
 
 Re-check:
 
-    uptime
-    systemctl status <service> --no-pager
+  uptime  
+  systemctl status <service> --no-pager  
+
+---
+
+## 🚫 Anti-Patterns (Auto-Fail)
+
+- Killing the “top” process without understanding it
+- Treating symptoms (PIDs) instead of sources (services, jobs)
+- Ignoring D-state and blaming the process
+- Rebooting without classification
+- Declaring victory because “CPU dropped”
+
+---
+
+## 🧭 Exit Conditions
+
+Exit immediately if you discover:
+
+- disk or mount is the real blocker → `storage-recovery-playbook.md`
+- service lifecycle is broken → `service-recovery-playbook.md`
+- policy/SELinux is blocking → `security-triage-playbook.md`
+- network or DNS is causal → `network-diagnosis-playbook.md`
 
 ---
 
 ## ✅ Completion Criteria
 
-- CPU and memory are stable
-- Offending process is corrected or controlled
+- System is stable
+- Offender is gone or controlled
+- Source is fixed or disabled
 - Services are in intended states
-- Logs show no ongoing restart/crash loop
 - You can explain:
   - what failed
   - why it failed
@@ -403,22 +308,10 @@ Re-check:
 
 ---
 
-## 🧠 Exam Safety Rules
+## 🧠 Operator Loop (Reinforced)
 
-- Prefer systemd controls for services
-- Use renice before kill when possible
-- Treat `D` state as I/O/kernel wait: killing will not help
-- Verify after every action
-- Avoid unnecessary reboots
+Symptom → Measure → Classify → Contain → Fix Source → Verify → Prevent
 
----
-
-## 🧱 This Playbook Composes From
-
-- processes-logs-and-scheduling.md
-- services-and-logging.md
-- essential-commands.md
-
-This is a **composition layer**, not a source of primitives.
+Never skip classification.
 
 ---
