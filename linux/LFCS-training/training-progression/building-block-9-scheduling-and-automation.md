@@ -51,6 +51,13 @@ You must master:
 
 - `linux/LFCS-training/execution-drills/processes-logs-and-scheduling.md`
 - `linux/LFCS-training/execution-drills/files-and-text.md`
+- `linux/LFCS-training/execution-drills/essential-commands.md`
+
+Definition of mastery for this block:
+
+- You can enumerate cron + timers quickly
+- You can identify the triggering unit/command and the executing user
+- You can verify actual runs via logs/status (not assumptions)
 
 Rule:
 
@@ -112,7 +119,7 @@ You must be able to:
   - command arguments
 - Verify:
   - behavior after change
-  - logs of execution
+  - evidence of execution (logs/status)
 
 ---
 
@@ -170,3 +177,4 @@ You must:
 Without this block, **periodic failures will feel like ghosts**.
 
 ---
+
