@@ -1,23 +1,51 @@
 # 🛠️ Service Recovery Playbook (LFCS)
 
 **Path:** `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md`  
-**Purpose:** Restore a Linux service to a **running, healthy, and persistent** state using a **safe, exam-ready operator algorithm**.
+Mental mode: **Classify → Inspect → Fix → Verify → Persist**  
+Purpose: Restore a Linux service to a **running, healthy, and persistent** state using a **safe, exam-grade operator algorithm**.
 
-This is not a tutorial. This is a procedure.
+This is **not** a tutorial.  
+This is a **live-system decision and recovery playbook**.
 
 ---
 
-## 🎯 Scope
+## 🧠 When To Use This Playbook
 
 Use this playbook when:
 
 - A service is reported **down**
 - A service **fails to start** or **crashes**
-- A service is **running but not reachable**
 - A service **starts but exits immediately**
-- A service **fails after config changes**
+- A service is **running but not reachable**
+- A service fails after **configuration changes**
+- A service is blocking **boot or other services**
 
-This playbook composes the following drill surfaces:
+Do **not** use this playbook if the **first evidence** points to:
+
+- disk, mount, or I/O failure → `storage-recovery-playbook.md`
+- process runaway or storm → `process-control-playbook.md`
+- network or DNS root cause → `network-diagnosis-playbook.md`
+- SELinux or policy root cause → `security-triage-playbook.md`
+
+---
+
+## 🧭 Scenarios That Validate This Playbook
+
+This playbook is exercised by:
+
+- `linux/LFCS-training/failure-scenarios/scenario-3-service-is-down.md`
+- `linux/LFCS-training/failure-scenarios/scenario-10-tls-certificate-failure.md`
+- `linux/LFCS-training/failure-scenarios/scenario-11-selinux-denial-breaks-service.md`
+- `linux/LFCS-training/failure-scenarios/scenario-12-filesystem-wont-mount.md`
+- `linux/LFCS-training/failure-scenarios/scenario-13-system-wont-boot.md`
+
+If you cannot solve those scenarios **cleanly and repeatably**, this playbook is not yet fluent.
+
+---
+
+## 🧪 Drills Required For Fluency
+
+You should be mechanically fluent with:
 
 - `linux/LFCS-training/execution-drills/services-and-logging.md`
 - `linux/LFCS-training/execution-drills/service-configuration.md`
@@ -25,9 +53,7 @@ This playbook composes the following drill surfaces:
 - `linux/LFCS-training/execution-drills/networking.md`
 - `linux/LFCS-training/execution-drills/essential-commands.md`
 
-Related scenario (practice input):
-
-- `linux/LFCS-training/failure-scenarios/scenario-3-service-is-down.md`
+This playbook is a **composition layer**, not a source of primitives.
 
 ---
 
@@ -35,274 +61,256 @@ Related scenario (practice input):
 
 Always proceed in this order:
 
-1. **Identify**
-2. **Observe**
-3. **Inspect logs**
-4. **Classify failure**
-5. **Stabilize (minimum safe action)**
-6. **Correct root cause**
-7. **Verify**
-8. **Make persistent**
-9. **Rollback if needed**
+1. Identify the service and symptom
+2. Observe supervisor state
+3. Inspect logs
+4. Classify failure
+5. Stabilize (minimum safe action)
+6. Correct root cause
+7. Verify function
+8. Make persistent
+9. Roll back if needed
 
-Never jump straight to editing files.
+> **Never jump straight to editing files or restarting in a loop.**
 
 ---
 
 ## 🧭 Global Safety Rules
 
-- **Preserve evidence first.** Read status and logs before changing anything.
-- **Prefer systemd controls** over killing PIDs.
-- **Do not restart in a loop.** Every restart must be preceded by new evidence.
-- **Smallest change first.**
-- **Every action requires verification.**
+- Preserve evidence first: status and logs before changes.
+- Prefer systemd controls over killing PIDs.
+- Never loop restarts without new evidence.
+- Make the **smallest safe change** first.
+- Every action requires verification.
 
 ---
 
-## 0) Inputs
-
-You must know or determine:
-
-- Service name (e.g. `nginx`, `sshd`, `httpd`, `crond`)
-- Expected behavior:
-  - Should it be running?
-  - Should it be listening on a port?
-  - Should it be enabled at boot?
-
----
-
-## 1) Identify Service State
+## 🧪 Phase 1 — Identify Service State (Supervisor View)
 
 Check authoritative state:
 
-    systemctl status <service> --no-pager
+  systemctl status <service> --no-pager  
 
 Branch:
 
-- If **active (running)** → go to **Section 2**
-- If **inactive / failed** → go to **Section 3**
-- If **not found** → go to **Section 8**
+- If **active (running)** → go to **Phase 2**
+- If **inactive / failed** → go to **Phase 3**
+- If **unit not found** → go to **Phase 8**
 
 ---
 
-## 2) Service Is Running But “Not Working”
+## 🧪 Phase 2 — Service Is Running But “Not Working”
 
-Confirm process and listener:
+Confirm binding and basic behavior:
 
-    ss -lntup
-    ss -lntup | grep <port>
+  ss -lntup  
+  ss -lntup | grep <port>  
 
-Basic local check:
+Local test (if applicable):
 
-    curl localhost
-    curl localhost:<port>
+  curl localhost  
+  curl localhost:<port>  
 
 Branch:
 
-- If **no listener** → go to **Section 4**
-- If **listening but unreachable** → go to **Section 5**
-- If **everything looks correct locally** → problem is likely **outside this host** (stop this playbook)
+- If **no listener** → go to **Phase 4**
+- If **listening but unreachable** → go to **Phase 5**
+- If **everything works locally** → this is likely **outside this host** → exit playbook
 
 ---
 
-## 3) Service Is Stopped or Failed
+## 🧪 Phase 3 — Service Is Stopped or Failed
 
 Attempt controlled start:
 
-    systemctl start <service>
+  systemctl start <service>  
 
 Re-check:
 
-    systemctl status <service> --no-pager
+  systemctl status <service> --no-pager  
 
 Branch:
 
-- If **starts successfully** → go to **Section 6**
-- If **fails** → go to **Section 4**
+- If **starts successfully** → go to **Phase 6**
+- If **fails** → go to **Phase 4**
 
 ---
 
-## 4) Inspect Logs and Failure Reason (Mandatory)
+## 🧪 Phase 4 — Inspect Logs and Failure Reason (Mandatory)
 
 Read recent logs:
 
-    journalctl -u <service> --no-pager -n 80
+  journalctl -u <service> --no-pager -n 80  
 
-If the service supports config testing, run it (examples):
+If supported, validate configuration:
 
-    <service-binary> -t
-    nginx -t
-    httpd -t
-    named-checkconf
+  <service-binary> -t  
+  nginx -t  
+  httpd -t  
+  named-checkconf  
 
 Classify:
 
-- If **config error / parse error** → go to **Section 7**
-- If **permission denied / SELinux** → go to **Section 9**
-- If **address already in use / bind error** → go to **Section 10**
-- If **binary missing / dependency error** → go to **Section 11**
-- If **unknown crash** → continue log inspection, do not loop restarts
+- config / parse error → Phase 7  
+- permission / SELinux → Phase 9  
+- address already in use → Phase 10  
+- binary missing / dependency → Phase 11  
+- storage / mount error → exit to `storage-recovery-playbook.md`  
+- unknown crash → continue log inspection, do not loop restarts
 
 ---
 
-## 5) Service Is Running But Network Fails
+## 🧪 Phase 5 — Service Is Running But Network Fails
 
-Confirm local policy and binding:
+Check local binding:
 
-    ss -lntup
+  ss -lntup  
 
-Check firewall (one of these may exist):
+Check firewall (one may exist):
 
-    iptables -L
-    nft list ruleset
+  iptables -L  
+  nft list ruleset  
 
-Check SELinux state and recent denials (if applicable):
+Check SELinux:
 
-    getenforce
-    ausearch -m avc -ts recent
+  getenforce  
+  ausearch -m avc -ts recent || true  
 
 Branch:
 
-- If **blocked by firewall** → fix rules → go to **Section 6**
-- If **SELinux denial** → go to **Section 9**
-- If **bound only to 127.0.0.1** → fix config → go to **Section 7**
+- firewall block → fix → Phase 6  
+- SELinux denial → Phase 9  
+- bound only to 127.0.0.1 → Phase 7  
 
 ---
 
-## 6) Verify Functional Recovery (Gate)
+## 🧪 Phase 6 — Verification Gate
 
 Confirm:
 
-    systemctl status <service> --no-pager
-    ss -lntup | grep <port>
-    curl localhost:<port>
+  systemctl status <service> --no-pager  
+  ss -lntup | grep <port>  
+  curl localhost:<port>  
 
-If OK:
-
-- Proceed to **Section 12**
-
-If not OK:
-
-- Return to **Section 4** (logs) and re-classify
+If OK → proceed to **Phase 12**  
+If not OK → return to **Phase 4**
 
 ---
 
-## 7) Fix Configuration Errors
+## 🧪 Phase 7 — Fix Configuration Errors
 
 Edit the correct config file (verify path first):
 
-    vi /etc/<service>/<config>
+  vi /etc/<service>/<config>  
 
 Validate:
 
-    <service-binary> -t
+  <service-binary> -t  
 
 Restart:
 
-    systemctl restart <service>
+  systemctl restart <service>  
 
-Return to **Section 6**
+Return to **Phase 6**
 
 ---
 
-## 8) Service Not Found
+## 🧪 Phase 8 — Service Not Found
 
 Check package presence:
 
-    rpm -q <service>
-    dpkg -l | grep <service>
+  rpm -q <service>  
+  dpkg -l | grep <service>  
 
 If missing:
 
-    apt-get install <package>
-    dnf install <package>
+  apt-get install <package>  
+  dnf install <package>  
 
-Then:
-
-- Return to **Section 3**
+Return to **Phase 3**
 
 ---
 
-## 9) Permission or SELinux Issue
+## 🧪 Phase 9 — Permission or SELinux Issue
 
-Inspect file ownership and modes:
+Inspect ownership and modes:
 
-    ls -l /path/to/files
+  ls -l /path  
 
-Inspect contexts (if applicable):
+Inspect contexts:
 
-    ls -Z /path/to/files
+  ls -Z /path  
 
 Check denials:
 
-    ausearch -m avc -ts recent
+  ausearch -m avc -ts recent || true  
 
 Preferred fix:
 
-    restorecon -Rv /path
+  restorecon -Rv /path  
 
-Temporary diagnostic only (never leave it this way):
+Temporary diagnostic only:
 
-    setenforce 0
+  setenforce 0  
 
 Then:
 
-- Retry start → return to **Section 3**
-- Re-enable enforcing after fix:
+- Retry start → Phase 3  
+- Re-enable enforcing:
 
-    setenforce 1
+  setenforce 1  
+
+If policy work is required → exit to `security-triage-playbook.md`
 
 ---
 
-## 10) Port Already In Use
+## 🧪 Phase 10 — Port Already In Use
 
 Find offender:
 
-    ss -lntup | grep <port>
+  ss -lntup | grep <port>  
 
 Decide:
 
-- Stop the conflicting service/process
-- Or change this service’s port (config change → Section 7)
+- stop conflicting service/process  
+- or change this service’s port → Phase 7  
 
 Then:
 
-- Restart service → return to **Section 6**
+- Restart → Phase 6
 
 ---
 
-## 11) Broken Binary or Dependency
+## 🧪 Phase 11 — Broken Binary or Dependency
 
 Check binary and linkages:
 
-    which <service-binary>
-    ldd <service-binary>
+  which <service-binary>  
+  ldd <service-binary>  
 
 Reinstall:
 
-    apt-get --reinstall install <package>
-    dnf reinstall <package>
+  apt-get --reinstall install <package>  
+  dnf reinstall <package>  
 
-Then:
-
-- Return to **Section 3**
+Return to **Phase 3**
 
 ---
 
-## 12) Persistence Check
+## 🧪 Phase 12 — Persistence Check
 
 Ensure correct boot behavior:
 
-    systemctl is-enabled <service>
-    systemctl enable <service>
+  systemctl is-enabled <service>  
+  systemctl enable <service>  
 
-Reboot test only if allowed and safe:
+Reboot test only if safe and allowed:
 
-    systemctl reboot
+  reboot  
 
 After reboot:
 
-    systemctl status <service> --no-pager
+  systemctl status <service> --no-pager  
 
 ---
 
@@ -310,15 +318,20 @@ After reboot:
 
 If a config change caused failure:
 
-- Restore known-good copy:
+  cp /etc/<service>/<config>.bak /etc/<service>/<config>  
+  systemctl restart <service>  
 
-    cp /etc/<service>/<config>.bak /etc/<service>/<config>
+Return to **Phase 6**
 
-- Restart:
+---
 
-    systemctl restart <service>
+## 🚫 Anti-Patterns (Auto-Fail)
 
-- Re-verify → **Section 6**
+- Restarting in a loop without reading logs
+- Editing config before checking logs
+- Killing service PIDs instead of using systemd
+- Disabling SELinux permanently
+- Assuming network problems are always firewall
 
 ---
 
@@ -329,7 +342,7 @@ If a config change caused failure:
 - Service is **enabled at boot**
 - No active errors in:
 
-    journalctl -u <service> --no-pager
+  journalctl -u <service> --no-pager  
 
 You can explain:
 
@@ -340,10 +353,21 @@ You can explain:
 
 ---
 
-## 🧠 Exam Safety Rules
+## 🧠 Operator Loop (Reinforced)
 
-- Never reboot unless explicitly safe and necessary
-- Never disable SELinux permanently
-- Never loop restarts without reading logs
-- Always follow: **observe → inspect → fix →
+Symptom → Identify → Inspect → Classify → Fix → Verify → Persist
 
+Never skip log inspection.
+
+---
+
+## 🧭 Exit Conditions
+
+Exit this playbook if you discover:
+
+- storage or mount failure → `storage-recovery-playbook.md`
+- process storm or runaway → `process-control-playbook.md`
+- SELinux policy design issue → `security-triage-playbook.md`
+- network or DNS root cause → `network-diagnosis-playbook.md`
+
+---
