@@ -55,6 +55,7 @@ You must master:
 - `linux/LFCS-training/execution-drills/processes-logs-and-scheduling.md`
 - `linux/LFCS-training/execution-drills/storage-and-mounts.md`
 - `linux/LFCS-training/execution-drills/networking.md`
+- `linux/LFCS-training/execution-drills/essential-commands.md`
 
 Rule:
 
@@ -181,3 +182,4 @@ You must:
 Without this block, **container problems will feel alien and slow to debug**.
 
 ---
+
