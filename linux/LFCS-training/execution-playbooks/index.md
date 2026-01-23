@@ -1,7 +1,8 @@
 # 🧭 Execution Playbooks — Index (LFCS)
 
 **Path:** `linux/LFCS-training/execution-playbooks/index.md`  
-**Purpose:** Provide a **fast operator navigation surface** for the LFCS **playbook layer**.
+Mental mode: **Route fast → Run the right algorithm → Verify hard**  
+Purpose: Provide a **fast operator navigation surface** for the LFCS **playbook layer**.
 
 This directory contains **exam-style operator playbooks** that compose:
 
@@ -10,7 +11,7 @@ This directory contains **exam-style operator playbooks** that compose:
 
 Execution playbooks are the **algorithm layer**:
 
-> observe → isolate → decide → correct → verify → persist → rollback
+> measure → classify → correct → verify → persist → rollback
 
 ---
 
@@ -26,8 +27,8 @@ The LFCS system is intentionally built in **four layers**:
 
 In other words:
 
-- **Drills** teach you *how to type*  
-- **Playbooks** teach you *how to think and route problems*  
+- **Drills** teach you how to execute mechanics  
+- **Playbooks** teach you how to route, decide, and recover safely  
 - **Scenarios** test whether you can do both under pressure  
 
 ---
@@ -37,18 +38,18 @@ In other words:
 These files are **playbooks, not runbooks**.
 
 - **Playbook** = strategic, diagnostic, flow-control algorithm  
-  - Chooses *what to do next*
+  - Chooses what to do next
   - Routes between domains
   - Enforces safe order of operations
   - Always includes verification and rollback logic
 
-- **Runbook** = tactical, step-by-step procedure for **one specific task**  
-  - (e.g., “exact steps to rotate a cert”, “exact steps to rebuild initramfs”)
+- **Runbook** = tactical, step-by-step procedure for one specific task  
+  - (e.g., exact steps to rotate a cert, exact steps to rebuild initramfs)
 
-This repository currently emphasizes:
+This repository emphasizes:
 
-> ✅ Playbooks = **how to decide and recover**  
-> ✅ Drills = **how to execute mechanics**  
+- Playbooks = how to decide and recover  
+- Drills = how to execute mechanics  
 
 If ultra-tactical runbooks are added later, **playbooks will call them** — not replace them.
 
@@ -70,9 +71,10 @@ If ultra-tactical runbooks are added later, **playbooks will call them** — not
 - `linux/LFCS-training/execution-playbooks/security-triage-playbook.md`
 - `linux/LFCS-training/execution-playbooks/tls-triage-playbook.md`
 
-### 🌱 Workflow Recovery (Local Tooling State)
+### 🌱 Workflow & Runtime Recovery (Local Tooling / Containers)
 
 - `linux/LFCS-training/execution-playbooks/git-recovery-playbook.md`
+- `linux/LFCS-training/execution-playbooks/container-runtime-triage-playbook.md`
 
 ---
 
@@ -82,13 +84,14 @@ Use this when the prompt is vague.
 
 - “Service down / fails to start” → `service-recovery-playbook.md`
 - “Running but unreachable” → start `network-diagnosis-playbook.md`, then `service-recovery-playbook.md`
-- “Disk full / read-only / won’t mount / emergency mode” → `storage-recovery-playbook.md`
-- “CPU pegged / memory pressure / process stuck” → `process-control-playbook.md`
+- “Disk full / read-only / won’t mount / emergency mode / boot broken” → `storage-recovery-playbook.md`
+- “CPU pegged / memory pressure / process stuck / system slow” → `process-control-playbook.md`
 - “Permission denied / works as root only / SELinux AVC” → `security-triage-playbook.md`
 - “TLS cert expired / handshake fails / key mismatch” → `tls-triage-playbook.md`
 - “apt/dnf broken / locks / half-installed / deps” → `package-repair-playbook.md`
 - “User can’t login / sudo broken / SSH auth fails” → `account-access-playbook.md`
 - “Git state wrong / detached HEAD / undo commit” → `git-recovery-playbook.md`
+- “Containers fail / runtime broken / image pull issues” → `container-runtime-triage-playbook.md`
 
 ---
 
@@ -102,55 +105,97 @@ Recommended order for a given incident class:
 
 Operator objective:
 
-- Use playbooks as **decision trees**, not as “reading material”
+- Use playbooks as **decision trees**, not reading material
 - Execute, verify, and persist safely
-- Avoid domain-hopping and “try random fixes” behavior
+- Avoid domain-hopping and random fixes
 
 ---
 
 ## 🔁 Failure Scenario → Playbook Map (Coverage Audit)
 
-This map ensures every existing failure scenario has a corresponding operator algorithm.
+This map ensures every failure scenario has a corresponding operator algorithm.
 
-### Existing failure scenarios
+### Scenario 1 — Slow system
 
 - `linux/LFCS-training/failure-scenarios/scenario-1-system-feels-slow.md`
   - Primary: `linux/LFCS-training/execution-playbooks/process-control-playbook.md`
-  - Secondary: `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md` (if I/O or disk pressure signals appear)
+  - Secondary: `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md` (if I/O wait, disk pressure, inode pressure)
   - Secondary: `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md` (if a specific service is the offender)
+
+### Scenario 2 — Disk full
 
 - `linux/LFCS-training/failure-scenarios/scenario-2-disk-is-full.md`
   - Primary: `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md`
-  - Secondary: `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md` (if service fails due to disk/log growth)
+  - Secondary: `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md` (if services fail due to log growth / write failures)
+
+### Scenario 3 — Service down
 
 - `linux/LFCS-training/failure-scenarios/scenario-3-service-is-down.md`
   - Primary: `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md`
   - Secondary: `linux/LFCS-training/execution-playbooks/network-diagnosis-playbook.md` (if “down” is actually reachability)
-  - Secondary: `linux/LFCS-training/execution-playbooks/security-triage-playbook.md` (if permissions/SELinux block startup)
+  - Secondary: `linux/LFCS-training/execution-playbooks/security-triage-playbook.md` (if permissions/SELinux blocks startup)
+
+### Scenario 4 — Process won’t die
 
 - `linux/LFCS-training/failure-scenarios/scenario-4-process-wont-die.md`
   - Primary: `linux/LFCS-training/execution-playbooks/process-control-playbook.md`
+  - Secondary: `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md` (if D-state indicates storage/I/O wedged)
+
+### Scenario 5 — CPU pegged
 
 - `linux/LFCS-training/failure-scenarios/scenario-5-cpu-pegged.md`
   - Primary: `linux/LFCS-training/execution-playbooks/process-control-playbook.md`
 
+### Scenario 6 — Memory pressure
+
 - `linux/LFCS-training/failure-scenarios/scenario-6-memory-pressure.md`
   - Primary: `linux/LFCS-training/execution-playbooks/process-control-playbook.md`
-  - Secondary: `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md` (if swap/disk I/O contributes to pressure)
+  - Secondary: `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md` (if swap/disk I/O contributes to thrash)
 
----
+### Scenario 7 — Can’t SSH / lost access
 
-## 🧪 Gap Notes (Optional Backlog for Future Scenarios)
+- `linux/LFCS-training/failure-scenarios/scenario-7-cant-ssh-lost-access.md`
+  - Primary: `linux/LFCS-training/execution-playbooks/account-access-playbook.md`
+  - Secondary: `linux/LFCS-training/execution-playbooks/network-diagnosis-playbook.md` (if it’s reachability/DNS)
+  - Secondary: `linux/LFCS-training/execution-playbooks/security-triage-playbook.md` (keys, perms, MAC/DAC blocks)
+  - Secondary: `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md` (if sshd is down)
 
-No new scenarios are required to proceed, but adding these later improves coverage validation:
+### Scenario 8 — DNS resolution failing
 
-- SSH / sudo / locked account failure → `account-access-playbook.md`
-- DNS broken / routing misconfig → `network-diagnosis-playbook.md`
-- Package manager broken / dependency block → `package-repair-playbook.md`
-- SELinux denial breaks service → `security-triage-playbook.md` + `service-recovery-playbook.md`
-- Expired/invalid TLS cert breaks service → `tls-triage-playbook.md`
-- Filesystem won’t mount / wrong UUID → `storage-recovery-playbook.md`
-- Detached HEAD / bad commit recovery → `git-recovery-playbook.md`
+- `linux/LFCS-training/failure-scenarios/scenario-8-dns-resolution-failing.md`
+  - Primary: `linux/LFCS-training/execution-playbooks/network-diagnosis-playbook.md`
+  - Secondary: `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md` (if local resolver service is failing)
+
+### Scenario 9 — Package manager locked or broken
+
+- `linux/LFCS-training/failure-scenarios/scenario-9-package-manager-broken.md`
+  - Primary: `linux/LFCS-training/execution-playbooks/package-repair-playbook.md`
+  - Secondary: `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md` (if failures are driven by disk full / RO filesystem)
+
+### Scenario 10 — TLS/cert failures
+
+- `linux/LFCS-training/failure-scenarios/scenario-10-tls-certificate-failure.md`
+  - Primary: `linux/LFCS-training/execution-playbooks/tls-triage-playbook.md`
+  - Secondary: `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md` (if the service is failing to start/reload)
+  - Secondary: `linux/LFCS-training/execution-playbooks/network-diagnosis-playbook.md` (if reachability masks as TLS failure)
+
+### Scenario 11 — SELinux denial breaks service
+
+- `linux/LFCS-training/failure-scenarios/scenario-11-selinux-denial-breaks-service.md`
+  - Primary: `linux/LFCS-training/execution-playbooks/security-triage-playbook.md`
+  - Secondary: `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md` (service lifecycle after security fix)
+
+### Scenario 12 — Filesystem won’t mount / wrong UUID
+
+- `linux/LFCS-training/failure-scenarios/scenario-12-filesystem-wont-mount.md`
+  - Primary: `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md`
+
+### Scenario 13 — System won’t boot
+
+- `linux/LFCS-training/failure-scenarios/scenario-13-system-wont-boot.md`
+  - Primary: `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md`
+  - Secondary: `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md` (if critical units fail post-mount fix)
+  - Secondary: `linux/LFCS-training/execution-playbooks/security-triage-playbook.md` (if policy blocks critical boot services)
 
 ---
 
@@ -158,22 +203,23 @@ No new scenarios are required to proceed, but adding these later improves covera
 
 These playbooks:
 
-- Are **operator algorithms** (diagnosis sequences + remediation patterns)
-- Are **strategic and flow-controlling**, not step-by-step command lists
-- Contain **decision points**, **verification steps**, and **rollback paths**
-- Compose drills and (future) runbooks, but do **not** replace them
+- are operator algorithms (diagnosis sequences + remediation patterns)
+- are strategic and flow-controlling, not command reference lists
+- contain decision points, verification steps, and rollback paths
+- compose drills and (future) runbooks, but do not replace them
 
 These playbooks are not:
 
 - tutorials
-- command references
+- command reference pages
 - scenario narratives
-- runbooks
+- task runbooks
 
 ---
 
 ## 🧠 Core Operator Rule
 
 > **Stabilize → Identify → Execute → Verify → Persist → Rollback if needed.**  
-> **Never skip a step.**
+> **Never skip classification.**
 
+---
