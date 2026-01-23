@@ -1,20 +1,28 @@
-# 🧪 LFCS Practice Questions — kai-memory-palace
+# 🧭 LFCS Training System — kai-memory-palace
 
-This directory is a **purpose-built training environment** for the  
+**Path:** `linux/LFCS-training/README.md`
+
+This directory is a **purpose-built, professional-grade training system** for the  
 **Linux Foundation Certified System Administrator (LFCS)** exam.
 
-It is not a collection of notes.  
-It is a **hands-on, execution-and-diagnosis training system**.
+It is not a notes folder.  
+It is not a tutorial collection.  
+It is a **multi-layer competence engine** designed to train you to:
+
+- operate Linux systems safely
+- diagnose failures under pressure
+- recover systems using correct procedures
+- and pass the LFCS exam by **execution, not guessing**
 
 ---
 
-## 🧠 Training Philosophy
+## 🧠 Core Philosophy
 
 LFCS does not test:
 
-- Memorization
-- Trivia
-- Multiple choice knowledge
+- memorization
+- trivia
+- multiple choice knowledge
 
 LFCS tests:
 
@@ -22,33 +30,44 @@ LFCS tests:
 - Can you **fix a broken system**
 - Can you **prove the system is healthy again**
 
-Accordingly, this directory is split into **two complementary training modes**:
+This training system is therefore built around **operator behavior**, not study notes.
 
 ---
 
-## 🧱 1) Execution Drills (`execution-drills/`)
+## 🧱 The Four-Layer Training Architecture
 
-Mental mode: **Muscle memory and speed**
+This wing is intentionally split into **four layers**, each training a different mental mode:
 
-These are:
+### 1) Training Progression (`training-progression/`)
 
-- Step-by-step **procedural drills**
-- Focused on **what to type**
-- Designed to be repeated until actions are automatic
+Mental mode: **Curriculum, order, and gates**
 
-They answer the question:
+- Contains the **Building Blocks**
+- Defines:
+  - what you must master
+  - in what order
+  - and what “done” means
+- You may not advance without passing exit criteria
 
-> “What commands do I run to perform this task?”
+Entry points:
 
-Examples of what you train here:
+    training-progression/README.md
+    training-progression/index.md
+    training-progression/LFCS-training-progression-guide.md
 
-- Storage (mounts, fstab, LVM, RAID, LUKS, quotas, autofs)
-- Networking (IP, routing, firewall, packet filtering, time sync)
-- Users and permissions (users, groups, ACLs, sudo)
-- Services and logs (systemd, journalctl, boot behavior)
-- Service configuration (DNS, web, proxy, mail, DB, SSH)
-- Containers and virtualization
-- Security and SELinux
+---
+
+### 2) Execution Drills (`execution-drills/`)
+
+Mental mode: **Muscle memory and mechanical fluency**
+
+- Procedural drills
+- Repeated until actions are automatic
+- No narrative, no diagnosis, no strategy
+
+They answer:
+
+> “What do I type to perform this task?”
 
 Entry point:
 
@@ -56,28 +75,36 @@ Entry point:
 
 ---
 
-## 🧯 2) Failure Scenarios (`failure-scenarios/`)
+### 3) Execution Playbooks (`execution-playbooks/`)
 
-Mental mode: **Diagnosis, recovery, and proof**
+Mental mode: **Operator algorithms and decision trees**
 
-These are:
+- Step-by-step diagnosis and recovery procedures
+- Evidence-first
+- Verification and rollback built in
+- Compose drills into **safe operational flows**
 
-- Scenario-driven **incident response drills**
-- Focused on **what to check first and why**
-- Designed to train **calm, methodical troubleshooting**
+They answer:
 
-They answer the question:
+> “Given this class of problem, what is the correct algorithm?”
 
-> “The system is broken. What do I do now?”
+Entry point:
 
-Examples of what you train here:
+    execution-playbooks/index.md
 
-- System feels slow
-- Disk is full
-- Service is down
-- Process won’t die
-- CPU is pegged
-- Memory pressure / OOM
+---
+
+### 4) Failure Scenarios (`failure-scenarios/`)
+
+Mental mode: **Judgment under pressure**
+
+- Scenario-driven incidents
+- Start from symptoms
+- Force classification and playbook selection
+
+They answer:
+
+> “The system is already broken. What do I do now?”
 
 Entry point:
 
@@ -85,83 +112,80 @@ Entry point:
 
 ---
 
-## 🗺️ How This Maps to the LFCS Exam
+## 📜 Governance and Rules
 
-LFCS domains include:
+The **constitution** of this entire system lives here:
 
-- Essential Commands
-- Operation of Running Systems
-- User and Group Management
-- Networking
-- Service Configuration
-- Storage Management
+    guiding-principles.md
 
-This directory covers **all of them** via:
+You should read it. It defines:
 
-- Execution drills → how to build and configure
-- Failure scenarios → how to diagnose and recover
-
-Together, they simulate **real exam conditions**.
+- the no-sprawl rule
+- the gate discipline
+- the drills vs playbooks vs scenarios separation
+- the operator-first philosophy
 
 ---
 
-## 🏃 How to Use This Directory
+## 🧪 How You Actually Train
 
-### Daily training
+### The canonical training loop (per Building Block):
 
-- Pick **one execution drill file**
-- Run it top to bottom **by typing commands**
-- Do not copy/paste
-
-### Diagnostic training
-
-- Pick **one failure scenario**
-- Solve it **without jumping to the fix**
-- Always:
-  - Inspect
-  - Hypothesize
-  - Fix
-  - Prove
-
-### Mock exam mode
-
-- Randomly choose:
-  - 2 execution drills
-  - 1 failure scenario
-- Do them cold and timed
+1) Run the linked **execution drills** until mechanics are automatic  
+2) Run the linked **execution playbook** end-to-end  
+3) Run the linked **failure scenarios** as timed break/fix exercises  
+4) If you fail the gate, you **do not advance**
 
 ---
 
-## 🎯 When You Are Ready for the Exam
+### Daily practice loop:
 
-You are ready when:
+1) Pick one failure scenario
+2) Classify the problem out loud
+3) Choose the playbook
+4) Execute the algorithm
+5) Verify recovery
 
-- You can run **any execution drill cold**
-- You never panic at broken systems
-- You always start by **measuring, not guessing**
-- You can explain **why** a fix works
-- You rarely need to look anything up
+Then:
 
----
-
-## 🧱 Design Principles
-
-- One file = one training surface
-- No diaries
-- No notes
-- No fluff
-- Everything here is **executable skill**
+1) Pick one execution-drill file
+2) Run 5–10 tasks
+3) Note what is slow or error-prone
+4) Drill those again tomorrow
 
 ---
 
-## 📁 Directory Structure
+## 🏁 Graduation Standard
+
+You are ready for LFCS when:
+
+- Failure scenarios feel boring and mechanical
+- Playbooks feel obvious
+- Execution drills are muscle memory
+- You stop exploring and start **operating**
+
+At that point:
+
+The exam is execution, not discovery.
+
+---
+
+## 📁 Directory Map
 
     LFCS-training/
-    ├── execution-drills/
-    │   └── index.md
-    ├── failure-scenarios/
-    │   └── index.md
+    ├── README.md
+    ├── index.md
     ├── guiding-principles.md
-    └── README.md
+    ├── training-progression/
+    ├── execution-drills/
+    ├── execution-playbooks/
+    └── failure-scenarios/
 
 ---
+
+## 🧠 Final Note
+
+This is not a study guide.
+
+This is a **system for producing an operator**.
+
