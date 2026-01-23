@@ -1,15 +1,56 @@
 # 🧭 Execution Playbooks — Index (LFCS)
 
 **Path:** `linux/LFCS-training/execution-playbooks/index.md`  
-**Purpose:** Provide a **fast operator navigation surface** for the LFCS execution-playbooks layer.
+**Purpose:** Provide a **fast operator navigation surface** for the LFCS **playbook layer**.
 
-This directory contains **exam-style operator algorithms** that compose:
+This directory contains **exam-style operator playbooks** that compose:
 
-- `linux/LFCS-training/execution-drills/` (muscle memory)
-- `linux/LFCS-training/failure-scenarios/` (practice cases)
+- `linux/LFCS-training/execution-drills/` (muscle memory layer)
+- `linux/LFCS-training/failure-scenarios/` (integration & practice cases)
 
 Execution playbooks are the **algorithm layer**:
-observe → isolate → decide → correct → verify → persist → rollback.
+
+> observe → isolate → decide → correct → verify → persist → rollback
+
+---
+
+## 🧠 Where This Fits in the LFCS Training System
+
+The LFCS system is intentionally built in **four layers**:
+
+1) **Building Blocks** — mental models, invariants, gates  
+2) **Execution Drills** — muscle memory and command fluency  
+   - See: `linux/LFCS-training/execution-drills/README.md`
+3) **Execution Playbooks** — **decision and flow-control algorithms** (this directory)
+4) **Failure Scenarios** — exam-style break/fix integration tests
+
+In other words:
+
+- **Drills** teach you *how to type*  
+- **Playbooks** teach you *how to think and route problems*  
+- **Scenarios** test whether you can do both under pressure  
+
+---
+
+## 📘 Playbooks vs Runbooks (Important Distinction)
+
+These files are **playbooks, not runbooks**.
+
+- **Playbook** = strategic, diagnostic, flow-control algorithm  
+  - Chooses *what to do next*
+  - Routes between domains
+  - Enforces safe order of operations
+  - Always includes verification and rollback logic
+
+- **Runbook** = tactical, step-by-step procedure for **one specific task**  
+  - (e.g., “exact steps to rotate a cert”, “exact steps to rebuild initramfs”)
+
+This repository currently emphasizes:
+
+> ✅ Playbooks = **how to decide and recover**  
+> ✅ Drills = **how to execute mechanics**  
+
+If ultra-tactical runbooks are added later, **playbooks will call them** — not replace them.
 
 ---
 
@@ -55,14 +96,15 @@ Use this when the prompt is vague.
 
 Recommended order for a given incident class:
 
-1) Run the relevant drill surface(s) until mechanics are automatic  
-2) Run the relevant execution playbook end-to-end as a timed operator algorithm  
-3) Run the relevant failure scenario(s) as a timed break/fix exercise
+1) Run the relevant **execution drill surface(s)** until mechanics are automatic  
+2) Run the relevant **execution playbook** end-to-end as a timed operator algorithm  
+3) Run the relevant **failure scenario(s)** as a timed break/fix exercise
 
 Operator objective:
 
 - Use playbooks as **decision trees**, not as “reading material”
 - Execute, verify, and persist safely
+- Avoid domain-hopping and “try random fixes” behavior
 
 ---
 
@@ -117,14 +159,21 @@ No new scenarios are required to proceed, but adding these later improves covera
 These playbooks:
 
 - Are **operator algorithms** (diagnosis sequences + remediation patterns)
+- Are **strategic and flow-controlling**, not step-by-step command lists
 - Contain **decision points**, **verification steps**, and **rollback paths**
-- Compose drills, but do **not** replace drills
+- Compose drills and (future) runbooks, but do **not** replace them
 
 These playbooks are not:
 
 - tutorials
 - command references
 - scenario narratives
+- runbooks
 
 ---
+
+## 🧠 Core Operator Rule
+
+> **Stabilize → Identify → Execute → Verify → Persist → Rollback if needed.**  
+> **Never skip a step.**
 
