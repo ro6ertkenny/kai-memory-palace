@@ -2,9 +2,11 @@
 
 **Path:** `linux/LFCS-training/README.md`
 
-This directory is a **purpose-built training system** for the  
+This directory is a **purpose-built, professional-grade training system** for the  
 **Linux Foundation Certified System Administrator (LFCS)** exam.
 
+It is not a notes folder.  
+It is not a tutorial collection.  
 It is a **multi-layer competence engine** designed to train you to:
 
 - operate Linux systems safely
@@ -182,13 +184,15 @@ Every training day:
 
 2) Pick **one scenario** (random or rotating)
 
-3) Solve it **from memory** using:
+3) Use it to **classify the failure** and select the correct playbook from:
 
        linux/LFCS-training/execution-playbooks/
 
-4) Verify using the scenario’s **proof ritual**
+4) Run that **playbook end-to-end as the algorithm**
 
-5) Then run **20–30 minutes of drills** from:
+5) Verify using the scenario’s **proof ritual**
+
+6) Then run **20–30 minutes of drills** from:
 
        linux/LFCS-training/execution-drills/
 
@@ -216,11 +220,16 @@ That is the entire system.
 2) 🚨 Main Event (20–40 min)
    - Pick **one failure scenario**
    - Timebox yourself
-   - Inspect → classify → choose playbook → fix → verify
+   - Inspect the system
+   - **Classify the failure**
+   - **Select the correct playbook**
+   - **Execute the playbook end-to-end**
+   - Verify using the scenario’s proof ritual
 
 3) 🧾 After-Action (5–10 min)
    - Write down:
      - what signal told you what class of failure it was
+     - what playbook you used and why
      - what you hesitated on
      - what to drill tomorrow
 
@@ -238,6 +247,22 @@ A scenario is **not complete** until:
   - why
   - how you knew what class of problem it was
   - why your fix was minimal and safe
+
+---
+
+## 🛑 Build Freeze Rule
+
+Once bootcamp starts:
+
+> ❗ **No new docs. No refactors. No reorganizing.**
+
+Only allowed changes:
+
+- Fixing **incorrect commands**
+- Fixing **broken procedures**
+- Clarifying **ambiguous steps**
+
+If you keep building, you are **not training**.
 
 ---
 
