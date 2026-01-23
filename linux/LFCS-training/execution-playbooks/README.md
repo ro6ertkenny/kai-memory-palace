@@ -1,211 +1,202 @@
-# 🧠 Execution Playbooks — Algorithmic Operations System
+# 🧠 Execution Playbooks — README (LFCS)
 
 **Path:** `linux/LFCS-training/execution-playbooks/`
 
+Mental mode: **Route fast → Run the right algorithm → Verify hard**  
+Purpose: Provide **exam-ready operator algorithms** for diagnosis and recovery across LFCS domains.
+
 ---
 
-## 📌 Purpose
+## 📌 What This Directory Is
 
-This directory contains **domain-level operational algorithms** for Linux system administration.
+This directory contains **domain-level operational algorithms**.
 
-These documents are intentionally called **playbooks**, but they are **not** orchestration-only guides and they are **not** shallow, app-specific runbooks.
+Each file here is a **playbook** in the strict sense:
 
-They are:
+> **measure → classify → isolate → correct → verify → persist → rollback**
 
-> **Full-spectrum operational algorithms** that combine:
-> - classification
-> - diagnosis
-> - ordered execution
-> - safety constraints
-> - verification gates
-
-They are designed to be:
+These are designed to be:
 
 - usable during **real incidents**
 - usable during **exam conditions**
 - transferable across **any Linux system**
-- and to **teach reasoning**, not memorization
+- and to train **operator behavior**, not memorization
 
 ---
 
-## 🧱 Important Terminology (Industry vs This System)
+## ✅ What These Playbooks Contain (Contract)
 
-In many organizations:
+Every playbook must include:
 
-- **Runbook** = narrow, step-by-step recipe for a specific task  
-  (“How to restart nginx”, “How to rotate certs”)
+- **Scope** (when to use it)
+- **Inputs** (what you must know/determine)
+- **Operator Contract** (the mandatory order of operations)
+- **Evidence-first steps**
+- **Decision points** (routing logic)
+- **Minimal corrective actions**
+- **Verification gates**
+- **Persistence check**
+- **Rollback strategy**
+- **Links to composing drills**
+- **Links to relevant failure scenarios (when they exist)**
 
-- **Playbook** = high-level orchestration and coordination guide  
-  (“How we handle incidents”, “Who does what in an outage”)
-
-That split usually produces:
-
-- hundreds of brittle, app-specific docs
-- shallow copy/paste procedures
-- little real operator skill growth
-- and poor performance under novel failures
-
----
-
-## 🎯 This System’s Design (Deliberate and Different)
-
-In **this repository**:
-
-> Each document in `execution-playbooks/` is a **domain algorithm**.
-
-It simultaneously serves the role of:
-
-- a **playbook** (decides *which path to take*)
-- and a **runbook** (tells you *exactly what to do*)
-
-Each playbook:
-
-- starts with **classification**
-- proceeds through **ordered diagnostic steps**
-- includes **concrete commands**
-- enforces **safety rules**
-- requires **verification before and after**
-- ends in a **known-good state**
-
-Examples:
-
-- `storage-recovery-playbook.md`
-- `network-diagnosis-playbook.md`
-- `security-triage-playbook.md`
-- `process-control-playbook.md`
-- `service-recovery-playbook.md`
-- `package-repair-playbook.md`
-- `tls-triage-playbook.md`
-- `git-recovery-playbook.md`
-
-These are **not** app recipes.
-
-They are **operator algorithms**.
+If any of the above is missing, the playbook is incomplete.
 
 ---
 
-## 🧠 Why There Is NO Separate “Runbooks” Directory
+## 🚫 What This Directory Is NOT
 
-Classic model:
+These files are **not**:
 
-- Playbook: “If disk full, run disk cleanup runbook”
-- Runbook: “Step 1: du, Step 2: rm logs, Step 3: …”
+- Tutorials
+- Command reference pages
+- Scenario narratives
+- App-specific “how to restart X” notes
+- Trial-and-error debugging diaries
 
-In this system:
+Those belong elsewhere:
 
-- `storage-recovery-playbook.md` already contains:
-  - classification (is it really full? wrong mount? readonly?)
-  - inspection steps
-  - safe deletion rules
-  - mount verification
-  - fstab safety testing
-  - step-by-step execution
-  - verification gates
-
-So:
-
-> The **runbook is embedded inside the playbook**, along with the reasoning.
-
-This produces:
-
-- fewer documents
-- higher quality documents
-- better skill transfer
-- better exam performance
-- better real-world operator behavior
+- Mechanics / command fluency → `execution-drills/`
+- Integration + pressure testing → `failure-scenarios/`
+- Gates + progression rules → `training-progression/`
 
 ---
 
-## 🧪 Relationship to Failure Scenarios
+## 📘 Playbooks vs Runbooks (Operational Definition)
 
-`linux/LFCS-training/failure-scenarios/` are:
+In many orgs:
 
-> The **inputs** to these playbooks.
+- Runbook = narrow procedure
+- Playbook = coordination / orchestration document
 
-They exist to train:
+In **this repo**:
 
-1. Symptom reading
-2. Domain classification
-3. Correct playbook selection
-4. Calm, algorithmic execution
+> Playbook = **operator algorithm** (with concrete commands + routing + gates)
 
-They replace the “incident type” layer found in enterprise playbooks.
+If ultra-tactical runbooks are ever added later, playbooks will **call them** — not replace them.
 
 ---
 
-## 🧱 Relationship to Building Blocks
+## 🧭 The Router Surface (Start Here)
 
-`linux/LFCS-training/training-progression/building-block-*.md` are:
+Do not guess which playbook to run.
 
-> **Training gates**, not runbooks.
+The router is:
 
-They define:
+- `linux/LFCS-training/execution-playbooks/index.md`
 
-- which skills must exist
-- before you are allowed to rely on a playbook under pressure
+Rule:
 
-They ensure:
-
-- you are not executing blindly
-- you understand what the commands mean
-- you can reason, not just follow steps
+> If the prompt is vague, start at **index.md**, choose the incident class, then run the selected playbook end-to-end.
 
 ---
 
-## 🏛️ Design Philosophy
+## 🔁 How This Fits Into the LFCS Training System
 
-> **Train operators, not button-pressers.**  
-> **Teach algorithms, not recipes.**  
-> **Prefer reasoning over memorization.**  
-> **Prefer domain thinking over app trivia.**
+The LFCS system has **four layers**:
 
----
+1) Training Progression (Building Blocks)  
+2) Execution Drills (mechanics)  
+3) Execution Playbooks (this directory)  
+4) Failure Scenarios (integration)
 
-## 🧠 What Mastery Looks Like
+Relationship:
 
-You have mastered a playbook when:
-
-- You can follow it **without surprises**
-- You understand **why each step exists**
-- You can detect when the system is lying to you
-- You can explain **why the fix worked**
-- You can apply the same algorithm to a new system
+- Drills teach **how to type**
+- Playbooks teach **how to route and recover**
+- Scenarios test whether you can do both under pressure
 
 ---
 
-## ⚠️ What This System Explicitly Avoids
-
-- App-specific “how to restart X” documents
-- Shallow copy/paste procedures
-- Orchestration-only docs with no commands
-- Trial-and-error operations
-- “Just try stuff and see” debugging
+# 🚀 How To Use This Directory (Operationally)
 
 ---
 
-## 🏁 Final Rule
+## ⏱️ The 15–30 Minute Daily Rule
 
-> **These playbooks are operational algorithms.  
-> Follow them exactly until you no longer need them.**
+Every training day:
 
-At that point, the algorithm should exist in your head.
+1) Run **one playbook** end-to-end (timed)
+2) Verify hard (no “seems fine”)
+3) Log what slowed you down (then drill it tomorrow)
+
+This keeps the algorithm layer fresh.
+
+---
+
+## 🧪 The Canonical Playbook Run (Non-Negotiable)
+
+When you run a playbook (even for practice), you must do this:
+
+1) State the **symptom**
+2) State the **incident class**
+3) State the **chosen playbook**
+4) Follow the playbook order exactly:
+   - measure
+   - classify
+   - isolate
+   - correct minimally
+   - verify
+   - persist
+   - rollback plan
+5) End with a **proof ritual** (see below)
+
+---
+
+## ✅ Proof Ritual (Do Not Skip)
+
+A playbook run is complete only when you can prove:
+
+- the original failure is gone
+- there are no new errors introduced
+- the fix is **minimal**
+- the change is **persistent** (or deliberately temporary)
+- you can explain:
+  - DAC vs MAC
+  - network vs service
+  - disk vs inode vs RO
+  - package state vs repo state
+  - config vs runtime
+
+If you cannot explain the classification, you did not run the playbook correctly.
+
+---
+
+## ✅ What “Pass” Looks Like
+
+You have “passed” a playbook when:
+
+- you follow it without skipping steps
+- you do not domain-hop
+- you reach a verified known-good state
+- you can explain the classification and evidence
+- you can do it again under a tighter timebox
+
+---
+
+## 🛑 Build Freeze Rule (During Bootcamp)
+
+Once you are actively prepping for LFCS:
+
+> ❗ Do not rewrite playbooks unless they are wrong.
+
+Only allowed edits:
+
+- fix incorrect commands
+- fix broken logic
+- add missing links to drills/scenarios
+- tighten verification / rollback gates
+
+If you keep polishing, you are not training.
+
+---
+
+## 🧠 Bottom Line
+
+> These playbooks are operational algorithms.  
+> Follow them exactly until the algorithm exists in your head.
 
 That is the goal.
 
 ---
-
-## 📍 Scope Note (LFCS)
-
-These playbooks are written to:
-
-- cover **LFCS exam domains**
-- but also represent **real operator behavior**
-- and remain valid outside the exam context
-
-They are not exam hacks.
-
-They are **how systems should be operated**.
-
----
-
 
