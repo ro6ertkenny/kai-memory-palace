@@ -1,31 +1,53 @@
 # 🌐 Network Diagnosis Playbook (LFCS)
 
 **Path:** `linux/LFCS-training/execution-playbooks/network-diagnosis-playbook.md`  
-**Purpose:** Restore **basic connectivity and service reachability** using a **safe, exam-ready operator algorithm**.
+Mental mode: **Measure → Classify → Isolate by Layer → Fix → Verify → Persist**  
+Purpose: Restore **basic connectivity and service reachability** using a **safe, exam-grade operator algorithm**.
 
-This is not a tutorial. This is a procedure.
+This is **not** a tutorial.  
+This is a **live-system diagnosis and recovery playbook**.
 
 ---
 
-## 🎯 Scope
+## 🧠 When To Use This Playbook
 
 Use this playbook when:
 
-- Host has **no network**
-- Cannot reach **gateway / DNS / internet**
+- The host has **no network connectivity**
+- The host cannot reach **gateway, DNS, or internet**
 - Clients cannot reach a service
-- Service is running but **not reachable**
-- Interface is **down / misconfigured**
+- A service is running but **not reachable**
+- An interface is **down or misconfigured**
 
-This playbook composes the following drill surfaces:
+Do **not** use this playbook if the **first evidence** points to:
+
+- service not running → `service-recovery-playbook.md`
+- disk, mount, or boot failure → `storage-recovery-playbook.md`
+- process storm or local resource collapse → `process-control-playbook.md`
+- SELinux / policy as primary root cause → `security-triage-playbook.md`
+
+---
+
+## 🧭 Scenarios That Validate This Playbook
+
+This playbook is exercised by:
+
+- `linux/LFCS-training/failure-scenarios/scenario-3-service-is-down.md` (when root cause is reachability)
+- `linux/LFCS-training/failure-scenarios/scenario-8-dns-resolution-failing.md`
+
+If you cannot solve those scenarios **cleanly and repeatably**, this playbook is not yet fluent.
+
+---
+
+## 🧪 Drills Required For Fluency
+
+You should be mechanically fluent with:
 
 - `linux/LFCS-training/execution-drills/networking.md`
 - `linux/LFCS-training/execution-drills/services-and-logging.md`
 - `linux/LFCS-training/execution-drills/essential-commands.md`
 
-Related scenario (practice input):
-
-- `linux/LFCS-training/failure-scenarios/scenario-3-service-is-down.md`
+This playbook is a **composition layer**, not a source of primitives.
 
 ---
 
@@ -33,252 +55,244 @@ Related scenario (practice input):
 
 Always proceed in this order:
 
-1. **Observe**
-2. **Establish local stack health**
-3. **Establish L3 connectivity**
-4. **Establish DNS**
-5. **Establish service reachability**
-6. **Correct**
-7. **Verify**
-8. **Make persistent**
-9. **Rollback if needed**
+1. Observe
+2. Establish local stack health (link, IP, route)
+3. Establish L3 reachability
+4. Establish DNS
+5. Establish service reachability
+6. Correct
+7. Verify
+8. Make persistent
+9. Roll back if needed
 
-Never assume “it’s the firewall” first.
+> **Never assume “it’s the firewall” first.**
 
 ---
 
 ## 🧭 Global Safety Rules
 
-- **Preserve evidence first.** Observe before changing config or flushing rules.
-- **Test by layer:** link → IP → route → gateway → external IP → DNS → service.
-- **Prefer minimal, reversible changes.**
-- **Avoid destructive firewall tests.** Only do temporary flushes if explicitly safe.
-- **Every action requires verification.**
+- Preserve evidence first.
+- Test **by layer**: link → IP → route → gateway → external IP → DNS → service.
+- Prefer minimal, reversible changes.
+- Avoid destructive firewall tests.
+- Every action requires verification.
 
 ---
 
-## 0) Inputs
-
-You must know or determine:
-
-- Target host or service
-- Expected behavior:
-  - Should it have internet?
-  - Should it serve traffic?
-  - On which port?
-
----
-
-## 1) Observe Current State (No Changes)
+## 🧪 Phase 1 — Observe Current State (No Changes)
 
 Interfaces and addresses:
 
-    ip a
+  ip a  
 
 Link state:
 
-    ip link
+  ip link  
 
 Routes:
 
-    ip route
+  ip route  
 
 DNS config:
 
-    cat /etc/resolv.conf
+  cat /etc/resolv.conf  
 
-Branch:
+Decision gate:
 
-- If **no interface has an IP** → go to **Section 2**
-- If **has IP but no default route** → go to **Section 3**
-- If **has IP + route but can’t reach outside** → go to **Section 4**
-- If **host has connectivity but service unreachable** → go to **Section 7**
+- If **no interface has an IP** → Bucket A
+- If **has IP but no default route** → Bucket B
+- If **has IP + route but can’t reach outside** → Bucket C
+- If **host has connectivity but service unreachable** → Bucket D
 
 ---
 
-## 2) Interface Has No IP
+## 🧭 Classification Buckets
+
+A) Interface has no IP  
+B) No default route  
+C) L3 connectivity failure  
+D) DNS failure  
+E) Service reachability failure  
+F) Not actually a network problem (exit playbook)
+
+---
+
+## 🧪 Phase 2 — Bucket A: Interface Has No IP
 
 Confirm interface is up:
 
-    ip link
+  ip link  
 
 Bring it up:
 
-    ip link set <iface> up
+  ip link set <iface> up  
 
-If using DHCP, request a lease (if available):
+If using DHCP:
 
-    dhclient <iface>
+  dhclient <iface>  
 
 Re-check:
 
-    ip a
+  ip a  
 
 If still no IP:
 
-- Check distro-specific network configuration (do not guess).
-- Return to **Section 1** after making a single change.
+- Check distro-specific network configuration
+- Make **one** change at a time
+- Return to Phase 1
 
 ---
 
-## 3) No Default Route
+## 🧪 Phase 3 — Bucket B: No Default Route
 
-Confirm routes:
+Confirm:
 
-    ip route
+  ip route  
 
-Add a temporary default route (only if you know the gateway is correct):
+Add temporary route (only if you know gateway is correct):
 
-    ip route add default via <gateway>
+  ip route add default via <gateway>  
 
 Verify:
 
-    ip route
-    ping -c 3 <gateway>
+  ip route  
+  ping -c 3 <gateway>  
 
 If it works:
 
-- Fix persistent network configuration.
-- Go to **Section 8**.
+- Fix persistent configuration
+- Go to Phase 8
 
-If it does not work:
+If not:
 
-- Remove the temporary route:
+  ip route del default  
 
-    ip route del default
-
-Return to **Section 1**.
+Return to Phase 1
 
 ---
 
-## 4) Test Layer 3 Connectivity
+## 🧪 Phase 4 — Bucket C: Test Layer 3 Connectivity
 
 Ping gateway:
 
-    ping -c 3 <gateway>
+  ping -c 3 <gateway>  
 
-Ping an external IP:
+Ping external IP:
 
-    ping -c 3 8.8.8.8
+  ping -c 3 8.8.8.8  
 
-Branch:
+Decision:
 
-- If **can’t reach gateway** → go back to **Section 2/3**
-- If **can reach external IP but not domains** → go to **Section 5**
-- If **can’t reach external IP** → go to **Section 6**
+- If **can’t reach gateway** → back to Buckets A/B
+- If **can reach external IP but not domains** → Bucket D (DNS)
+- If **can’t reach external IP** → inspect firewall or upstream routing
 
 ---
 
-## 5) DNS Check
+## 🧪 Phase 5 — Bucket D: DNS Failure
 
-Test resolution using system resolver:
+Test resolver:
 
-    getent hosts google.com
+  getent hosts google.com  
 
-Optional helper if available:
+Optional:
 
-    dig google.com
+  dig google.com  
 
 If resolution fails:
 
-- Inspect and correct DNS server entries:
-
-    cat /etc/resolv.conf
-
-Re-test:
-
-    getent hosts google.com
-
-Return to **Section 4**.
+- Fix DNS servers in `/etc/resolv.conf` or system config
+- Re-test
+- Return to Phase 4
 
 ---
 
-## 6) Firewall / Policy Check (Only After L3 Fails)
+## 🧪 Phase 6 — Firewall / Policy Check (Only After L3 Fails)
 
-If you cannot reach external IP but have link + IP + route:
+Inspect rules (one may exist):
 
-Inspect firewall rules (one of these may exist):
+  iptables -L  
+  nft list ruleset  
 
-    iptables -L
-    nft list ruleset
+Prefer:
 
-Safer test approach:
-- Prefer inspecting and making a targeted change.
-- Avoid flushes unless explicitly safe.
+- targeted inspection and changes
 
-If you must temporarily flush for diagnosis (ONLY IF SAFE):
+Temporary flush **only if safe**:
 
-    iptables -F
+  iptables -F  
 
 Re-test:
 
-    ping -c 3 8.8.8.8
+  ping -c 3 8.8.8.8  
 
-If firewall was the issue:
-- Restore rules properly.
-- Do not leave the system in an unprotected state.
-- Proceed to **Section 8**.
+If firewall was cause:
+
+- Restore correct rules
+- Do not leave system exposed
 
 ---
 
-## 7) Service Reachability Check (Network OK, Service Not Reachable)
+## 🧪 Phase 7 — Bucket E: Service Reachability Failure
 
 Check listener:
 
-    ss -lntup | grep <port>
+  ss -lntup | grep <port>  
 
 Test locally:
 
-    curl localhost:<port>
+  curl localhost:<port>  
 
-Test remotely (from another host) if possible:
+Test remotely if possible:
 
-    curl <host>:<port>
+  curl <host>:<port>  
 
-Classify:
+Decision:
 
-- If **not listening** → use `service-recovery-playbook.md`
-- If **listening only on 127.0.0.1** → fix service config (then verify)
-- If **listening on 0.0.0.0 or host IP but unreachable remotely** → firewall / SELinux policy likely
+- If **not listening** → exit to `service-recovery-playbook.md`
+- If **bound only to 127.0.0.1** → fix service config
+- If **listening correctly but unreachable** → firewall or SELinux
 
 If SELinux is relevant:
 
-    getenforce
-    ausearch -m avc -ts recent
+  getenforce  
+  ausearch -m avc -ts recent || true  
 
-After correction, go to **Section 8**.
+If policy is the blocker → exit to `security-triage-playbook.md`
 
 ---
 
-## 8) Verification and Persistence Check
+## 🧪 Phase 8 — Verification Gate
 
-Verify current state:
+Verify:
 
-    ip a
-    ip route
-    ping -c 3 <gateway>
-    ping -c 3 8.8.8.8
-    getent hosts google.com
+  ip a  
+  ip route  
+  ping -c 3 <gateway>  
+  ping -c 3 8.8.8.8  
+  getent hosts google.com  
 
 If service-related:
 
-    ss -lntup | grep <port>
-    curl localhost:<port>
+  ss -lntup | grep <port>  
+  curl localhost:<port>  
 
-Persistence guidance:
-- Ensure interface config, routing, DNS, and firewall policy survive reboot.
-- Only perform reboot test if safe.
+---
 
-Reboot test (only if allowed):
+## 🧪 Phase 9 — Persistence Check
 
-    systemctl reboot
+Ensure config survives reboot.
+
+If safe and allowed:
+
+  reboot  
 
 After reboot:
 
-    ip a
-    ip route
-    ping -c 3 8.8.8.8
-    getent hosts google.com
+  ip a  
+  ip route  
+  ping -c 3 8.8.8.8  
+  getent hosts google.com  
 
 ---
 
@@ -286,13 +300,33 @@ After reboot:
 
 If a change breaks networking:
 
-- Revert the last change (one at a time).
+- Revert **only the last change**
 - Remove temporary routes:
 
-    ip route del default
+  ip route del default  
 
-- Restore firewall rules if you modified them.
-- Return to **Section 1** and re-observe.
+- Restore firewall rules if modified
+- Return to Phase 1
+
+---
+
+## 🚫 Anti-Patterns (Auto-Fail)
+
+- Testing DNS before IP
+- Flushing firewall as first move
+- Making multiple changes at once
+- Debugging service before host connectivity is proven
+
+---
+
+## 🧭 Exit Conditions
+
+Exit this playbook if you discover:
+
+- service is not running → `service-recovery-playbook.md`
+- storage or boot failure → `storage-recovery-playbook.md`
+- process/resource collapse → `process-control-playbook.md`
+- SELinux is primary cause → `security-triage-playbook.md`
 
 ---
 
@@ -314,21 +348,10 @@ You can explain:
 
 ---
 
-## 🧠 Exam Safety Rules
+## 🧠 Operator Loop (Reinforced)
 
-- Always test IP before DNS
-- Always test localhost before remote
-- Do not permanently flush firewall blindly
-- Prefer observe → isolate → fix → verify
+Symptom → Measure → Isolate by Layer → Fix → Verify → Persist
 
----
-
-## 🧱 This Playbook Composes From
-
-- networking.md
-- services-and-logging.md
-- essential-commands.md
-
-This is a **composition layer**, not a source of primitives.
+Never skip layers.
 
 ---
