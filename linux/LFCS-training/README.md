@@ -79,7 +79,7 @@ Entry point:
 
 Mental mode: **Operator algorithms and decision trees**
 
-- Step-by-step diagnosis and recovery procedures
+- Diagnosis and recovery algorithms
 - Evidence-first
 - Verification and rollback built in
 - Compose drills into **safe operational flows**
@@ -127,9 +127,35 @@ You should read it. It defines:
 
 ---
 
-## 🧪 How You Actually Train
+# 🚀 How To Use This System (The Only Way That Counts)
 
-### The canonical training loop (per Building Block):
+---
+
+## ⏱️ The 60-Second “What Do I Do Today?” Rule
+
+Every training day:
+
+1) Open:
+   
+       linux/LFCS-training/failure-scenarios/index.md
+
+2) Pick **one scenario** (random or rotating)
+
+3) Solve it **from memory** using:
+
+       linux/LFCS-training/execution-playbooks/
+
+4) Verify using the scenario’s **proof ritual**
+
+5) Then run **20–30 minutes of drills** from:
+
+       linux/LFCS-training/execution-drills/
+
+That is the entire system.
+
+---
+
+## 🔁 The Canonical Training Loop (Per Skill Area)
 
 1) Run the linked **execution drills** until mechanics are automatic  
 2) Run the linked **execution playbook** end-to-end  
@@ -138,20 +164,55 @@ You should read it. It defines:
 
 ---
 
-### Daily practice loop:
+## 📅 Daily Bootcamp Mode (What You Should Be Doing Now)
 
-1) Pick one failure scenario
-2) Classify the problem out loud
-3) Choose the playbook
-4) Execute the algorithm
-5) Verify recovery
+**Minimum daily session: ~60–90 minutes**
 
-Then:
+1) 🔥 Warmup (20–30 min)
+   - Pick 1–2 drill files
+   - Run commands until you stop hesitating
 
-1) Pick one execution-drill file
-2) Run 5–10 tasks
-3) Note what is slow or error-prone
-4) Drill those again tomorrow
+2) 🚨 Main Event (20–40 min)
+   - Pick **one failure scenario**
+   - Timebox yourself
+   - Diagnose → choose playbook → fix → verify
+
+3) 🧾 After-Action (5–10 min)
+   - Write down:
+     - what signal told you what class of failure it was
+     - what you hesitated on
+     - what to drill tomorrow
+
+---
+
+## 🧪 Proof Ritual (Never Skip This)
+
+A scenario is **not complete** until:
+
+- The service / system works
+- The negative symptom is gone
+- You re-run the **known-good verification commands**
+- You can explain:
+  - what failed
+  - why
+  - how you knew
+  - why your fix was minimal and safe
+
+---
+
+## 🛑 Build Freeze Rule
+
+Once bootcamp starts:
+
+> ❗ **No new docs. No refactors. No reorganizing.**
+
+Only allowed changes:
+
+- Fixing **incorrect commands**
+- Fixing **broken procedures**
+- Clarifying **ambiguous steps**
+
+If you keep building, you are **not training**.
 
 ---
 
@@ -166,7 +227,7 @@ You are ready for LFCS when:
 
 At that point:
 
-The exam is execution, not discovery.
+> The exam is execution, not discovery.
 
 ---
 
