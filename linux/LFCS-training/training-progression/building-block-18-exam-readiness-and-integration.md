@@ -46,19 +46,19 @@ Invariants:
 
 At this stage, **all drills are assumed**. You should be fluent with:
 
-- essential-commands.md
-- files-and-text.md
-- users-and-permissions.md
-- processes-logs-and-scheduling.md
-- services-and-logging.md
-- service-configuration.md
-- networking.md
-- storage-and-mounts.md
-- package-management.md
-- security-and-selinux.md
-- ssl-certificates.md
-- containers-and-virtualization.md
-- git.md
+- `linux/LFCS-training/execution-drills/essential-commands.md`
+- `linux/LFCS-training/execution-drills/files-and-text.md`
+- `linux/LFCS-training/execution-drills/users-and-permissions.md`
+- `linux/LFCS-training/execution-drills/processes-logs-and-scheduling.md`
+- `linux/LFCS-training/execution-drills/services-and-logging.md`
+- `linux/LFCS-training/execution-drills/service-configuration.md`
+- `linux/LFCS-training/execution-drills/networking.md`
+- `linux/LFCS-training/execution-drills/storage-and-mounts.md`
+- `linux/LFCS-training/execution-drills/package-management.md`
+- `linux/LFCS-training/execution-drills/security-and-selinux.md`
+- `linux/LFCS-training/execution-drills/ssl-certificates.md`
+- `linux/LFCS-training/execution-drills/containers-and-virtualization.md`
+- `linux/LFCS-training/execution-drills/git.md`
 
 Rule:
 
@@ -70,12 +70,12 @@ Rule:
 
 Run **all** of these repeatedly and timed:
 
-- scenario-a-system-feels-slow.md
-- scenario-b-disk-is-full.md
-- scenario-c-service-is-down.md
-- scenario-d-process-wont-die.md
-- scenario-e-cpu-pegged.md
-- scenario-f-memory-pressure.md
+- `linux/LFCS-training/failure-scenarios/scenario-a-system-feels-slow.md`
+- `linux/LFCS-training/failure-scenarios/scenario-b-disk-is-full.md`
+- `linux/LFCS-training/failure-scenarios/scenario-c-service-is-down.md`
+- `linux/LFCS-training/failure-scenarios/scenario-d-process-wont-die.md`
+- `linux/LFCS-training/failure-scenarios/scenario-e-cpu-pegged.md`
+- `linux/LFCS-training/failure-scenarios/scenario-f-memory-pressure.md`
 
 Rule:
 
@@ -87,15 +87,15 @@ Rule:
 
 You must be able to select and execute **any** of these immediately:
 
-- account-access-playbook.md
-- service-recovery-playbook.md
-- network-diagnosis-playbook.md
-- storage-recovery-playbook.md
-- package-repair-playbook.md
-- security-triage-playbook.md
-- tls-triage-playbook.md
-- process-control-playbook.md
-- git-recovery-playbook.md
+- `linux/LFCS-training/execution-playbooks/account-access-playbook.md`
+- `linux/LFCS-training/execution-playbooks/service-recovery-playbook.md`
+- `linux/LFCS-training/execution-playbooks/network-diagnosis-playbook.md`
+- `linux/LFCS-training/execution-playbooks/storage-recovery-playbook.md`
+- `linux/LFCS-training/execution-playbooks/package-repair-playbook.md`
+- `linux/LFCS-training/execution-playbooks/security-triage-playbook.md`
+- `linux/LFCS-training/execution-playbooks/tls-triage-playbook.md`
+- `linux/LFCS-training/execution-playbooks/process-control-playbook.md`
+- `linux/LFCS-training/execution-playbooks/git-recovery-playbook.md`
 
 Rule:
 
@@ -214,3 +214,4 @@ When this block is satisfied:
 That is exactly what the LFCS exam measures.
 
 ---
+
