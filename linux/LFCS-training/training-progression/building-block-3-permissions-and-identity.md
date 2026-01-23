@@ -53,6 +53,7 @@ You must master:
 
 - `linux/LFCS-training/execution-drills/users-and-permissions.md`
 - `linux/LFCS-training/execution-drills/files-and-text.md`
+- `linux/LFCS-training/execution-drills/essential-commands.md`
 
 Rule:
 
@@ -176,3 +177,4 @@ You must:
 Without this block, **everything security-related becomes guesswork**.
 
 ---
+
