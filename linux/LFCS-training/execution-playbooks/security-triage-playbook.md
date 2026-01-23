@@ -1,33 +1,54 @@
 # 🛡️ Security Triage Playbook (LFCS)
 
 **Path:** `linux/LFCS-training/execution-playbooks/security-triage-playbook.md`  
-**Purpose:** Restore **intended access and behavior** when security controls (permissions, ownership, SELinux) block operations, using a **safe, exam-ready operator algorithm**.
+Mental mode: **Classify DAC vs MAC → Inspect → Minimal Fix → Verify → Persist**  
+Purpose: Restore **intended access and behavior** when security controls (permissions, ownership, SELinux) block operations, using a **safe, exam-grade operator algorithm**.
 
-This is not a tutorial. This is a procedure.
+This is **not** a tutorial.  
+This is a **live-system diagnosis and recovery playbook**.
 
 ---
 
-## 🎯 Scope
+## 🧠 When To Use This Playbook
 
 Use this playbook when:
 
 - A command or service fails with **Permission denied**
-- A service runs but **cannot access files**
-- An operation works as root but **not as a user**
-- SELinux **silently blocks** or logs denials
-- Behavior changed after **file moves, restores, or package installs**
+- A service runs but cannot read/write required paths
+- An operation works as root but not as the intended user
+- SELinux blocks behavior (denials, unexpected failures)
+- Behavior changed after file moves, restores, or package installs
 
-This playbook composes the following drill surfaces:
+Do **not** use this playbook if the **first evidence** points to:
+
+- the service is not running (lifecycle failure) → `service-recovery-playbook.md`
+- disk/mount/boot state is broken → `storage-recovery-playbook.md`
+- network reachability or DNS is causal → `network-diagnosis-playbook.md`
+- process storm/resource collapse dominates → `process-control-playbook.md`
+
+---
+
+## 🧭 Scenarios That Validate This Playbook
+
+This playbook is exercised by:
+
+- `linux/LFCS-training/failure-scenarios/scenario-11-selinux-denial-breaks-service.md`
+
+If you cannot solve that scenario **cleanly and repeatably**, this playbook is not yet fluent.
+
+---
+
+## 🧪 Drills Required For Fluency
+
+You should be mechanically fluent with:
 
 - `linux/LFCS-training/execution-drills/security-and-selinux.md`
 - `linux/LFCS-training/execution-drills/users-and-permissions.md`
 - `linux/LFCS-training/execution-drills/files-and-text.md`
 - `linux/LFCS-training/execution-drills/essential-commands.md`
+- `linux/LFCS-training/execution-drills/services-and-logging.md` (for service-impact recovery)
 
-Related scenarios (practice inputs):
-
-- (Future) selinux-denial-breaks-service  
-- (Future) permissions-regression-after-restore
+This playbook is a **composition layer**, not a source of primitives.
 
 ---
 
@@ -35,284 +56,292 @@ Related scenarios (practice inputs):
 
 Always proceed in this order:
 
-1. **Reproduce and observe**
-2. **Classify: DAC vs MAC**
-3. **Inspect DAC (ownership / permissions)**
-4. **Inspect MAC (SELinux)**
-5. **Apply minimal correction**
-6. **Verify**
-7. **Make persistent**
-8. **Rollback if needed**
+1. Reproduce and observe
+2. Classify: **DAC vs MAC**
+3. Inspect DAC (ownership, modes, path traversal)
+4. Inspect MAC (SELinux)
+5. Apply minimal correction
+6. Verify
+7. Make persistent
+8. Roll back if needed
 
-Never disable security permanently to “make it work”.
+> **Never disable security permanently to “make it work”.**
 
 ---
 
 ## 🧭 Global Safety Rules
 
-- **Preserve evidence first.** Read errors and logs before changing anything.
-- **Decide DAC vs MAC early.** Do not mix fixes blindly.
-- **Prefer minimal, targeted changes.**
-- **Never leave SELinux disabled.**
-- **Every action requires verification.**
+- Preserve evidence first.
+- Decide DAC vs MAC early; do not mix fixes blindly.
+- Prefer minimal, targeted changes.
+- Never leave SELinux disabled.
+- Every action requires verification.
 
 ---
 
-## 0) Inputs
+## 🧭 Classification Buckets (Pick One Before Acting)
 
-You must know or determine:
+You must place the incident into **exactly one** bucket:
 
-- The failing command or service
+A) DAC block (ownership/mode/path traversal)  
+B) MAC block (SELinux context/policy)  
+C) Mixed (DAC + MAC)  
+D) Not a security problem (exit playbook)
+
+---
+
+## 🧪 Phase 1 — Reproduce and Observe
+
+Capture the failing symptom and context:
+
 - The exact error message
-- The file or path involved (if any)
-- Whether the failure is **user-only** or **system-wide**
-
----
-
-## 1) Reproduce and Observe
-
-Re-run the failing action and capture the error.
+- The path being accessed
+- The identity of the actor (user/service)
 
 If service-related:
 
-    systemctl status <service> --no-pager
-    journalctl -u <service> --no-pager -n 80
+  systemctl status <service> --no-pager  
+  journalctl -u <service> --no-pager -n 80  
 
 If command-line:
 
-    <command>
+  <command>  
 
 Record:
 
-- Path being accessed
-- User identity
-- Exact wording of the error
+- user identity (`id`, `whoami`)
+- path(s) involved
+- whether the failure is user-only or system-wide
 
 ---
 
-## 2) Classify: DAC vs MAC
+## 🧪 Phase 2 — Classify DAC vs MAC (Early Gate)
 
 Check SELinux mode:
 
-    getenforce
+  getenforce || true  
 
-Interpretation:
+Check for recent denials:
 
-- Enforcing → both DAC and MAC may apply
-- Permissive → only DAC blocks, but MAC denials are logged
-- Disabled → only DAC applies
+  ausearch -m avc -ts recent || true  
 
-Check for SELinux denials:
+Decision gate:
 
-    ausearch -m avc -ts recent
-
-Branch:
-
-- If **AVC denials exist** → go to **Section 5**
-- If **no AVC denials or SELinux disabled** → go to **Section 3**
+- If AVC denials exist and SELinux is Enforcing/Permissive → Bucket B or C
+- If no AVC denials (or SELinux disabled) → Bucket A (DAC first)
 
 ---
 
-## 3) Inspect Ownership and Permissions (DAC)
+## 🧪 Phase 3 — Inspect DAC (Ownership / Modes / Path Traversal)
 
-Inspect the target path:
+Inspect the target path and parents:
 
-    ls -ld /path
-    ls -l /path
+  ls -ld /path  
+  ls -l /path  
 
-Walk the tree if needed:
+If file deep in tree:
 
-    namei -l /path/to/file
+  namei -l /path/to/file  
 
 Check:
 
-- Owner
-- Group
-- Mode bits
-- Execute bit on all parent directories
+- owner and group
+- mode bits
+- execute bit on all parent directories
+- whether the actor is in the required group(s)
 
-If service-related, confirm runtime user:
+If service-related, confirm runtime identity:
 
-    ps -eo pid,user,comm | grep <service>
+  ps -eo pid,user,comm | grep <service> || true  
 
-Branch:
+Decision:
 
-- If **ownership/mode is incorrect** → go to **Section 4**
-- If **ownership/mode looks correct** → go to **Section 5**
+- If ownership/modes/path traversal is wrong → Phase 4
+- If DAC looks correct → Phase 5 (MAC)
 
 ---
 
-## 4) Correct DAC (Ownership / Mode)
+## 🧪 Phase 4 — Minimal DAC Correction
 
-Fix owner/group:
+Fix owner/group (targeted):
 
-    chown user:group /path
-    chown -R user:group /path
+  chown user:group /path  
+  chown -R user:group /path  
 
-Fix modes (be minimal):
+Fix modes (minimal):
 
-    chmod 755 /dir
-    chmod 644 /file
+  chmod 755 /dir  
+  chmod 644 /file  
 
 Re-test the failing action.
 
-- If fixed → go to **Section 7**
-- If still failing → go to **Section 5**
+If fixed → Phase 7  
+If still failing → Phase 5
 
 ---
 
-## 5) Inspect and Correct SELinux (MAC)
+## 🧪 Phase 5 — Inspect and Correct SELinux (MAC)
 
-Check context:
+Check contexts:
 
-    ls -Z /path
-    ls -Z /path/to/file
+  ls -Z /path || true  
+  ls -Z /path/to/file || true  
 
-Check recent denials:
+Re-check denials:
 
-    ausearch -m avc -ts recent
+  ausearch -m avc -ts recent || true  
 
-If files were moved or restored, reset to defaults:
+If files were moved/restored or look mislabeled:
 
-    restorecon -Rv /path
+  restorecon -Rv /path  
 
-If a path requires a custom context, inspect existing rules:
+If a custom context is required, inspect rules:
 
-    semanage fcontext -l | grep /path
+  semanage fcontext -l | grep /path || true  
 
-Temporary diagnostic ONLY (never leave it this way):
+Temporary diagnostic only:
 
-    setenforce 0
+  setenforce 0  
 
-Re-test the action.
+Re-test the failing action.
 
 If it works in permissive:
 
 - Re-enable enforcing:
 
-    setenforce 1
+  setenforce 1  
 
 - Fix contexts properly using `restorecon` or a precise `semanage fcontext` rule.
 
 If it still does not work:
 
-- Return to **Section 3** and re-evaluate DAC.
+- Return to Phase 3 and re-evaluate DAC (mixed case likely).
+
+If policy design is required beyond labeling:
+
+- Exit to `security-triage-playbook.md` is already the correct surface
+- Keep changes minimal and evidence-driven
 
 ---
 
-## 6) Service-Specific Checks
+## 🧪 Phase 6 — Service-Specific Security Checks
 
-If a service still fails:
+If a service still fails, re-check evidence:
 
-    systemctl status <service> --no-pager
-    journalctl -u <service> --no-pager -n 100
+  systemctl status <service> --no-pager  
+  journalctl -u <service> --no-pager -n 100  
 
-Common causes:
+Common security blockers:
 
-- Data directory context wrong
-- Log directory not writable
-- Socket or PID directory wrong owner/context
+- data directory wrong owner or context
+- log directory not writable
+- runtime socket/pid directory wrong owner or context
 
-Fix with:
+Fix with minimal:
 
-    chown
-    chmod
-    restorecon
+  chown  
+  chmod  
+  restorecon  
 
-Then restart:
+Then:
 
-    systemctl restart <service>
+  systemctl restart <service>  
 
-Return to **Section 7**.
-
----
-
-## 7) Verification
-
-Re-test:
-
-- The original command or workflow
-- The service, if applicable:
-
-    systemctl status <service> --no-pager
-
-Confirm:
-
-- No new AVC denials:
-
-    ausearch -m avc -ts recent
-
-- No permission errors appear
+Proceed to Phase 7.
 
 ---
 
-## 8) Persistence Check
+## 🧪 Phase 7 — Verification Gate
+
+Verify the original workflow is restored.
+
+If service-related:
+
+  systemctl status <service> --no-pager  
+
+Confirm no new denials:
+
+  ausearch -m avc -ts recent || true  
+
+Confirm no permission errors recur in logs.
+
+---
+
+## 🧪 Phase 8 — Persistence Check
 
 Ensure:
 
-- Fix survives reboot
-- No temporary hacks remain:
-  - SELinux is Enforcing (if applicable)
-  - No over-broad modes (e.g., 777)
-  - No unnecessary ownership changes
+- SELinux is Enforcing (if applicable)
+- no broad permissions remain (avoid 777)
+- ownership changes are intentional
+- any fcontext rules are correct and minimal
 
-If custom fcontext rules were added, confirm:
+If custom fcontext rules were added:
 
-    semanage fcontext -l | grep /path
+  semanage fcontext -l | grep /path || true  
 
 ---
 
 ## 🔁 Rollback Strategy
 
-If you over-loosened permissions:
+If you over-loosened DAC:
 
-- Restore tighter modes and ownership
-- Re-apply defaults:
+- restore tighter ownership/modes
+- re-test immediately
 
-    restorecon -Rv /path
+If SELinux labeling changes went wrong:
 
-If SELinux changes cause new issues:
+- remove custom fcontext rules (if added)
+- re-apply defaults:
 
-- Remove the custom fcontext rule
-- Re-apply default contexts
+  restorecon -Rv /path  
+
+---
+
+## 🚫 Anti-Patterns (Auto-Fail)
+
+- Disabling SELinux and leaving it that way
+- Using `chmod 777` as a “solution”
+- Changing both DAC and MAC without classification
+- Restarting services repeatedly without inspecting logs
+- Fixing symptoms without confirming the actor identity
+
+---
+
+## 🧭 Exit Conditions
+
+Exit this playbook if you discover:
+
+- service lifecycle failure → `service-recovery-playbook.md`
+- storage/mount/boot failure → `storage-recovery-playbook.md`
+- network/DNS root cause → `network-diagnosis-playbook.md`
+- process storm/resource collapse → `process-control-playbook.md`
 
 ---
 
 ## ✅ Completion Criteria
 
 - Operation or service works
-- Permissions are **minimal and correct**
-- SELinux is **Enforcing** (if applicable)
+- Permissions are minimal and correct
+- SELinux is Enforcing (if applicable)
 - No new denials appear
-- Behavior is stable
+- Behavior is stable and repeatable
 
 You can explain:
 
-- Whether the block was DAC or MAC
-- What specifically was wrong
-- Why your fix was minimal and safe
-- How you verified recovery
+- whether the block was DAC or MAC
+- what specifically was wrong
+- why your fix was minimal and safe
+- how you verified recovery
 
 ---
 
 ## 🧠 Exam Safety Rules
 
 - Never leave SELinux disabled
-- Never use `chmod 777` as a “solution”
+- Never “solve” with 777
 - Always classify DAC vs MAC first
-- Prefer `restorecon` before inventing new contexts
+- Prefer `restorecon` before inventing contexts
 - Verify after every change
 
 ---
-
-## 🧱 This Playbook Composes From
-
-- security-and-selinux.md
-- users-and-permissions.md
-- files-and-text.md
-- essential-commands.md
-
-This is a **composition layer**, not a source of primitives.
-
----
-
