@@ -212,6 +212,7 @@ This map ensures every failure scenario has a corresponding operator algorithm.
 - `linux/LFCS-training/failure-scenarios/scenario-15-container-networking-broken.md`
   - Primary: `linux/LFCS-training/execution-playbooks/container-runtime-triage-playbook.md`
   - Secondary: `linux/LFCS-training/execution-playbooks/network-diagnosis-playbook.md`
+  - Secondary: `linux/LFCS-training/execution-playbooks/security-triage-playbook.md`
 
 ### Scenario 16 — Image pull fails
 
