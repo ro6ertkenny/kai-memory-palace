@@ -22,9 +22,9 @@ The LFCS training system has **four layers**:
 
 In other words:
 
-- **Drills** teach you how to type  
-- **Playbooks** teach you how to think and route problems  
-- **Scenarios** test whether you can do both under stress  
+- **Drills** teach you how to type
+- **Playbooks** teach you how to think and route problems
+- **Scenarios** test whether you can do both under stress
 
 Failure scenarios are **not** about new commands.  
 They are about **correct diagnosis, correct playbook choice, and clean recovery**.
@@ -73,7 +73,7 @@ You should **not** jump to the fix.
 
 ## 🗂️ Scenarios in This Directory
 
-### A) scenario-a-system-feels-slow.md
+### 1) scenario-1-system-feels-slow.md
 
 Symptom focus:
 - The machine is responsive but **everything feels sluggish**
@@ -98,7 +98,7 @@ Use this when:
 
 ---
 
-### B) scenario-b-disk-is-full.md
+### 2) scenario-2-disk-is-full.md
 
 Symptom focus:
 - Writes fail
@@ -127,7 +127,7 @@ Use this when:
 
 ---
 
-### C) scenario-c-service-is-down.md
+### 3) scenario-3-service-is-down.md
 
 Symptom focus:
 - A service is not running
@@ -158,7 +158,7 @@ Use this when:
 
 ---
 
-### D) scenario-d-process-wont-die.md
+### 4) scenario-4-process-wont-die.md
 
 Symptom focus:
 - A process is stuck
@@ -185,7 +185,7 @@ Use this when:
 
 ---
 
-### E) scenario-e-cpu-pegged.md
+### 5) scenario-5-cpu-pegged.md
 
 Symptom focus:
 - CPU is at or near 100%
@@ -211,7 +211,7 @@ Use this when:
 
 ---
 
-### F) scenario-f-memory-pressure.md
+### 6) scenario-6-memory-pressure.md
 
 Symptom focus:
 - OOM kills
@@ -275,3 +275,4 @@ You are “ready” with failure scenarios when:
 > **Stabilize → Identify → Execute → Verify → Persist → Rollback if needed.**  
 > **Never skip classification.**
 
+---
