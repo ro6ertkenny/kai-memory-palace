@@ -50,6 +50,7 @@ Invariants:
 You must master:
 
 - `linux/LFCS-training/execution-drills/services-and-logging.md`
+- `linux/LFCS-training/execution-drills/files-and-text.md`
 - `linux/LFCS-training/execution-drills/essential-commands.md`
 
 Rule:
@@ -169,4 +170,3 @@ You must:
 
 Without this block, **service operations become trial-and-error**.
 
----
