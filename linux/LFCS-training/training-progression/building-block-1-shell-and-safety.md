@@ -3,6 +3,8 @@
 **Path:** `linux/LFCS-training/training-progression/building-block-1-shell-and-safety.md`  
 **Purpose:** Establish **safe, fast, and confident shell operation**. This is the foundation for everything that follows.
 
+This block is a **gate**. If this is weak, every later block becomes slow and error-prone.
+
 ---
 
 ## 🎯 What This Block Builds
@@ -10,13 +12,14 @@
 You are building:
 
 - Mechanical fluency in the shell
-- A **safety-first operator posture**
-- The habit of:
-  - inspecting before acting
-  - verifying targets
-  - verifying results
-
-Nothing else in the curriculum works if you are slow or careless here.
+- A safety-first operator posture
+- A consistent operator loop:
+  - inspect → act → verify
+- Predictable control of:
+  - paths
+  - quoting
+  - glob expansion
+  - pipes and redirection
 
 ---
 
@@ -26,14 +29,15 @@ Nothing else in the curriculum works if you are slow or careless here.
 - Every destructive command must be:
   - preceded by inspection
   - followed by verification
-- Paths and globbing are **exact**; mistakes are **literal**.
-- Pipes and redirection are how operators **compose tools into procedures**.
-- You are always operating on **real state**.
+- Paths and globbing are **literal**; mistakes are **literal**.
+- Pipes and redirection compose tools into procedures.
+- You are always operating on real state.
 
 Invariants:
 
 - “I know exactly what object I am about to modify or delete.”
 - “I can explain what this command will do before I press Enter.”
+- “I can prove what changed after I run it.”
 
 ---
 
@@ -43,9 +47,11 @@ You must master:
 
 - `linux/LFCS-training/execution-drills/essential-commands.md`
 
-Rule:
+Definition of mastery for this block:
 
-> You should be able to navigate, inspect, search, copy, move, and remove files and directories **without pausing to recall syntax**.
+- You can execute the drill actions **without pausing to recall syntax**
+- You can explain **what will happen** before you run the command
+- You can verify outcomes using inspection commands, not hope
 
 ---
 
@@ -67,49 +73,84 @@ This block underpins **all** later playbooks.
 
 ## 🧭 Required Capabilities
 
-You must be able to:
+You must be able to do the following reliably.
 
-- Navigate the filesystem confidently:
-  - `pwd`, `ls`, `cd`
-- Inspect before acting:
-  - `ls -l`, `ls -ld`, `stat`, `file`
-- Find things:
-  - `find`, `which`, `whereis`
-- Compose commands:
-  - pipes, redirection, command substitution
-- Work safely with:
-  - `cp`, `mv`, `rm`, `mkdir`, `rmdir`
-- Preview effects before destructive actions:
-  - `ls` with the same glob
-  - `echo` with the same arguments
+### 1) Navigation and orientation
+
+- `pwd`, `ls`, `cd`
+- Identify “where am I?” and “what am I about to touch?” instantly
+
+### 2) Inspection before action
+
+- `ls -l`, `ls -ld`, `stat`, `file`
+- Recognize:
+  - file vs directory vs symlink
+  - owner/group
+  - basic permission posture
+  - timestamps
+
+### 3) Safe change operations
+
+- `cp`, `mv`, `mkdir`, `rmdir`, `rm`
+
+Safety behaviors (mandatory):
+
+- Verify targets before destructive actions:
+  - run `ls` on the same path/glob you intend to use
+  - use `echo` to preview arguments/globs
+- Confirm results after the action:
+  - re-run `ls -l` / `stat` on the affected object(s)
+
+### 4) Finding and locating
+
+- `find`
+- `which`, `whereis`
+
+### 5) Composition primitives
+
+- pipes: `|`
+- redirection: `>`, `>>`, `2>`, `&>`
+- command substitution: `$(...)`
+
+You must be able to answer simple operational questions with a pipeline, without trial-and-error.
 
 ---
 
 ## ✅ Exit Criteria (Gate)
 
-You may proceed only when all of the following are true:
+You may proceed only when all of the following are true.
 
-- You can:
-  - navigate anywhere
-  - inspect any path
-  - explain what a command will do **before** running it
-- You do **not**:
-  - use `rm` without verifying the target
-  - rely on trial-and-error
-- You can:
-  - build simple pipelines to answer questions
-  - redirect output and errors intentionally
+### A) Prediction
+- You can explain what a command will do **before** running it.
+- You can predict the target set when globs or `find` are involved.
 
-Concrete test:
+### B) Safety posture
+- You do not run `rm` without verifying the target.
+- You do not “try things” in a real directory to see what happens.
+- You do not act on a path you haven’t just inspected.
 
-- Given any path, you can:
-  - explain who owns it
-  - what type it is
-  - what will happen if you remove it
-- You can recover from:
-  - “I’m in the wrong directory”
-  - “I’m not sure what this glob expands to”
-  - without panic or guessing
+### C) Verification
+- After any action, you verify outcomes by inspection.
+- You can prove what changed (or that nothing changed).
+
+---
+
+## 🧪 Concrete Gate Test (Run in a Scratch Directory)
+
+Create a scratch directory and demonstrate all of the following in one session:
+
+- Create a nested tree and files
+- Copy and move files safely
+- Delete only the intended targets
+- Use a pipeline to answer a question about the tree
+- Use `find` to locate a file by name pattern
+- Use redirection intentionally (capture output and errors)
+
+Pass condition:
+
+- Zero target mistakes
+- Zero “surprise” glob expansions
+- You can narrate intent → action → verification for each step
 
 ---
 
@@ -131,18 +172,7 @@ You must:
 
 > **Never operate on a path or object you have not just inspected.**
 
-This rule applies to **every single Building Block that follows**.
+This rule applies to every Building Block that follows.
 
 ---
 
-## 🧱 This Block Is the Foundation
-
-Everything else assumes:
-
-- you are fast
-- you are precise
-- you are safe
-
-Do not rush this.
-
----
