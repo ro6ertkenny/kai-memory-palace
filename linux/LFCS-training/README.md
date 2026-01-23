@@ -2,11 +2,9 @@
 
 **Path:** `linux/LFCS-training/README.md`
 
-This directory is a **purpose-built, professional-grade training system** for the  
+This directory is a **purpose-built training system** for the  
 **Linux Foundation Certified System Administrator (LFCS)** exam.
 
-It is not a notes folder.  
-It is not a tutorial collection.  
 It is a **multi-layer competence engine** designed to train you to:
 
 - operate Linux systems safely
@@ -112,6 +110,49 @@ Entry point:
 
 ---
 
+## 🧠 What “Classification” Actually Means (Critical Concept)
+
+**Classification** means:
+
+> Determining **what class of failure you are dealing with** before you try to fix anything.
+
+Examples of failure classes:
+
+- This is a **service lifecycle problem**
+- This is a **networking / reachability problem**
+- This is a **storage / disk / mount problem**
+- This is a **permissions / SELinux / security problem**
+- This is a **process / CPU / memory pressure problem**
+- This is a **package / dependency problem**
+- This is a **container runtime problem**
+
+Classification is **not**:
+
+- Guessing
+- Trying fixes
+- Restarting random things
+- “Let me see if this works”
+
+Classification is:
+
+- Reading the symptom
+- Inspecting the system
+- Deciding **which playbook applies**
+
+Only **after** classification do you execute.
+
+This is why the system is structured as:
+
+> **Scenarios → Classification → Playbook → Execution → Verification**
+
+If you skip classification, you will:
+
+- waste time
+- make the system worse
+- fail the exam
+
+---
+
 ## 📜 Governance and Rules
 
 The **constitution** of this entire system lives here:
@@ -175,7 +216,7 @@ That is the entire system.
 2) 🚨 Main Event (20–40 min)
    - Pick **one failure scenario**
    - Timebox yourself
-   - Diagnose → choose playbook → fix → verify
+   - Inspect → classify → choose playbook → fix → verify
 
 3) 🧾 After-Action (5–10 min)
    - Write down:
@@ -195,24 +236,8 @@ A scenario is **not complete** until:
 - You can explain:
   - what failed
   - why
-  - how you knew
+  - how you knew what class of problem it was
   - why your fix was minimal and safe
-
----
-
-## 🛑 Build Freeze Rule
-
-Once bootcamp starts:
-
-> ❗ **No new docs. No refactors. No reorganizing.**
-
-Only allowed changes:
-
-- Fixing **incorrect commands**
-- Fixing **broken procedures**
-- Clarifying **ambiguous steps**
-
-If you keep building, you are **not training**.
 
 ---
 
@@ -221,6 +246,7 @@ If you keep building, you are **not training**.
 You are ready for LFCS when:
 
 - Failure scenarios feel boring and mechanical
+- You immediately know **which playbook class applies**
 - Playbooks feel obvious
 - Execution drills are muscle memory
 - You stop exploring and start **operating**
