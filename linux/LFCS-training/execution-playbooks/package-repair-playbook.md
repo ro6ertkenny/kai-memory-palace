@@ -223,7 +223,7 @@ Find owning package:
 
 Reinstall:
 
-    apt-get --reinstall install <package>
+    apt-get install --reinstall <package>
     dnf reinstall <package>
 
 Verify:
