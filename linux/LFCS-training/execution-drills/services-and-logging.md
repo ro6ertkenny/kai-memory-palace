@@ -22,6 +22,28 @@ Install a safe service or two to practice with:
     sudo apt-get update
     sudo apt-get install -y nginx apache2
 
+Optional convenience variable (pick one you actually have):
+
+    export LFCS_SVC=nginx
+
+---
+
+## 🧾 Proof Capture Rule (Exam Habit)
+
+When you need **mechanical proof** (or the prompt asks you to “save output”):
+
+- Capture with `>` and verify the file is non-empty
+- Prefer `--no-pager` for `systemctl` output
+- When capturing mixed output, include stderr
+
+Patterns:
+
+    systemctl status "$LFCS_SVC" --no-pager > status.txt 2>&1
+    test -s status.txt && tail -n 30 status.txt
+
+    journalctl -u "$LFCS_SVC" -n 50 --no-pager > svc.log
+    test -s svc.log && tail -n 20 svc.log
+
 ---
 
 ## ⚙️ 1) Service Inspection
@@ -34,9 +56,16 @@ Install a safe service or two to practice with:
 
     systemctl list-units --type=service
     systemctl list-unit-files --type=service
-    systemctl status ssh
+    systemctl status ssh --no-pager
     systemctl list-dependencies ssh
     systemctl cat ssh
+
+Proof-capture reps (Phase-5 style):
+
+    systemctl list-unit-files > unit-files.txt
+    systemctl list-units > running-units.txt
+    wc -l unit-files.txt
+    wc -l running-units.txt
 
 ---
 
@@ -95,6 +124,11 @@ Target law:
 - set-default affects next boot
 - isolate changes current session
 
+Proof-capture rep (Phase-5 style):
+
+    systemctl get-default > boot-target.txt
+    cat boot-target.txt
+
 ---
 
 ## 🧩 5) Socket Activation (Recognition Drill)
@@ -102,10 +136,16 @@ Target law:
 - Recognize socket-activated services
 - Understand: socket may accept connections even if service is “disabled”
 
-    systemctl status ssh || true
-    systemctl status ssh.socket || true
+    systemctl status ssh --no-pager || true
+    systemctl status ssh.socket --no-pager || true
     systemctl is-enabled ssh || true
     systemctl is-enabled ssh.socket || true
+
+Proof-capture rep (Phase-5 style):
+
+    systemctl status ssh --no-pager > ssh-units.txt 2>&1
+    systemctl status ssh.socket --no-pager >> ssh-units.txt 2>&1
+    test -s ssh-units.txt && tail -n 40 ssh-units.txt
 
 ---
 
@@ -127,6 +167,11 @@ Target law:
     journalctl -p err
     journalctl --since "1 hour ago"
     journalctl -g "failed"
+
+Proof-capture rep (Phase-5 style):
+
+    journalctl -u ssh -n 20 --no-pager > ssh.log
+    test -s ssh.log && wc -l ssh.log
 
 ---
 
@@ -272,6 +317,13 @@ Enable:
     sudo systemctl enable lfcs-test
     systemctl is-enabled lfcs-test
 
+Disable + remove (cleanup):
+
+    sudo systemctl disable lfcs-test || true
+    sudo rm -f /etc/systemd/system/lfcs-test.service
+    sudo systemctl daemon-reload
+    rm -f /tmp/lfcs-test-service.log
+
 ---
 
 ## 🧯 16) Emergency Recovery (Recognition)
@@ -291,7 +343,8 @@ Enable:
 
 - Inspect GRUB defaults
 - Regenerate config (safe)
-- Capture output from grub-install (recognition only; do not overwrite real disks)
+- Capture output (safe)
+- Recognition only for grub-install; do not overwrite real disks
 
 Inspect:
 
@@ -302,7 +355,12 @@ Regenerate config:
 
     sudo update-grub
 
-Capture output (only if you understand the disk target; prefer capture without running destructive changes):
+Proof-capture rep (Phase-5 style):
+
+    sudo update-grub > grub.txt 2>&1
+    test -s grub.txt && tail -n 40 grub.txt
+
+Recognition (do not run destructive install):
 
     sudo grub-install --version 2>/dev/null || true
 
@@ -372,17 +430,5 @@ Fix:
 
     sudo systemctl unmask nginx
     sudo systemctl start nginx
-
----
-
-## ✅ Completion Criteria
-
-You are **done with this file** when:
-
-- You can control services (start/stop/restart/reload/enable/disable/mask) without hesitation
-- You can diagnose failures using systemctl + journalctl in minutes
-- You can recognize socket activation and targets
-- You can create a unit, daemon-reload, run it, verify logs
-- You can operate cron/at/timers/logrotate confidently
 
 ---
