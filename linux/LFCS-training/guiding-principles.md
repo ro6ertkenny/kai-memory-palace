@@ -6,17 +6,10 @@ This document is the **constitution and governance policy** of the LFCS practice
 
 It exists to:
 
-- prevent scope and scenario sprawl
-- preserve a deliberate, layered training architecture
 - enforce **gates before progress**
 - keep practice **high-signal and exam-relevant**
 - separate **mechanics, algorithms, and judgment**
-- train **operators**, not note collectors
-
-This wing is not a question bank.  
-It is not a tutorial library.  
-It is a **competence engine**.
-
+- train **operators**
 ---
 
 ## 🧠 The Four-Layer Training Architecture
