@@ -25,13 +25,13 @@ You are building:
 
 ## 🧠 Mental Models You Must Own
 
-- The shell is a **power tool**, not a toy.
+- The shell is a **power tool**
 - Every destructive command must be:
   - preceded by inspection
   - followed by verification
-- Paths and globbing are **literal**; mistakes are **literal**.
-- Pipes and redirection compose tools into procedures.
-- You are always operating on real state.
+- Paths and globbing are **literal**; mistakes are **literal**
+- Pipes and redirection compose tools into procedures
+- You are always operating on real state
 
 Invariants:
 
@@ -41,7 +41,7 @@ Invariants:
 
 ---
 
-## 🛠️ Canonical Drill Surfaces
+## 🛠️ Drill Surfaces
 
 You must master:
 
@@ -56,7 +56,7 @@ Definition of mastery for this block:
 
 ---
 
-## 🧪 Canonical Failure Scenarios
+## 🧪 Failure Scenarios
 
 None required at this level.
 
@@ -64,7 +64,7 @@ This block is about **posture and mechanics**, not diagnosis.
 
 ---
 
-## ⚙️ Canonical Execution Playbooks
+## ⚙️  Execution Playbooks
 
 None required at this level.
 
@@ -113,26 +113,26 @@ Safety behaviors (mandatory):
 - redirection: `>`, `>>`, `2>`, `&>`
 - command substitution: `$(...)`
 
-You must be able to answer simple operational questions with a pipeline, without trial-and-error.
+You must be able to answer simple operational questions with a pipeline, without trial-and-error
 
 ---
 
 ## ✅ Exit Criteria (Gate)
 
-You may proceed only when all of the following are true.
+You may proceed only when all of the following are true
 
 ### A) Prediction
-- You can explain what a command will do **before** running it.
-- You can predict the target set when globs or `find` are involved.
+- You can explain what a command will do **before** running it
+- You can predict the target set when globs or `find` are involved
 
 ### B) Safety posture
-- You do not run `rm` without verifying the target.
-- You do not “try things” in a real directory to see what happens.
-- You do not act on a path you haven’t just inspected.
+- You do not run `rm` without verifying the target
+- You do not “try things” in a real directory to see what happens
+- You do not act on a path you haven’t just inspected
 
 ### C) Verification
-- After any action, you verify outcomes by inspection.
-- You can prove what changed (or that nothing changed).
+- After any action, you verify outcomes by inspection
+- You can prove what changed (or that nothing changed)
 
 ---
 
