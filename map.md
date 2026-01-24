@@ -133,28 +133,6 @@ Vim usage patterns, workflows, and references.
 
 ---
 
-## 🧩 Reusable Knowledge Libraries
-
-### `snippets/`
-Small, atomic, copy/paste-ready fragments.
-
-- Commands
-- YAML fragments
-- Bash one-liners
-- Markdown patterns
-
-### `templates/`
-Opinionated starting structures.
-
-- README skeletons
-- Runbook templates
-- Learning logs
-- Documentation scaffolds
-
-Snippets and templates are **general-purpose**, not Kubernetes-specific.
-
----
-
 ## 🧭 Meta & Assets
 
 - `README.md` — repository entry point and navigation
