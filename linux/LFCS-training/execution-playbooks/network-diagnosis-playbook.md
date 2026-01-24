@@ -56,16 +56,17 @@ This playbook is a **composition layer**, not a source of primitives.
 Always proceed in this order:
 
 1. Observe
-2. Establish local stack health (link, IP, route)
-3. Establish L3 reachability
-4. Establish DNS
-5. Establish service reachability
-6. Correct
-7. Verify
-8. Make persistent
-9. Roll back if needed
+2. Preserve evidence
+3. Establish local stack health (link, IP, route)
+4. Establish L3 reachability (gateway → external IP)
+5. Establish DNS
+6. Establish service reachability
+7. Correct (minimal, reversible)
+8. Verify
+9. Make persistent
+10. Roll back if needed
 
-> **Never assume “it’s the firewall” first.**
+Never assume “it’s the firewall” first.
 
 ---
 
@@ -74,8 +75,29 @@ Always proceed in this order:
 - Preserve evidence first.
 - Test **by layer**: link → IP → route → gateway → external IP → DNS → service.
 - Prefer minimal, reversible changes.
-- Avoid destructive firewall tests.
+- Keep one root-capable session open when changing firewall rules on remote systems.
 - Every action requires verification.
+
+---
+
+## 🧾 Phase 0 — Capture Evidence (Before Any Changes)
+
+Create a quick evidence bundle:
+
+  mkdir -p /tmp/net-evidence
+  ip a > /tmp/net-evidence/ip-a.txt
+  ip link > /tmp/net-evidence/ip-link.txt
+  ip route > /tmp/net-evidence/ip-route.txt
+  ss -lntup > /tmp/net-evidence/listeners.txt
+
+Resolver evidence (modern + fallback):
+
+  resolvectl status > /tmp/net-evidence/resolvectl.txt 2>/dev/null || true
+  cat /etc/resolv.conf > /tmp/net-evidence/resolv.conf.txt 2>/dev/null || true
+
+Optional (fast routing proof to a destination):
+
+  ip route get 8.8.8.8 > /tmp/net-evidence/route-to-8.8.8.8.txt 2>/dev/null || true
 
 ---
 
@@ -83,26 +105,27 @@ Always proceed in this order:
 
 Interfaces and addresses:
 
-  ip a  
+  ip a
 
 Link state:
 
-  ip link  
+  ip link
 
 Routes:
 
-  ip route  
+  ip route
 
-DNS config:
+DNS config (systemd-resolved if present):
 
-  cat /etc/resolv.conf  
+  resolvectl status 2>/dev/null || cat /etc/resolv.conf
 
 Decision gate:
 
 - If **no interface has an IP** → Bucket A
 - If **has IP but no default route** → Bucket B
-- If **has IP + route but can’t reach outside** → Bucket C
-- If **host has connectivity but service unreachable** → Bucket D
+- If **has IP + route but can’t reach gateway/external IP** → Bucket C
+- If **can reach external IP but cannot resolve names** → Bucket D
+- If **host connectivity is OK but service is unreachable** → Bucket E
 
 ---
 
@@ -110,9 +133,9 @@ Decision gate:
 
 A) Interface has no IP  
 B) No default route  
-C) L3 connectivity failure  
-D) DNS failure  
-E) Service reachability failure  
+C) L3 connectivity failure (gateway/external IP unreachable)  
+D) DNS failure (names don’t resolve)  
+E) Service reachability failure (host OK, service unreachable)  
 F) Not actually a network problem (exit playbook)
 
 ---
@@ -121,19 +144,19 @@ F) Not actually a network problem (exit playbook)
 
 Confirm interface is up:
 
-  ip link  
+  ip link
 
 Bring it up:
 
-  ip link set <iface> up  
+  sudo ip link set <iface> up
 
 If using DHCP:
 
-  dhclient <iface>  
+  sudo dhclient <iface>
 
 Re-check:
 
-  ip a  
+  ip a
 
 If still no IP:
 
@@ -147,16 +170,16 @@ If still no IP:
 
 Confirm:
 
-  ip route  
+  ip route
 
 Add temporary route (only if you know gateway is correct):
 
-  ip route add default via <gateway>  
+  sudo ip route add default via <gateway>
 
 Verify:
 
-  ip route  
-  ping -c 3 <gateway>  
+  ip route
+  ping -c 3 <gateway>
 
 If it works:
 
@@ -165,7 +188,7 @@ If it works:
 
 If not:
 
-  ip route del default  
+  sudo ip route del default
 
 Return to Phase 1
 
@@ -175,56 +198,66 @@ Return to Phase 1
 
 Ping gateway:
 
-  ping -c 3 <gateway>  
+  ping -c 3 <gateway>
 
 Ping external IP:
 
-  ping -c 3 8.8.8.8  
+  ping -c 3 8.8.8.8
 
 Decision:
 
-- If **can’t reach gateway** → back to Buckets A/B
+- If **can’t reach gateway** → return to Buckets A/B
 - If **can reach external IP but not domains** → Bucket D (DNS)
-- If **can’t reach external IP** → inspect firewall or upstream routing
+- If **can’t reach external IP** → inspect firewall and upstream routing (Phase 6)
 
 ---
 
 ## 🧪 Phase 5 — Bucket D: DNS Failure
 
-Test resolver:
+Test resolution:
 
-  getent hosts google.com  
+  getent hosts google.com
 
-Optional:
+Optional deeper proof:
 
-  dig google.com  
+  dig google.com 2>/dev/null || true
+  resolvectl query google.com 2>/dev/null || true
 
 If resolution fails:
 
-- Fix DNS servers in `/etc/resolv.conf` or system config
-- Re-test
-- Return to Phase 4
+- Fix DNS servers in `/etc/resolv.conf` or system resolver config
+- Flush caches if applicable:
+
+  sudo resolvectl flush-caches 2>/dev/null || true
+
+Re-test:
+
+  getent hosts google.com
+
+Then return to Phase 4.
 
 ---
 
 ## 🧪 Phase 6 — Firewall / Policy Check (Only After L3 Fails)
 
-Inspect rules (one may exist):
+Inspect first (read-only):
 
-  iptables -L  
-  nft list ruleset  
+  sudo ufw status numbered 2>/dev/null || true
+  sudo nft list ruleset 2>/dev/null || true
+  sudo iptables -L -n -v 2>/dev/null || true
+  sudo iptables -t nat -L -n -v 2>/dev/null || true
 
-Prefer:
+If you suspect firewall is blocking and it is safe to modify:
 
-- targeted inspection and changes
+- Prefer targeted changes (allow required port/subnet) over flushing.
 
-Temporary flush **only if safe**:
+Last resort (lab/local console only; dangerous remotely):
 
-  iptables -F  
+  sudo iptables -F
 
 Re-test:
 
-  ping -c 3 8.8.8.8  
+  ping -c 3 8.8.8.8
 
 If firewall was cause:
 
@@ -235,28 +268,29 @@ If firewall was cause:
 
 ## 🧪 Phase 7 — Bucket E: Service Reachability Failure
 
+Confirm host connectivity first:
+
+  ping -c 3 8.8.8.8
+  getent hosts google.com
+
 Check listener:
 
-  ss -lntup | grep <port>  
+  ss -lntup | grep <port> || true
 
 Test locally:
 
-  curl localhost:<port>  
-
-Test remotely if possible:
-
-  curl <host>:<port>  
+  curl -I http://127.0.0.1:<port> 2>/dev/null | head -n 5 || true
 
 Decision:
 
 - If **not listening** → exit to `service-recovery-playbook.md`
-- If **bound only to 127.0.0.1** → fix service config
+- If **bound only to 127.0.0.1** → fix service config (bind address / listen)
 - If **listening correctly but unreachable** → firewall or SELinux
 
 If SELinux is relevant:
 
-  getenforce  
-  ausearch -m avc -ts recent || true  
+  getenforce 2>/dev/null || true
+  ausearch -m avc -ts recent 2>/dev/null || true
 
 If policy is the blocker → exit to `security-triage-playbook.md`
 
@@ -266,16 +300,16 @@ If policy is the blocker → exit to `security-triage-playbook.md`
 
 Verify:
 
-  ip a  
-  ip route  
-  ping -c 3 <gateway>  
-  ping -c 3 8.8.8.8  
-  getent hosts google.com  
+  ip a
+  ip route
+  ping -c 3 <gateway>
+  ping -c 3 8.8.8.8
+  getent hosts google.com
 
 If service-related:
 
-  ss -lntup | grep <port>  
-  curl localhost:<port>  
+  ss -lntup | grep <port> || true
+  curl -I http://127.0.0.1:<port> 2>/dev/null | head -n 5 || true
 
 ---
 
@@ -285,14 +319,14 @@ Ensure config survives reboot.
 
 If safe and allowed:
 
-  reboot  
+  sudo reboot
 
 After reboot:
 
-  ip a  
-  ip route  
-  ping -c 3 8.8.8.8  
-  getent hosts google.com  
+  ip a
+  ip route
+  ping -c 3 8.8.8.8
+  getent hosts google.com
 
 ---
 
@@ -303,7 +337,7 @@ If a change breaks networking:
 - Revert **only the last change**
 - Remove temporary routes:
 
-  ip route del default  
+  sudo ip route del default
 
 - Restore firewall rules if modified
 - Return to Phase 1
@@ -355,3 +389,4 @@ Symptom → Measure → Isolate by Layer → Fix → Verify → Persist
 Never skip layers.
 
 ---
+
