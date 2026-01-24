@@ -1,113 +1,156 @@
-# 🧪 Security and SELinux — Execution Drills (LFCS)
+# 🧪 Security and SELinux / AppArmor — Execution Drills (LFCS)
+
+Path:
+  linux/LFCS-training/execution-drills/security-and-selinux.md
 
 Mental mode: Defense, containment, and proof.  
-Goal: Be able to **audit access, harden a system, control services, manage firewalling, and diagnose MAC (SELinux/AppArmor) denials** under time pressure.
+Goal: Audit access, harden services, control exposure, and diagnose **DAC vs MAC** failures under time pressure.
 
 This is not a tutorial.  
-This is an **execution checklist**.
-
-Notes:
-- Some systems use **SELinux** (RHEL, Rocky, Alma, Fedora).
-- Others use **AppArmor** (Ubuntu, Debian).
-- If SELinux is not present, **still practice command recognition and AppArmor inspection**.
+This is an execution checklist.
 
 Core law:
 
-> If permissions look right but access is denied, assume MAC until proven otherwise.
+If permissions look right but access is denied, assume MAC until proven otherwise.
 
 ---
 
-## 🔎 1) Baseline Security Inspection
+## 🧱 Lab Root (Do once)
 
-    who
-    w
-    last
-    ss -lntup
-    ps aux | head -n 20
+    mkdir -p ~/lfcs-labs/execution-drills/security
+    cd ~/lfcs-labs/execution-drills/security
 
 ---
 
-## 🔐 2) Account and Authentication Hardening
+## 🔎 1) Baseline Security Snapshot
 
-    sudo passwd -l testuser
-    sudo passwd -u testuser
-    sudo chage -E 2026-12-31 testuser
-    sudo chage -d 0 testuser
-    sudo chage -l testuser
+Capture “what is happening” first.
 
----
+    who > who.txt
+    w > w.txt
+    last | head -n 50 > last.txt
+    ss -lntup > listeners.txt 2>/dev/null || true
+    ps aux --sort=-%cpu | head -n 30 > topcpu.txt
+    id > identity.txt
 
-## 🧱 3) File Permission Audits
+Verify:
 
-    find / -perm -0002 -type f 2>/dev/null
-    find / -perm -0002 -type d 2>/dev/null
-    find / -perm -4000 -type f 2>/dev/null
-    find / -perm -2000 -type d 2>/dev/null
-    find / -nouser -o -nogroup 2>/dev/null
+    ls -l *.txt
 
 ---
 
-## 🧷 4) ACL Auditing and Control
+## 🧱 2) File Permission Audits (High-signal Finds)
 
-    getfacl file.txt
-    setfacl -m u:testuser:r-- file.txt
-    getfacl file.txt
-    setfacl -b file.txt
-    setfacl -d -m u:testuser:rw somedir
+World-writable files/dirs:
 
----
+    sudo find / -xdev -perm -0002 -type f 2>/dev/null | head
+    sudo find / -xdev -perm -0002 -type d 2>/dev/null | head
 
-## 🔥 5) Firewall Basics (ufw / nftables / iptables)
+SUID/SGID:
 
-    sudo ufw status verbose || sudo nft list ruleset || sudo iptables -L
-    sudo ufw allow 22 || true
-    sudo ufw deny 1234 || true
-    sudo ufw reload || true
-    ss -lntup | grep 22 || true
+    sudo find / -xdev -perm -4000 -type f 2>/dev/null | head
+    sudo find / -xdev -perm -2000 -type d 2>/dev/null | head
 
-nftables:
+Orphans:
 
-    sudo nft list ruleset
-    sudo nft list tables
+    sudo find / -xdev -nouser -o -nogroup 2>/dev/null | head
 
-iptables:
-
-    sudo iptables -L -n -v
+Rule:
+- Use `-xdev` to avoid traversing other mounts during drills.
 
 ---
 
-## 🌐 6) Service Exposure Control
+## 🧷 3) ACL Auditing and Control
 
-    ss -lntup | grep 80 || true
-    sudo systemctl stop nginx || true
-    sudo systemctl disable nginx || true
-    sudo systemctl mask nginx || true
+Inspect (note the `+` in `ls -l` as a clue):
+
+    getfacl file.txt 2>/dev/null || true
+
+Add an ACL:
+
+    setfacl -m u:testuser:r-- file.txt 2>/dev/null || true
+    getfacl file.txt 2>/dev/null || true
+
+Remove ACLs (revert to classic DAC):
+
+    setfacl -b file.txt 2>/dev/null || true
+    getfacl file.txt 2>/dev/null || true
+
+Default ACL (directory inheritance):
+
+    mkdir -p somedir
+    setfacl -d -m u:testuser:rw somedir 2>/dev/null || true
+    getfacl somedir 2>/dev/null || true
 
 ---
 
-## 🧠 7) sudo Policy Inspection
+## 🔥 4) Firewall Inspection (UFW / nftables / iptables)
+
+Status (one may exist; you are proving what is active):
+
+    sudo ufw status verbose 2>/dev/null || true
+    sudo nft list ruleset 2>/dev/null || true
+    sudo iptables -L -n -v 2>/dev/null || true
+
+UFW minimal drill (do not do this remotely without a console):
+
+    sudo ufw allow 22 2>/dev/null || true
+    sudo ufw reload 2>/dev/null || true
+    sudo ufw status numbered 2>/dev/null || true
+
+---
+
+## 🌐 5) Service Exposure Control (Control Plane)
+
+Prove listener → then act.
+
+    ss -lntup | grep -E ':(22|80|443)\b' || true
+    sudo systemctl status nginx --no-pager 2>/dev/null || true
+
+Stop/disable/mask (lab-safe service only):
+
+    sudo systemctl stop nginx 2>/dev/null || true
+    sudo systemctl disable nginx 2>/dev/null || true
+    sudo systemctl mask nginx 2>/dev/null || true
+
+Verify:
+
+    systemctl is-enabled nginx 2>/dev/null || true
+    systemctl status nginx --no-pager 2>/dev/null || true
+
+---
+
+## 🧠 6) sudo Policy Inspection (Safe Workflow)
+
+Rule:
+- Always keep one root-capable session open.
+- Always edit with `visudo`.
+
+Inspect your effective privileges:
 
     sudo -l
+
+Edit sudoers safely:
+
     sudo visudo
-    sudo usermod -aG sudo testuser
 
 ---
 
-## 🧪 8) Integrity and Package Trust
+## 🧪 7) Integrity and Package Trust (Recognition + Minimal Proof)
 
-RPM:
+DEB (optional; may not be installed):
 
-    rpm -Va | head -n 20 || true
-
-DEB:
-
+    command -v debsums 2>/dev/null || true
     debsums -s 2>/dev/null || true
 
-Hashes:
+RPM (if applicable):
 
-    sha256sum /bin/ls
-    sha256sum /bin/ls > /tmp/ls.sha256
-    sha256sum -c /tmp/ls.sha256
+    rpm -Va | head -n 20 2>/dev/null || true
+
+Hash proof pattern:
+
+    sha256sum /bin/ls > ls.sha256
+    sha256sum -c ls.sha256
 
 ---
 
@@ -115,29 +158,34 @@ Hashes:
 # 🔐 MAC: SELinux / AppArmor
 # =========================
 
-## 🧱 9) Determine What Is In Use
+## 🧭 8) Determine What Is In Use (Prove MAC System)
 
-SELinux:
+SELinux (RHEL/Fedora family often):
 
-    getenforce || true
-    sestatus || true
+    getenforce 2>/dev/null || echo "no getenforce"
+    sestatus 2>/dev/null || true
 
-AppArmor:
+AppArmor (Debian/Ubuntu often):
 
-    sudo aa-status || true
+    sudo aa-status 2>/dev/null || echo "no aa-status"
 
 Write down:
-- Which one is active?
-- In what mode?
+- SELinux: Enforcing / Permissive / Disabled / Not installed
+- AppArmor: enabled + which profiles are enforcing/complain
 
 ---
 
-## 🏷️ 10) SELinux Context Inspection (If Present)
+## 🏷️ 9) SELinux Context Inspection (If Present)
 
-    ls -Z /bin/ls || true
-    ls -Z /usr/bin/sudo || true
-    ps auxZ | head || true
-    ps auxZ | grep -E 'sshd|systemd' || true
+File contexts:
+
+    ls -Z /bin/ls 2>/dev/null || true
+    ls -Z /usr/bin/sudo 2>/dev/null || true
+
+Process contexts:
+
+    ps auxZ | head 2>/dev/null || true
+    ps -eZ | grep -E 'sshd|systemd' 2>/dev/null || true
 
 Format reminder:
 
@@ -145,219 +193,144 @@ Format reminder:
 
 ---
 
-## 🧱 11) SELinux Modes (Debug Only)
-
-    getenforce || true
-    sudo setenforce 0 || true
-    getenforce || true
-    sudo setenforce 1 || true
-    getenforce || true
+## 🧱 10) SELinux Modes (Diagnostic Only)
 
 Rule:
-- Never leave system in permissive.
+- Never leave the system permissive.
+
+    getenforce 2>/dev/null || true
+    sudo setenforce 0 2>/dev/null || true
+    getenforce 2>/dev/null || true
+    sudo setenforce 1 2>/dev/null || true
+    getenforce 2>/dev/null || true
 
 ---
 
-## 🔧 12) Fixing Label Problems (Correct Way)
+## 🧩 11) AppArmor Inspection (If Present)
 
-Preferred fix:
+Prove it is active and identify profiles:
 
-    sudo restorecon -v /var/www/html || true
-    sudo restorecon -Rv /var/www || true
-    sudo restorecon -nRv /var/www || true
+    sudo aa-status 2>/dev/null || true
+    sudo aa-status 2>/dev/null | head -n 80 || true
+
+Find loaded profiles (kernel interface):
+
+    ls -l /sys/kernel/security/apparmor 2>/dev/null || true
+    sudo cat /sys/kernel/security/apparmor/profiles 2>/dev/null | head -n 40 || true
+
+Evidence for denials (varies by distro):
+
+    sudo journalctl -g apparmor --no-pager 2>/dev/null | tail -n 50 || true
+    sudo grep -i apparmor /var/log/syslog 2>/dev/null | tail -n 50 || true
+
+Rule:
+- LFCS expectation is usually recognition + evidence gathering, not full profile authoring.
 
 ---
 
-## 🚧 13) Persistent Fix — semanage fcontext
+## 🧪 12) Canonical SELinux Label Drill (Break → Prove → Restore → Persist)
 
-    sudo semanage fcontext -l | head || true
-    sudo semanage fcontext -a -t httpd_sys_content_t "/var/www/html/custom(/.*)?" || true
-    sudo restorecon -Rv /var/www/html/custom || true
+This is the “Phase 10 core” absorbed into the canonical drill.
 
----
+### 12.1 Create lab web tree
 
-## ⚠️ 14) Temporary Fix — chcon (Know Why This Is Bad)
+    sudo mkdir -p /var/www/lfcs-mac-lab
+    echo "LFCS MAC LAB" | sudo tee /var/www/lfcs-mac-lab/index.html > /dev/null
+    ls -l /var/www/lfcs-mac-lab/index.html > mac-lab-dac.txt
 
-    sudo chcon -t httpd_sys_content_t /var/www/html/index.html || true
-    ls -Z /var/www/html/index.html || true
+### 12.2 Capture current context (if SELinux exists)
+
+    ls -Z /var/www/lfcs-mac-lab/index.html > mac-lab-before.txt 2>/dev/null || echo "no SELinux" > mac-lab-before.txt
+
+### 12.3 Break label (temporary) using chcon (if possible)
+
+    sudo chcon -t user_home_t /var/www/lfcs-mac-lab/index.html 2>/dev/null || true
+    ls -Z /var/www/lfcs-mac-lab/index.html > mac-lab-broken.txt 2>/dev/null || echo "no SELinux" > mac-lab-broken.txt
+
+### 12.4 Restore correct label using restorecon (correct fix)
+
+    sudo restorecon -Rv /var/www/lfcs-mac-lab 2>/dev/null || true
+    ls -Z /var/www/lfcs-mac-lab/index.html > mac-lab-restored.txt 2>/dev/null || echo "no SELinux" > mac-lab-restored.txt
+
+### 12.5 Prove difference
+
+    diff mac-lab-broken.txt mac-lab-restored.txt > mac-lab-diff.txt 2>/dev/null || true
+    ls -l mac-lab-*.txt
 
 Law:
 - chcon is temporary
-- will be lost after relabel or restorecon
+- restorecon is the correct fix for mislabeled files
 
 ---
 
-## 🧾 15) Diagnosing SELinux Denials
+## 🚧 13) Persistent SELinux Fix — semanage fcontext (When Path Is Legit But Non-Standard)
 
-    sudo grep -i denied /var/log/audit/audit.log 2>/dev/null | tail -n 20 || true
-    sudo ausearch -m avc 2>/dev/null || true
-    sudo journalctl -g denied || true
+Recognition:
+
+    sudo semanage fcontext -l 2>/dev/null | head || true
+
+Example persistent rule pattern:
+
+    sudo semanage fcontext -a -t httpd_sys_content_t "/var/www/lfcs-mac-lab(/.*)?" 2>/dev/null || true
+    sudo restorecon -Rv /var/www/lfcs-mac-lab 2>/dev/null || true
+    ls -Z /var/www/lfcs-mac-lab/index.html 2>/dev/null || true
+
+Rule:
+- Use semanage only when the path is intentionally non-default and must persist.
+
+---
+
+## 🧾 14) Diagnosing SELinux Denials (Evidence)
+
+Audit log (if present):
+
+    sudo ausearch -m avc -ts recent 2>/dev/null || true
+
+Journal fallback:
+
+    sudo journalctl -g denied --no-pager 2>/dev/null | tail -n 50 || true
+    sudo journalctl -g avc --no-pager 2>/dev/null | tail -n 50 || true
+
+Optional helper (if present):
+
     sudo sealert -a /var/log/audit/audit.log 2>/dev/null || true
 
 ---
 
-## 🧱 16) Allowing Services on Non-Standard Ports (SELinux)
+## 🧱 15) SELinux Non-Standard Port Allow (Recognition Drill)
 
-    semanage port -l | grep http || true
-    sudo semanage port -a -t http_port_t -p tcp 8081 || true
-    semanage port -l | grep 8081 || true
-    sudo semanage port -d -t http_port_t -p tcp 8081 || true
+List existing:
 
----
+    semanage port -l 2>/dev/null | grep -E 'http|http_port_t' || true
 
-# =========================
-# 🔐 Phase 12 Additions
-# =========================
+Add and remove example port:
 
-## 🧠 17) Sudo Delegation Patterns (Safe + Testable)
-
-Rule:
-- Always keep one root-capable session open.
-- Always edit with `visudo`.
-
-Open sudoers safely:
-
-    sudo visudo
-
-Create a test user (if needed):
-
-    sudo useradd -m -s /bin/bash harry || true
-    sudo passwd harry
-
-Grant full sudo (password required):
-
-    sudo visudo
-
-Add:
-
-    harry ALL=(ALL) ALL
-
-Test:
-
-    su - harry
-    sudo id
-    exit
-
-Grant full sudo (no password):
-
-    sudo visudo
-
-Change to:
-
-    harry ALL=(ALL) NOPASSWD: ALL
-
-Test:
-
-    su - harry
-    sudo -l
-    sudo id
-    exit
-
-Group sudo (pattern):
-
-    sudo groupadd students || true
-    sudo usermod -aG students harry
-
-    sudo visudo
-
-Add:
-
-    %students ALL=(ALL) ALL
-
-Test:
-
-    su - harry
-    sudo -l
-    exit
-
-Restrict to a single command (verify deny works):
-
-    sudo visudo
-
-Add:
-
-    harry ALL=(ALL) /usr/bin/mount
-
-Test:
-
-    su - harry
-    sudo -l
-    sudo mount || true
-    sudo id || true
-    exit
+    sudo semanage port -a -t http_port_t -p tcp 8081 2>/dev/null || true
+    semanage port -l 2>/dev/null | grep 8081 || true
+    sudo semanage port -d -t http_port_t -p tcp 8081 2>/dev/null || true
 
 ---
 
-## 🧯 18) MAC Triage Flow (Fast Diagnosis)
+## 🧰 16) sysctl — Kernel Security Knobs (Inspect, Set, Persist)
 
-If something “should work” but doesn’t:
-
-1) DAC: permissions / ownership / ACLs
-2) Sudo: do you actually have privileges?
-3) MAC: SELinux/AppArmor
-4) Logs: prove the denial
-
-Checklist:
-
-    namei -l <path> 2>/dev/null || true
-    ls -l <path> 2>/dev/null || true
-    getfacl <path> 2>/dev/null || true
-
-    sudo -l
-
-    getenforce || true
-    sestatus || true
-    sudo aa-status || true
-
-    sudo journalctl -g denied --no-pager || true
-    sudo ausearch -m avc 2>/dev/null || true
-
----
-
-## 🧰 19) sysctl — Kernel Security Knobs (Inspect, Set, Persist)
-
-Goal:
-- Prove you can view, set temporarily, and persist values safely.
-
-Inspect (spot check):
+Inspect:
 
     sysctl -a | head
 
-Read a specific key:
+Read one key:
 
     sysctl vm.swappiness
 
-Set temporary value:
+Set temporarily:
 
     sudo sysctl -w vm.swappiness=10
     sysctl vm.swappiness
 
 Persist (preferred: drop-in file):
 
-    echo "vm.swappiness=10" | sudo tee /etc/sysctl.d/99-lfcs.conf
+    echo "vm.swappiness=10" | sudo tee /etc/sysctl.d/99-lfcs.conf > /dev/null
     sudo sysctl --system
     sysctl vm.swappiness
-
-Alternate persist (classic file):
-
-    sudo vi /etc/sysctl.conf
-
-Add:
-
-    vm.swappiness=10
-
-Apply:
-
-    sudo sysctl -p
-
-Another example (IPv6 forwarding):
-
-    echo "net.ipv6.conf.all.forwarding=1" | sudo tee -a /etc/sysctl.d/99-lfcs.conf
-    sudo sysctl --system
-    sysctl net.ipv6.conf.all.forwarding
-
-Safety rule:
-- Prefer `/etc/sysctl.d/*.conf` for lab changes (easy rollback).
 
 Rollback (lab):
 
@@ -366,57 +339,16 @@ Rollback (lab):
 
 ---
 
-## ⏱️ 20) Timed Drills (Phase 12)
+## ⏱️ 17) Timed Drills (Speed)
 
-Write MAC mode to file:
+MAC status to files (10 seconds):
 
-    getenforce > /tmp/selinux-mode.txt || true
-    sudo aa-status > /tmp/apparmor-status.txt 2>/dev/null || true
+    getenforce > selinux-mode.txt 2>/dev/null || echo "no getenforce" > selinux-mode.txt
+    sudo aa-status > apparmor-status.txt 2>/dev/null || echo "no aa-status" > apparmor-status.txt
 
-Fix mislabeled tree:
+Fix mislabeled tree (15 seconds):
 
-    sudo restorecon -Rv /var/www || true
-
-Set + persist sysctl in 20 seconds:
-
-    sudo sysctl -w vm.swappiness=30
-    sudo sed -i 's/^vm.swappiness.*/vm.swappiness=30/' /etc/sysctl.conf || echo "vm.swappiness=30" | sudo tee -a /etc/sysctl.conf
-    sudo sysctl -p
-
----
-
-## 🧠 21) Failure Recognition Drills (Mental)
-
-Scenarios:
-- chmod didn’t fix it → check MAC (getenforce / ls -Z / aa-status)
-- Permissions 755 but still denied → contexts + logs
-- Someone set permissive and left it → restore enforcing immediately
-- Someone used chcon instead of semanage → relabel will break it again
-- You edited sudoers with vi and broke sudo → always use visudo
-
----
-
-## 🧯 22) Emergency Access Recovery
-
-    mount -o remount,rw /
-    restorecon -Rv / || true
-    reboot
-
----
-
-## 🛡️ 23) Quick Hardening Checklist
-
-    systemctl --failed
-    ss -lntup
-    find / -perm -4000 -type f 2>/dev/null
-    grep -i '^PermitRootLogin' /etc/ssh/sshd_config || true
-    grep -i '^PasswordAuthentication' /etc/ssh/sshd_config || true
-
----
-
-## 🔒 Final Law
-
-If you don’t understand MAC, you will “fix” systems by making them less secure.
+    sudo restorecon -Rv /var/www 2>/dev/null || true
 
 ---
 
@@ -424,23 +356,22 @@ If you don’t understand MAC, you will “fix” systems by making them less se
 
 You are done with this file when:
 
-- You can prove whether a failure is DAC or MAC
-- You can fix mislabeled files in seconds
-- You can create persistent SELinux rules correctly
-- You never leave systems in permissive mode
-- You can explain *why* access is denied, not guess
-- You can set and persist sysctl values safely
-- You can delegate sudo without locking yourself out
+- You can classify DAC vs MAC quickly
+- You can prove SELinux/AppArmor state with evidence
+- You can fix mislabeled files using restorecon (not chmod)
+- You can apply persistent fcontext rules correctly (semanage + restorecon)
+- You can find denial evidence in logs
+- You never leave SELinux permissive
 
 ---
 
 ## 🧹 Cleanup (Optional)
 
-Remove lab user:
+Remove MAC lab tree:
 
-    sudo userdel -r harry || true
+    sudo rm -rf /var/www/lfcs-mac-lab
 
-Remove lab sysctl drop-in:
+Remove sysctl drop-in:
 
     sudo rm -f /etc/sysctl.d/99-lfcs.conf
     sudo sysctl --system

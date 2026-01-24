@@ -1,54 +1,56 @@
 # 🛡️ Security Triage Playbook (LFCS)
 
-**Path:** `linux/LFCS-training/execution-playbooks/security-triage-playbook.md`  
-Mental mode: **Classify DAC vs MAC → Inspect → Minimal Fix → Verify → Persist**  
-Purpose: Restore **intended access and behavior** when security controls (permissions, ownership, SELinux) block operations, using a **safe, exam-grade operator algorithm**.
+Path:
+  linux/LFCS-training/execution-playbooks/security-triage-playbook.md
 
-This is **not** a tutorial.  
-This is a **live-system diagnosis and recovery playbook**.
+Mental mode: Classify DAC vs MAC → Inspect → Minimal Fix → Verify → Persist  
+Purpose: Restore intended access/behavior when security controls block operations, using an exam-grade operator algorithm.
+
+This is not a tutorial.  
+This is a live-system diagnosis and recovery playbook.
 
 ---
 
-## 🧠 When To Use This Playbook
+## 🎯 When To Use This Playbook
 
 Use this playbook when:
 
-- A command or service fails with **Permission denied**
+- A command or service fails with Permission denied
 - A service runs but cannot read/write required paths
-- An operation works as root but not as the intended user
-- SELinux blocks behavior (denials, unexpected failures)
-- Behavior changed after file moves, restores, or package installs
+- It works as root but not as the intended user/service
+- SELinux/AppArmor denials appear
+- Behavior changed after file moves/restores/installs
 
-Do **not** use this playbook if the **first evidence** points to:
+Do not use this playbook if the first evidence points to:
 
-- the service is not running (lifecycle failure) → `service-recovery-playbook.md`
-- disk/mount/boot state is broken → `storage-recovery-playbook.md`
-- network reachability or DNS is causal → `network-diagnosis-playbook.md`
-- process storm/resource collapse dominates → `process-control-playbook.md`
+- service lifecycle failure → service-recovery-playbook.md
+- disk/mount/boot failure → storage-recovery-playbook.md
+- network/DNS is causal → network-diagnosis-playbook.md
+- resource collapse dominates → process-control-playbook.md
 
 ---
 
 ## 🧭 Scenarios That Validate This Playbook
 
-This playbook is exercised by:
+Primary:
 
-- `linux/LFCS-training/failure-scenarios/scenario-11-selinux-denial-breaks-service.md`
+- linux/LFCS-training/failure-scenarios/scenario-11-selinux-denial-breaks-service.md
 
-If you cannot solve that scenario **cleanly and repeatably**, this playbook is not yet fluent.
+If you cannot solve it cleanly and repeatably, this playbook is not fluent.
 
 ---
 
 ## 🧪 Drills Required For Fluency
 
-You should be mechanically fluent with:
+You must be mechanically fluent with:
 
-- `linux/LFCS-training/execution-drills/security-and-selinux.md`
-- `linux/LFCS-training/execution-drills/users-and-permissions.md`
-- `linux/LFCS-training/execution-drills/files-and-text.md`
-- `linux/LFCS-training/execution-drills/essential-commands.md`
-- `linux/LFCS-training/execution-drills/services-and-logging.md` (for service-impact recovery)
+- linux/LFCS-training/execution-drills/security-and-selinux.md
+- linux/LFCS-training/execution-drills/users-and-permissions.md
+- linux/LFCS-training/execution-drills/files-and-text.md
+- linux/LFCS-training/execution-drills/services-and-logging.md
+- linux/LFCS-training/execution-drills/essential-commands.md
 
-This playbook is a **composition layer**, not a source of primitives.
+This playbook composes drills; it does not introduce new primitives.
 
 ---
 
@@ -56,292 +58,292 @@ This playbook is a **composition layer**, not a source of primitives.
 
 Always proceed in this order:
 
-1. Reproduce and observe
-2. Classify: **DAC vs MAC**
-3. Inspect DAC (ownership, modes, path traversal)
-4. Inspect MAC (SELinux)
-5. Apply minimal correction
-6. Verify
-7. Make persistent
-8. Roll back if needed
+1) Reproduce and observe
+2) Classify: DAC vs MAC (early gate)
+3) Inspect DAC (ownership, modes, traversal, ACLs)
+4) Inspect MAC (SELinux/AppArmor state + denials + contexts)
+5) Apply minimal correction
+6) Verify
+7) Make persistent
+8) Roll back if needed
 
-> **Never disable security permanently to “make it work”.**
-
----
-
-## 🧭 Global Safety Rules
-
-- Preserve evidence first.
-- Decide DAC vs MAC early; do not mix fixes blindly.
-- Prefer minimal, targeted changes.
-- Never leave SELinux disabled.
-- Every action requires verification.
+Never disable security permanently to “make it work”.
 
 ---
 
 ## 🧭 Classification Buckets (Pick One Before Acting)
 
-You must place the incident into **exactly one** bucket:
-
-A) DAC block (ownership/mode/path traversal)  
-B) MAC block (SELinux context/policy)  
+A) DAC block (ownership/mode/traversal/ACL/sudo)  
+B) MAC block (SELinux context/policy, AppArmor profile)  
 C) Mixed (DAC + MAC)  
-D) Not a security problem (exit playbook)
+D) Not a security problem (exit)
 
 ---
 
-## 🧪 Phase 1 — Reproduce and Observe
+## 0) Inputs
 
-Capture the failing symptom and context:
+You must know or determine:
 
-- The exact error message
-- The path being accessed
-- The identity of the actor (user/service)
+- Actor identity (user/service)
+- Path(s) involved
+- Exact error message
+- Whether this is local-only or remote reachability
 
 If service-related:
 
-  systemctl status <service> --no-pager  
-  journalctl -u <service> --no-pager -n 80  
-
-If command-line:
-
-  <command>  
-
-Record:
-
-- user identity (`id`, `whoami`)
-- path(s) involved
-- whether the failure is user-only or system-wide
+    systemctl status <service> --no-pager
+    journalctl -u <service> -n 100 --no-pager
 
 ---
 
-## 🧪 Phase 2 — Classify DAC vs MAC (Early Gate)
+## 1) Reproduce and Preserve Evidence (No Changes Yet)
 
-Check SELinux mode:
+Capture actor identity:
 
-  getenforce || true  
+    whoami > triage-whoami.txt
+    id > triage-id.txt
 
-Check for recent denials:
+Capture target path evidence:
 
-  ausearch -m avc -ts recent || true  
+    ls -ld <path> > triage-path.txt 2>&1
+    ls -l  <path> >> triage-path.txt 2>&1
+
+If deep path:
+
+    namei -l <path> > triage-namei.txt 2>&1
+
+If service-related:
+
+    systemctl status <service> --no-pager > triage-service-status.txt 2>&1
+    journalctl -u <service> -n 120 --no-pager > triage-service-journal.txt 2>&1
+
+---
+
+## 2) Early Gate: MAC System Presence and Recent Denials
+
+SELinux state (if present):
+
+    getenforce 2>/dev/null || echo "no getenforce"
+    sestatus 2>/dev/null || true
+
+Recent AVC denials:
+
+    sudo ausearch -m avc -ts recent 2>/dev/null || true
+
+AppArmor state (if present):
+
+    sudo aa-status 2>/dev/null || true
+    sudo journalctl -g apparmor --no-pager 2>/dev/null | tail -n 50 || true
 
 Decision gate:
 
-- If AVC denials exist and SELinux is Enforcing/Permissive → Bucket B or C
-- If no AVC denials (or SELinux disabled) → Bucket A (DAC first)
+- If SELinux is Enforcing/Permissive and AVC denials exist → Bucket B or C
+- If AppArmor is enabled and logs show denies → Bucket B or C
+- Otherwise → Bucket A first (DAC)
 
 ---
 
-## 🧪 Phase 3 — Inspect DAC (Ownership / Modes / Path Traversal)
+## 3) Bucket A: Inspect DAC (Ownership / Modes / Traversal / ACL / Sudo)
 
-Inspect the target path and parents:
+Ownership and mode:
 
-  ls -ld /path  
-  ls -l /path  
+    stat <path> 2>/dev/null || true
+    ls -ld <path> 2>/dev/null || true
 
-If file deep in tree:
+Traversal (most common hidden cause):
 
-  namei -l /path/to/file  
+    namei -l <path> 2>/dev/null || true
 
-Check:
+ACL clue (`+` in permissions) and ACL dump:
 
-- owner and group
-- mode bits
-- execute bit on all parent directories
-- whether the actor is in the required group(s)
+    getfacl <path> 2>/dev/null | sed -n '1,120p' || true
 
-If service-related, confirm runtime identity:
+Actor group membership:
 
-  ps -eo pid,user,comm | grep <service> || true  
+    id <user> 2>/dev/null || true
+    groups <user> 2>/dev/null || true
+
+If privilege is involved:
+
+    sudo -l 2>/dev/null || true
 
 Decision:
 
-- If ownership/modes/path traversal is wrong → Phase 4
-- If DAC looks correct → Phase 5 (MAC)
+- If traversal or mode is wrong → Phase 4 (minimal DAC correction)
+- If DAC looks correct → Bucket B (MAC)
 
 ---
 
-## 🧪 Phase 4 — Minimal DAC Correction
+## 4) Bucket A: Minimal DAC Correction (Targeted)
 
-Fix owner/group (targeted):
+Fix only the minimal defect.
 
-  chown user:group /path  
-  chown -R user:group /path  
+Examples:
 
-Fix modes (minimal):
+    sudo chown <user>:<group> <path>
+    sudo chmod 755 <dir>
+    sudo chmod 644 <file>
 
-  chmod 755 /dir  
-  chmod 644 /file  
+ACL revert (only when you intend to return to classic DAC):
 
-Re-test the failing action.
+    sudo setfacl -b <path>
+
+Re-test the original operation.
 
 If fixed → Phase 7  
-If still failing → Phase 5
+If not fixed → Bucket B (MAC) or Bucket C (Mixed)
 
 ---
 
-## 🧪 Phase 5 — Inspect and Correct SELinux (MAC)
+## 5) Bucket B: Inspect MAC and Correct Properly
 
-Check contexts:
+### 5.1 SELinux: contexts + denials
 
-  ls -Z /path || true  
-  ls -Z /path/to/file || true  
+Inspect file context:
 
-Re-check denials:
+    ls -Z <path> 2>/dev/null || true
 
-  ausearch -m avc -ts recent || true  
+Inspect process contexts (find domain):
 
-If files were moved/restored or look mislabeled:
+    ps -eZ 2>/dev/null | grep -E "<service>|sshd|httpd|nginx" || true
 
-  restorecon -Rv /path  
+Re-check denials after reproducing:
 
-If a custom context is required, inspect rules:
+    sudo ausearch -m avc -ts recent 2>/dev/null || true
 
-  semanage fcontext -l | grep /path || true  
+Correct mislabeled trees first:
 
-Temporary diagnostic only:
+    sudo restorecon -Rv <path> 2>/dev/null || true
 
-  setenforce 0  
+If the path is intentionally non-standard and needs persistent labeling:
 
-Re-test the failing action.
+    sudo semanage fcontext -l 2>/dev/null | grep -F "<path>" || true
+    sudo semanage fcontext -a -t <type> "<path>(/.*)?" 2>/dev/null || true
+    sudo restorecon -Rv <path> 2>/dev/null || true
 
-If it works in permissive:
+Diagnostic gate only (never leave permissive):
 
-- Re-enable enforcing:
+    getenforce 2>/dev/null || true
+    sudo setenforce 0 2>/dev/null || true
+    <re-test operation>
+    sudo setenforce 1 2>/dev/null || true
+    getenforce 2>/dev/null || true
 
-  setenforce 1  
+Interpretation:
+- If it works only in permissive → it is MAC-causal. Fix via restorecon / fcontext / boolean / minimal policy.
+- If it still fails → re-check DAC; you likely have a Mixed incident.
 
-- Fix contexts properly using `restorecon` or a precise `semanage fcontext` rule.
+### 5.2 AppArmor: status + denial evidence
 
-If it still does not work:
+Prove AppArmor is active:
 
-- Return to Phase 3 and re-evaluate DAC (mixed case likely).
+    sudo aa-status 2>/dev/null || true
 
-If policy design is required beyond labeling:
+Find denial evidence:
 
-- Exit to `security-triage-playbook.md` is already the correct surface
-- Keep changes minimal and evidence-driven
+    sudo journalctl -g apparmor --no-pager 2>/dev/null | tail -n 80 || true
+    sudo grep -i apparmor /var/log/syslog 2>/dev/null | tail -n 80 || true
 
----
-
-## 🧪 Phase 6 — Service-Specific Security Checks
-
-If a service still fails, re-check evidence:
-
-  systemctl status <service> --no-pager  
-  journalctl -u <service> --no-pager -n 100  
-
-Common security blockers:
-
-- data directory wrong owner or context
-- log directory not writable
-- runtime socket/pid directory wrong owner or context
-
-Fix with minimal:
-
-  chown  
-  chmod  
-  restorecon  
-
-Then:
-
-  systemctl restart <service>  
-
-Proceed to Phase 7.
+Operator rule:
+- For LFCS, treat AppArmor primarily as “recognize + gather evidence + route.”
+- Corrective action is typically restoring expected paths/configs or adjusting service behavior (minimal change).
 
 ---
 
-## 🧪 Phase 7 — Verification Gate
+## 6) Bucket C: Mixed (DAC + MAC)
 
-Verify the original workflow is restored.
+When you suspect both:
 
-If service-related:
+- Fix traversal/ownership/modes first (DAC)
+- Then restorecon and re-check denials (MAC)
+- Verify after each single change
 
-  systemctl status <service> --no-pager  
-
-Confirm no new denials:
-
-  ausearch -m avc -ts recent || true  
-
-Confirm no permission errors recur in logs.
+Never change both layers at once without a re-test.
 
 ---
 
-## 🧪 Phase 8 — Persistence Check
+## 7) Verification Gate (Required Proof)
+
+Confirm:
+
+- The original operation works
+- No new denials appear
+- MAC is enforcing/enabled (when present)
+
+SELinux proof:
+
+    getenforce 2>/dev/null || true
+    sudo ausearch -m avc -ts recent 2>/dev/null || true
+
+Service proof:
+
+    systemctl status <service> --no-pager 2>/dev/null || true
+    journalctl -u <service> -n 80 --no-pager 2>/dev/null || true
+
+---
+
+## 8) Persistence Check
 
 Ensure:
 
-- SELinux is Enforcing (if applicable)
-- no broad permissions remain (avoid 777)
-- ownership changes are intentional
-- any fcontext rules are correct and minimal
+- SELinux is Enforcing (if present)
+- No broad permissions were left behind (no 777)
+- Any fcontext rules are minimal and correct
+- AppArmor state is unchanged unless explicitly required
 
-If custom fcontext rules were added:
+SELinux fcontext proof (if used):
 
-  semanage fcontext -l | grep /path || true  
+    sudo semanage fcontext -l 2>/dev/null | grep -F "<path>" || true
 
 ---
 
 ## 🔁 Rollback Strategy
 
-If you over-loosened DAC:
+If you loosened DAC too far:
 
-- restore tighter ownership/modes
+- restore tighter modes/ownership
 - re-test immediately
 
 If SELinux labeling changes went wrong:
 
-- remove custom fcontext rules (if added)
-- re-apply defaults:
+- remove custom fcontext rules if you added the wrong one
+- restore defaults:
 
-  restorecon -Rv /path  
+    sudo restorecon -Rv <path> 2>/dev/null || true
+
+If you changed a firewall or service setting accidentally:
+
+- exit to the correct playbook:
+  - service-recovery-playbook.md
+  - network-diagnosis-playbook.md
 
 ---
 
 ## 🚫 Anti-Patterns (Auto-Fail)
 
-- Disabling SELinux and leaving it that way
-- Using `chmod 777` as a “solution”
-- Changing both DAC and MAC without classification
-- Restarting services repeatedly without inspecting logs
-- Fixing symptoms without confirming the actor identity
-
----
-
-## 🧭 Exit Conditions
-
-Exit this playbook if you discover:
-
-- service lifecycle failure → `service-recovery-playbook.md`
-- storage/mount/boot failure → `storage-recovery-playbook.md`
-- network/DNS root cause → `network-diagnosis-playbook.md`
-- process storm/resource collapse → `process-control-playbook.md`
+- Leaving SELinux permissive/disabled
+- Solving with chmod 777
+- Mixing DAC + MAC changes without classification
+- Restarting services repeatedly without reading logs
+- “Fixing” by weakening security instead of proving cause
 
 ---
 
 ## ✅ Completion Criteria
 
-- Operation or service works
+- Operation/service works
 - Permissions are minimal and correct
-- SELinux is Enforcing (if applicable)
+- SELinux is enforcing (if applicable)
+- AppArmor evidence is understood (if applicable)
 - No new denials appear
 - Behavior is stable and repeatable
 
 You can explain:
 
-- whether the block was DAC or MAC
-- what specifically was wrong
-- why your fix was minimal and safe
+- DAC vs MAC vs Mixed
+- what evidence proved it
+- what minimal fix you applied
 - how you verified recovery
 
 ---
 
-## 🧠 Exam Safety Rules
-
-- Never leave SELinux disabled
-- Never “solve” with 777
-- Always classify DAC vs MAC first
-- Prefer `restorecon` before inventing contexts
-- Verify after every change
-
----
