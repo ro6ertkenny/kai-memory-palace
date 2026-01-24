@@ -21,7 +21,8 @@ Always remember:
 
 ⚠️ Do NOT modify or delete your own active user.  
 ⚠️ Always keep one root-capable session open when editing sudoers.  
-⚠️ Always use `visudo`.
+⚠️ Always use `visudo` (or `visudo -f` for files under `/etc/sudoers.d/`).  
+⚠️ Prefer `/etc/sudoers.d/` and `/etc/security/limits.d/` over editing monolithic files.
 
 ---
 
@@ -58,8 +59,18 @@ Set passwords:
     who
     w
     last
+
+NSS lookup (preferred over grepping files):
+
     getent passwd
     getent group
+    getent passwd alice
+    getent group developers
+
+Account state (fast signal):
+
+    sudo passwd -S alice
+    sudo chage -l alice | sed -n '1,120p'
 
 ---
 
@@ -92,11 +103,14 @@ Change home (and move it):
 Expire password (force change on next login):
 
     sudo passwd -e harry
+    sudo chage -l harry | sed -n '1,120p'
 
 Lock and unlock:
 
     sudo passwd -l harry
+    sudo passwd -S harry
     sudo passwd -u harry
+    sudo passwd -S harry
 
 ---
 
@@ -137,23 +151,27 @@ Check:
 
 Add file to skeleton:
 
-    sudo touch /etc/skel/NEWS
+    echo "Welcome to the lab" | sudo tee /etc/skel/WELCOME.txt > /dev/null
 
 Create user:
 
-    sudo useradd -m skeltest
-    ls -l /home/skeltest
+    sudo useradd -m -s /bin/bash skeltest
+    sudo passwd skeltest
+
+Verify:
+
+    ls -l /home/skeltest/WELCOME.txt
 
 Cleanup:
 
     sudo userdel -r skeltest
-    sudo rm -f /etc/skel/NEWS
+    sudo rm -f /etc/skel/WELCOME.txt
 
 ---
 
 ## 🌱 7) Environment Variables
 
-System-wide:
+### 7.1 System-wide (/etc/environment)
 
 Edit:
 
@@ -163,16 +181,16 @@ Add:
 
     LFCS_USERS_PHASE=ACTIVE
 
-Reload or re-login:
+Proof (capture inside a login shell):
 
-    source /etc/environment
-    printenv LFCS_USERS_PHASE
+    su - alice -c 'echo "LFCS_USERS_PHASE=$LFCS_USERS_PHASE" > ~/lfcs-users-phase-proof.txt'
+    sudo cat /home/alice/lfcs-users-phase-proof.txt
 
-Per-user:
+### 7.2 Per-user (~/.bashrc)
 
     echo 'export MYTESTVAR=hello' >> ~/.bashrc
-    source ~/.bashrc
-    echo $MYTESTVAR
+    . ~/.bashrc
+    echo "$MYTESTVAR"
 
 Capture environment:
 
@@ -183,21 +201,30 @@ Capture environment:
 
 ## 🔐 8) sudo (Privilege Control)
 
-Always use:
+### Preferred workflow: /etc/sudoers.d + visudo -f
 
-    sudo visudo
+Create a dedicated sudoers drop-in:
 
-### 8.1 Passwordless sudo for user
+    sudo visudo -f /etc/sudoers.d/harry
 
 Add:
 
     harry ALL=(ALL) NOPASSWD: ALL
 
+Validate (never skip):
+
+    sudo visudo -cf /etc/sudoers
+    sudo visudo -cf /etc/sudoers.d/harry
+
 Test as harry:
 
+    su - harry
     sudo -l
+    exit
 
 ### 8.2 Group sudo
+
+    sudo visudo -f /etc/sudoers.d/developers
 
 Add:
 
@@ -205,18 +232,11 @@ Add:
 
 ### 8.3 Restrict to one command
 
+    sudo visudo -f /etc/sudoers.d/harry-restrict
+
 Add:
 
     harry ALL=(ALL) /usr/bin/mount
-
-### 8.4 Run as specific user
-
-Add:
-
-    harry ALL=(sam) ALL
-
-Explain:
-- harry can run commands as user sam.
 
 ---
 
@@ -226,22 +246,23 @@ View current:
 
     ulimit -a
 
-Edit limits:
+Preferred workflow: a dedicated limits file:
 
-    sudo vi /etc/security/limits.conf
+    sudo vi /etc/security/limits.d/harry.conf
 
 Add:
 
     harry soft nproc 20
     harry hard nproc 30
 
-Log out and log back in as harry, then:
+Re-login and verify:
 
-    ulimit -a
+    su - harry -c 'ulimit -a > ~/harry-ulimit.txt'
+    sudo cat /home/newharry/harry-ulimit.txt 2>/dev/null || sudo cat /home/harry/harry-ulimit.txt
 
 ---
 
-## 🗃️ 10) Identity Databases
+## 🗃️ 10) Identity Databases (Recognition)
 
 Inspect:
 
@@ -270,15 +291,18 @@ Requirements:
 
 ### 11.2 Passwordless sudo (20 seconds)
 
-    sudo visudo
+    sudo visudo -f /etc/sudoers.d/examuser
 
 Add:
 
     examuser ALL=(ALL) NOPASSWD: ALL
 
-Test:
+Validate + test:
 
+    sudo visudo -cf /etc/sudoers
+    su - examuser
     sudo -l
+    exit
 
 ### 11.3 Force password change (10 seconds)
 
@@ -288,7 +312,7 @@ Test:
 
 ## 🧨 12) Failure Injection Drills
 
-### 12.1 Forgot -a with -G
+### 12.1 Forgot -a with -G (group wipe)
 
 Simulate:
 
@@ -307,14 +331,11 @@ Fix:
 
 ---
 
-### 12.2 Bad shell path
+### 12.2 Bad shell path (login breaks)
 
 Break:
 
     sudo usermod -s /bin/notreal harry
-
-Explain:
-- User cannot log in.
 
 Fix:
 
@@ -322,11 +343,16 @@ Fix:
 
 ---
 
-### 12.3 Sudoers syntax error (theory)
+### 12.3 Sudoers syntax error (practice workflow)
+
+Do NOT break your real sudoers.
+
+Practice the recovery method:
+
+    sudo visudo -cf /etc/sudoers
 
 Explain:
-- Why visudo exists
-- How it prevents total lockout
+- visudo prevents total lockout by validating syntax before install/save.
 
 ---
 
@@ -344,28 +370,24 @@ Goal:
 
     sudo useradd projectadmin -d /home/projects/projectadmin -m -s /bin/bash -g developers
     sudo passwd projectadmin
-    sudo visudo
 
-Add:
-
+    sudo visudo -f /etc/sudoers.d/projectadmin
     projectadmin ALL=(ALL) NOPASSWD: ALL
-
-Then:
 
     sudo passwd -e projectadmin
     getent passwd projectadmin
 
----
-
 ### 13.2 Apply resource limit
 
-Add to /etc/security/limits.conf:
+    sudo vi /etc/security/limits.d/projectadmin.conf
+
+Add:
 
     projectadmin hard nproc 50
 
 Re-login and verify:
 
-    ulimit -a
+    su - projectadmin -c 'ulimit -a | grep -i nproc || true'
 
 ---
 
@@ -390,7 +412,7 @@ You are done when:
 - You never break supplementary groups accidentally
 - You can lock/unlock and expire accounts safely
 - You can grant and restrict sudo without locking yourself out
-- You can explain and apply resource limits
+- You can explain and apply resource limits (and verify after re-login)
 - You can reason about /etc/passwd, /etc/group, /etc/shadow
 - You can recover from identity or sudo breakage
 
@@ -404,7 +426,7 @@ If you don’t control identity and privilege, you don’t control the system.
 
 ## 🧹 Cleanup (Optional)
 
-    sudo userdel -r harry
-    sudo userdel -r examuser
-    sudo userdel -r projectadmin
+    sudo userdel -r harry 2>/dev/null || true
+    sudo userdel -r examuser 2>/dev/null || true
+    sudo userdel -r projectadmin 2>/dev/null || true
 

@@ -60,7 +60,7 @@ Never start by editing config blindly.
 - **Never lock yourself out of root.**
 - **Always keep one recovery path available.**
 - **Prefer minimal, reversible changes.**
-- **Use `visudo` for sudoers.**
+- **Use `visudo` for sudoers** (prefer `/etc/sudoers.d/` + validation).
 - **Every action requires verification.**
 - **Classify DAC vs MAC early** (route to `security-triage-playbook.md` when needed).
 
@@ -81,7 +81,7 @@ You must know or determine:
 Fast storage sanity check (do not deep-dive here):
 
     findmnt / /home 2>/dev/null || true
-    mount | rg -n " on / | on /home " || true
+    mount | grep -E " on / | on /home " || true
     df -h / /home 2>/dev/null || true
 
 Decision gate:
@@ -179,27 +179,43 @@ Return to **Section 9 (Verify Access)**.
 
 ## 5) Fix sudo Access
 
-Check groups:
+### 5.1 Identify the correct admin group
+
+Check what exists:
+
+    getent group sudo 2>/dev/null || true
+    getent group wheel 2>/dev/null || true
+
+Decision:
+- If `sudo` group exists → prefer it
+- Else if `wheel` exists → use it
+- Else → use sudoers.d entry
+
+### 5.2 Group-based fix (preferred)
+
+    usermod -aG sudo <user> 2>/dev/null || true
+    usermod -aG wheel <user> 2>/dev/null || true
+
+Verify:
 
     groups <user>
 
-Check sudo groups:
+Return to **Section 9 (Verify Access)**.
 
-    getent group sudo || true
-    getent group wheel || true
+### 5.3 sudoers fix (when required)
 
-Add user to appropriate group:
+Create a drop-in:
 
-    usermod -aG sudo <user> || true
-    usermod -aG wheel <user> || true
+    visudo -f /etc/sudoers.d/<user>
 
-Or edit sudoers safely:
-
-    visudo
-
-Add line if required:
+Add:
 
     <user> ALL=(ALL) ALL
+
+Validate:
+
+    visudo -cf /etc/sudoers
+    visudo -cf /etc/sudoers.d/<user>
 
 Return to **Section 9 (Verify Access)**.
 
@@ -228,7 +244,7 @@ Then reboot.
 
 Check SSH service:
 
-    systemctl status sshd --no-pager
+    systemctl status sshd --no-pager || systemctl status ssh --no-pager
 
 Check config syntax:
 
@@ -240,7 +256,7 @@ If connecting by hostname, confirm DNS first (or temporarily try by IP):
 
 Check relevant settings:
 
-    rg -n "PermitRootLogin|PasswordAuthentication|PubkeyAuthentication" /etc/ssh/sshd_config
+    grep -nE "PermitRootLogin|PasswordAuthentication|PubkeyAuthentication|AllowUsers|AllowGroups|Match" /etc/ssh/sshd_config
 
 If SSH fails with “Permission denied” or key auth fails, do the **permissions gate** for `.ssh`:
 
@@ -248,7 +264,7 @@ If SSH fails with “Permission denied” or key auth fails, do the **permission
 
 After corrections, restart SSH:
 
-    systemctl restart sshd
+    systemctl restart sshd 2>/dev/null || systemctl restart ssh
 
 Return to **Section 9 (Verify Access)**.
 
@@ -353,19 +369,6 @@ Fix:
 If the issue is still present and SELinux exists, exit to:
 - `security-triage-playbook.md` (labeling via `restorecon` etc.)
 
-### 8.6 Special bits sanity (rare in access issues, but exam-relevant)
-
-If you discover unexpected SUID/SGID/sticky on user paths, capture evidence:
-
-    find "$home_dir" -maxdepth 2 -type f -perm -4000 -ls 2>/dev/null || true
-    find "$home_dir" -maxdepth 2 -type d -perm -2000 -ls 2>/dev/null || true
-
-Decision gate:
-- If special bits are present without intent, remove them minimally:
-
-    chmod u-s /path/to/file
-    chmod g-s /path/to/dir
-
 Return to **Section 9 (Verify Access)**.
 
 ---
@@ -413,7 +416,11 @@ Ensure:
 If sudoers is broken:
 
 - Use recovery shell
-- Run:
+- Validate:
+
+    visudo -cf /etc/sudoers
+
+Then fix with:
 
     visudo
 
@@ -472,3 +479,4 @@ You can explain:
 This is a **composition layer**, not a source of primitives.
 
 ---
+
