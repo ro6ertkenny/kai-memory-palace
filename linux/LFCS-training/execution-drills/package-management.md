@@ -1,7 +1,7 @@
 # 🧪 Package Management — Execution Drills (LFCS)
 
 Mental mode: Software lifecycle control.  
-Goal: Be able to **search, install, remove, purge, repair, audit, verify integrity, manage repos, and distinguish apt-managed vs source-built software** quickly and safely.
+Goal: Be able to **search, install, remove, purge, repair, audit, verify integrity, manage repos, and distinguish apt-managed vs source/manual software** quickly and safely.
 
 This is not a tutorial.  
 This is an **execution checklist**.
@@ -12,7 +12,20 @@ Core law:
 
 ---
 
-## 🧱 Lab Setup (Do once)
+## 🧠 Canonical Command Standard (Repo Rule)
+
+This repo standardizes on:
+
+- `apt-get` (canonical, stable scripting surface)
+- `dpkg` / `dpkg-query`
+
+Note:
+- `apt` often provides friendlier output for humans (`apt update`, `apt search`)
+- For LFCS drills and repeatability, use `apt-get`
+
+---
+
+## 🧱 Lab Setup
 
     mkdir -p ~/lfcs-labs/execution-drills/package-management
     cd ~/lfcs-labs/execution-drills/package-management
@@ -154,7 +167,7 @@ Optional: search installed packages (pattern):
 
 Verify (no output usually means clean):
 
-    dpkg -V coreutils
+    dpkg -V coreutils || true
 
 Explain:
 - output = files differ from package expectations
@@ -205,12 +218,12 @@ Then refresh:
 
 ---
 
-# E) Build From Source (Safe Flow)
+# E) Build From Source (Two Safe Patterns)
 
 Rule:
 - Do NOT overwrite core system binaries with source builds.
 - Prefer building + testing locally first.
-- If you install, be aware it may land in /usr/local and become outside apt control.
+- Manual installs often land in `/usr/local` and become outside apt control.
 
 ## E1 — Install build tools
 
@@ -218,17 +231,15 @@ Rule:
 
 ---
 
-## E2 — Fetch source (example: tmux)
+## E2 — Source build (package source flow)
 
-From your lab directory:
+Example using tmux source (no install required):
 
     cd ~/lfcs-labs/execution-drills/package-management
     apt-get source tmux
     cd tmux-*
 
----
-
-## E3 — Build cycle (no install yet)
+Build cycle:
 
     ./configure
     make
@@ -237,22 +248,63 @@ Test local binary (if produced):
 
     ./tmux -V || true
 
----
-
-## E4 — Optional controlled install (know the consequence)
-
-If you choose to install:
+Optional controlled install (understand the consequence):
 
     sudo make install
 
-Then verify which tmux you’re running:
+Verify which tmux you’re running:
 
     which tmux
     tmux -V
 
 ---
 
-# F) Distinguish apt-managed vs Source-installed
+## E3 — Build-from-source simulation (minimal C binary)
+
+Goal:
+- prove you can compile
+- install to `/usr/local/bin`
+- prove dpkg does not track it
+
+Setup:
+
+    cd ~/lfcs-labs/execution-drills/package-management
+    rm -rf hello-src && mkdir hello-src
+    cd hello-src
+
+Create source:
+
+    cat > hello.c <<EOF
+    #include <stdio.h>
+    int main() { printf("hello\n"); return 0; }
+    EOF
+
+Build:
+
+    gcc hello.c -o hello
+
+Install (manual):
+
+    sudo cp hello /usr/local/bin/hello
+
+Verify:
+
+    which hello
+    hello
+
+Prove it is not tracked by dpkg:
+
+    dpkg -S "$(which hello)" || echo "Not tracked (manual/source install)"
+
+Cleanup (optional):
+
+    sudo rm -f /usr/local/bin/hello
+    cd ..
+    rm -rf hello-src
+
+---
+
+# F) Distinguish apt-managed vs Source/manual-installed
 
 ## F1 — Identify origin of a binary
 
@@ -275,12 +327,12 @@ Interpretation:
 
 ---
 
-## G2 — Source-installed binary awareness
+## G2 — Source/manual-installed binary awareness
 
 Explain:
 - apt cannot remove a manually installed binary
 - removal is usually:
-  - make uninstall (if supported), or
+  - `make uninstall` (if supported), or
   - delete installed files manually (last resort)
 
 ---
@@ -345,7 +397,7 @@ Conclusion:
 
 Explain:
 - overwriting system-managed binaries risks breaking upgrades and dependencies
-- /usr/local is typically safer than /usr for manual installs
+- `/usr/local` is typically safer than `/usr` for manual installs
 
 ---
 
@@ -400,9 +452,3 @@ If you don’t control the software lifecycle, you don’t control the system.
 
 ---
 
-## 🧹 Cleanup (Optional)
-
-    cd ~
-    rm -rf ~/lfcs-labs/execution-drills/package-management/tmux-* || true
-
----
