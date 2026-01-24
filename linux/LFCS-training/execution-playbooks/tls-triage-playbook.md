@@ -1,330 +1,212 @@
-# 🔒 TLS Triage Playbook (LFCS)
+# 🔐 TLS / SSL Certificate Triage Playbook
+*Operational doctrine for diagnosing, selecting, validating, and repairing TLS certificates under time pressure.*
 
-**Path:** `linux/LFCS-training/execution-playbooks/tls-triage-playbook.md`  
-**Purpose:** Restore **valid, trusted TLS operation** for a service using a **safe, exam-ready operator algorithm**.
+Path:
+- linux/LFCS-training/execution-playbooks/tls-triage-playbook.md
 
-This is not a tutorial. This is a procedure.
+Mental mode:
+- Incident response
+- “Service is down / browser says cert is bad / chain is broken / wrong cert deployed”
 
----
-
-## 🎯 Scope
-
-Use this playbook when:
-
-- A service fails to start due to **certificate errors**
-- Clients reject connections due to **expired / wrong / untrusted cert**
-- TLS handshake fails
-- Wrong **key, cert, or chain** is configured
-- A recent cert change broke the service
-
-This playbook composes the following drill surfaces:
-
-- `linux/LFCS-training/execution-drills/ssl-certificates.md`
-- `linux/LFCS-training/execution-drills/services-and-logging.md`
-- `linux/LFCS-training/execution-drills/service-configuration.md`
-- `linux/LFCS-training/execution-drills/files-and-text.md`
-- `linux/LFCS-training/execution-drills/essential-commands.md`
-
-Related scenarios (practice inputs):
-
-- `linux/LFCS-training/failure-scenarios/scenario-10-tls-certificate-failure.md` (primary)
-- `linux/LFCS-training/failure-scenarios/scenario-3-service-is-down.md` (secondary, when TLS prevents startup)
-- `linux/LFCS-training/failure-scenarios/scenario-11-selinux-denial-breaks-service.md` (secondary, when MAC blocks cert/key paths)
+This is **not** a crypto tutorial.  
+This is **execution under pressure**.
 
 ---
 
-## 🧠 Operator Contract
+## 📌 Scope
 
-Always proceed in this order:
+This playbook covers:
 
-1. **Reproduce and observe**
-2. **Identify the TLS endpoint**
-3. **Inspect certificate material**
-4. **Validate certificate, key, and dates**
-5. **Validate chain**
-6. **Verify service configuration**
-7. **Apply minimal correction**
-8. **Verify**
-9. **Make persistent**
-10. **Rollback if needed**
-
-Never regenerate keys or certs blindly.
+- Identifying cert vs key vs CSR instantly
+- Inspecting subject, SAN, expiration, and key size
+- Verifying which cert a service is actually serving
+- Selecting the correct cert among many
+- Detecting expired / wrong / weak certs
+- Verifying certificate chains
+- Generating replacement keys, CSRs, and certs
+- Avoiding service-breaking mistakes
 
 ---
 
-## 🧭 Global Safety Rules
+## 🧱 Laws of TLS Triage
 
-- **Preserve evidence first.** Inspect before replacing files.
-- **Never loosen private key permissions.**
-- **Do not guess chain order.**
-- **Prefer smallest, reversible change.**
-- **Every action requires verification.**
-
----
-
-## 0) Inputs
-
-You must know or determine:
-
-- Service name
-- Port
-- Paths to:
-  - certificate
-  - private key
-  - chain (if applicable)
-- Exact client or service error message
+1. Most TLS failures are **selection and deployment mistakes**, not crypto.
+2. Always answer first:
+   - Which cert is the service serving?
+   - Which cert should it be serving?
+3. Never overwrite keys or certs without a backup.
+4. Never delete before you prove.
 
 ---
 
-## 1) Reproduce and Observe
+## 🧭 Quick Identification (File Types)
 
-Check service:
+Identify file types immediately:
 
-    systemctl status <service> --no-pager
-    journalctl -u <service> --no-pager -n 80
+    openssl x509 -in file.crt -noout -subject      # certificate
+    openssl pkey -in file.key -noout -text         # private key
+    openssl req  -in file.csr -noout -subject      # CSR
 
-Test locally:
-
-    curl -vk https://localhost:<port>
-
-Or:
-
-    openssl s_client -connect localhost:<port>
-
-Record:
-
-- Error message
-- Whether a cert is presented
-- Which cert is presented
-
-If the service is not running at all, you may need to **temporarily** switch to:
-
-- `service-recovery-playbook.md`
-
-Then return here once the service starts.
+If one of these errors:
+- “unable to load certificate” → it’s not a cert
+- “unable to load key” → it’s not a key
 
 ---
 
-## 2) Identify TLS Endpoint and Files
+## 🔍 Inspect a Certificate (Core Signals)
 
-Inspect service configuration:
+Subject and SAN:
 
-    grep -R "ssl\|tls\|cert" /etc/<service>/
+    openssl x509 -in server.crt -noout -subject
+    openssl x509 -in server.crt -noout -text | grep -A1 "Subject Alternative Name"
 
-Or open the main config:
+Expiration:
 
-    vi /etc/<service>/<config>
+    openssl x509 -in server.crt -noout -enddate
 
-Identify and write down paths to:
+Key size:
 
-- cert file
-- key file
-- chain file (if any)
+    openssl x509 -in server.crt -noout -text | grep "Public-Key"
 
----
+Issuer:
 
-## 3) Inspect Certificate Material
-
-Check files exist and are readable by the service:
-
-    ls -l /path/to/cert.pem
-    ls -l /path/to/key.pem
-    ls -l /path/to/chain.pem
-
-Check ownership and modes:
-
-- Private key should usually be:
-  - owned by root or service user
-  - mode 600 or similarly restrictive
-
-If access is denied and SELinux is enforcing, check:
-
-    getenforce
-    ausearch -m avc -ts recent
-
-And consider:
-
-    restorecon -Rv /path/to/
+    openssl x509 -in server.crt -noout -issuer
 
 ---
 
-## 4) Validate Certificate and Key
+## 🌐 Inspect What a Service Is Actually Serving
 
-Check certificate dates:
+Direct socket check:
 
-    openssl x509 -in /path/to/cert.pem -noout -dates
+    openssl s_client -connect example.com:443 -servername example.com
 
-Check subject and issuer:
+Then inspect the presented cert:
 
-    openssl x509 -in /path/to/cert.pem -noout -subject -issuer
+    openssl s_client -connect example.com:443 -servername example.com </dev/null 2>/dev/null | openssl x509 -noout -subject -enddate -issuer
 
-Check key matches cert:
+This answers:
 
-    openssl x509 -noout -modulus -in /path/to/cert.pem | openssl md5
-    openssl rsa  -noout -modulus -in /path/to/key.pem  | openssl md5
-
-The hashes must match.
-
-If:
-
-- Cert is expired
-- Or key does not match
-
-→ Go to **Section 7**.
+- Which cert is live
+- Whether it is expired
+- Who issued it
 
 ---
 
-## 5) Validate Chain
+## 🧬 Verify Certificate Chain
 
-If a chain file is used:
+Given a cert file:
 
-    cat /path/to/chain.pem
+    openssl verify server.crt
 
-Test verification:
+With explicit CA bundle:
 
-    openssl verify -CAfile /path/to/chain.pem /path/to/cert.pem
+    openssl verify -CAfile chain.pem server.crt
 
-If verification fails:
-
-- Missing intermediate
-- Wrong file order
-- Wrong CA file
-
-Fix the chain file, then continue.
+If this fails:
+- You have a missing or wrong intermediate
+- Or the wrong cert entirely
 
 ---
 
-## 6) Verify Service Configuration
+## 🧹 Selecting the Right Cert Among Many
 
-Confirm:
+Enumerate:
 
-- Config points to the correct files
-- No typos in paths
-- No stale references to old certs
+    for f in *.crt; do echo "==== $f ===="; openssl x509 -in "$f" -noout -subject -enddate; done
 
-Validate config if supported:
+Find:
+- Correct CN / SAN
+- Not expired
+- Correct issuer
+- Correct key size
 
-    nginx -t
-    httpd -t
-
-Restart service:
-
-    systemctl restart <service>
-
-If it still fails:
-
-- Return to **Section 1** and re-observe.
+Only then consider deleting others.
 
 ---
 
-## 7) Replace or Fix Certificate Material
+## 🗑️ Safe Deletion Rule
 
-If cert is expired, wrong, or mismatched:
+Before deleting anything:
 
-- Obtain or generate the correct cert (exam scope: assume provided or self-signed if instructed)
-- Place files in correct paths
-- Fix ownership and modes:
+    openssl x509 -in correct.crt -noout -subject > keep-proof.txt
 
-    chown root:root /path/to/key.pem
-    chmod 600 /path/to/key.pem
+Then:
 
-Restart service:
+    rm -f wrong1.crt wrong2.crt old.crt
 
-    systemctl restart <service>
-
-Return to **Section 1**.
+Always leave proof.
 
 ---
 
-## 8) Verification
+## 🛠️ Generate New Key + CSR
 
-Test locally:
+    openssl req -newkey rsa:2048 -nodes -keyout server.key -out server.csr -subj "/CN=example.com"
 
-    curl -vk https://localhost:<port>
+Verify:
 
-Or:
-
-    openssl s_client -connect localhost:<port>
-
-Confirm:
-
-- No certificate errors
-- Correct certificate is presented
-- Service is running:
-
-    systemctl status <service> --no-pager
+    openssl req -in server.csr -noout -subject
 
 ---
 
-## 9) Persistence Check
+## 🧪 Generate Temporary Self-Signed Cert (Testing Only)
 
-Ensure:
+    openssl req -x509 -noenc -days 365 -keyout test.key -out test.crt -subj "/CN=test.local"
 
-- Files are in stable, non-temporary paths
-- Config does not reference temp locations
-- Permissions and ownership are correct
+Inspect:
 
-Restart test:
-
-    systemctl restart <service>
-    systemctl status <service> --no-pager
+    openssl x509 -in test.crt -noout -subject -enddate
 
 ---
 
-## 🔁 Rollback Strategy
+## 🔁 Check That Cert Matches Key
 
-If a new cert or config breaks things:
+    openssl x509 -noout -modulus -in server.crt | openssl md5
+    openssl pkey -noout -modulus -in server.key | openssl md5
 
-- Restore previous cert/key/chain
-- Restore previous config
-- Restart service
-- Re-verify
-
-Always keep backups of:
-
-- cert
-- key
-- config
+These must match.
 
 ---
 
-## ✅ Completion Criteria
+## 🧯 Common Failure Patterns
 
-- Service starts cleanly
-- Clients connect without TLS errors
-- Certificate:
-  - is valid
-  - is not expired
-  - matches the private key
-  - has a correct chain (if used)
-- Configuration is stable
-
-You can explain:
-
-- What was wrong
-- Why it broke TLS
-- Why your fix was minimal and safe
-- How you verified recovery
+- Cert not expired, but:
+  - Wrong CN / SAN
+  - Wrong cert file configured
+  - Missing intermediate chain
+  - Key does not match cert
+- “It works in curl but not in browser” → chain problem
+- “It worked yesterday” → expiration or renewal deployed incorrectly
 
 ---
 
-## 🧠 Exam Safety Rules
+## 🧠 Operator Checklist
 
-- Never expose private keys with loose permissions
-- Never guess at chain order
-- Always verify dates and key match
-- Always test with curl or openssl after changes
+When TLS is broken:
+
+- [ ] What cert is being served?
+- [ ] Is it expired?
+- [ ] Is the name correct?
+- [ ] Does the key match?
+- [ ] Is the chain complete?
+- [ ] Is the service pointing at the correct files?
+
+---
+
+## 🏁 Success Criteria
+
+You can:
+
+- Identify cert vs key vs CSR instantly
+- Inspect subject, SAN, expiration, and key size
+- Verify what a service is serving
+- Verify chains
+- Select the correct cert among many
+- Generate replacement keys and CSRs safely
+- Avoid deleting the wrong thing
 
 ---
 
-## 🧱 This Playbook Composes From
+## 🔒 Final Law
 
-- ssl-certificates.md
-- services-and-logging.md
-- service-configuration.md
-- files-and-text.md
-- essential-commands.md
+Most TLS outages are **file selection mistakes**, not cryptography problems.
 
-This is a **composition layer**, not a source of primitives.
-
----
