@@ -56,7 +56,7 @@ Goal: read success/failure immediately.
 
 Target: 10 reps, no hesitation.
 
-🧠 The rule (must memorize)
+### 🧠 The rule (must memorize)
 
 In Unix/Linux:
 
@@ -79,7 +79,7 @@ false
 echo $?
 # -> 1
 
-🧱 Why Unix did it this way
+### 🧱 Why Unix did it this way
 
 Because it allows:
 
@@ -119,7 +119,7 @@ non-zero = failure
 test -f /etc/passwd && echo "exists" || echo "missing"
 
 
-🧠 Step 1 — test -f /etc/passwd
+### 🧠 Step 1 — test -f /etc/passwd
 
 test is a command that:
 
@@ -137,7 +137,7 @@ If it does not exist (or is not a regular file) → exit code ≠ 0 (failure)
 
 It prints nothing. It only sets $?.
 
-🧠 Step 2 — && echo "exists"
+### 🧠 Step 2 — && echo "exists"
 
 && means:
 
@@ -149,7 +149,7 @@ If /etc/passwd exists → this runs:
 
 echo "exists"
 
-##🧠 Step 3 — || echo "missing"
+### 🧠 Step 3 — || echo "missing"
 
 || means:
 
@@ -161,13 +161,13 @@ If test -f /etc/passwd failed → this runs:
 
 echo "missing"
 
-##🧠 Whole thing in plain English
+### 🧠 Whole thing in plain English
 
 Check if /etc/passwd exists.
 If it does → print exists.
 If it does not → print missing.
 
-##🧠 What $? means
+### 🧠 What $? means
 
 $? = “The exit code of the last command that ran.”
 
@@ -184,7 +184,7 @@ Means:
 
 The test -f /etc/passwd command succeeded.
 
-##🧪 Why this works
+### 🧪 Why this works
 
 Because:
 
@@ -194,7 +194,7 @@ test returns only an exit code
 
 The shell is acting like a logic engine
 
-##⚠️ Subtle but important operator detail
+### ⚠️ Subtle but important operator detail
 
 This is evaluated as:
 
@@ -207,7 +207,7 @@ If test succeeds → echo "exists" runs → that also succeeds → || echo "miss
 
 If test fails → the && part is skipped → whole left side fails → echo "missing" runs
 
-##🧠 Operator mental model
+### 🧠 Operator mental model
 
 Every command is just:
 
@@ -215,7 +215,7 @@ Every command is just:
 
 And the shell chains them like logic blocks.
 
-##🎯 Why this is exam-critical
+### 🎯 Why this is exam-critical
 
 Because you will often see or need to write:
 
@@ -229,22 +229,22 @@ Example:
 
 test -d /backup && rm -rf /backup || echo "no backup dir"
 
-##🏁 Final one-line translation
+### 🏁 Final one-line translation
 
 “If /etc/passwd exists, say so. Otherwise, say it’s missing.”
 
 
 ##This is one of the most important rules in all of Linux and scripting.
 
-##🧠 Operator-grade mental model
+### 🧠 Operator-grade mental model
 
 mkdir -p = “Make this path exist. I don’t care if parts already exist.”
 
-##🎯 Why LFCS loves this
+### 🎯 Why LFCS loves this
 
 Because provisioning scripts and recovery commands must not fail if rerun.
 
-##🏁 Lock-in sentence
+### 🏁 Lock-in sentence
 
 -p makes mkdir safe, repeatable, and parent-aware.
 
