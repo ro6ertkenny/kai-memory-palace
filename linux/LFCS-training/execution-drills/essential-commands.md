@@ -310,7 +310,77 @@ Goal: interpret grep exit codes correctly.
     cat input.txt | grep beta
     echo $?
 
-Pass condition: you can explain:
+🧠 What it does (simple)
+
+It writes the words alpha, beta, and gamma one per line into a file called input.txt.
+
+After running it:
+
+cat input.txt
+
+
+You’ll see:
+
+alpha
+beta
+gamma
+
+### 🧱 Now, the pieces and “flags”
+1️⃣ printf
+
+printf = “Print formatted output” (like C’s printf)
+
+It does not automatically add newlines unless you tell it to.
+
+2️⃣ "%s\n"
+
+This is the format string.
+
+%s = “print a string”
+
+\n = “print a newline”
+
+So:
+
+"%s\n" means: “Print each string, then move to a new line.”
+
+3️⃣ alpha beta gamma
+
+These are the strings being printed.
+
+printf will apply the format to each argument:
+
+prints alpha\n
+
+prints beta\n
+
+prints gamma\n
+
+4️⃣ > input.txt
+
+> = “Redirect output into a file (overwrite it).”
+
+So:
+
+Instead of printing to the screen,
+
+The output goes into input.txt
+
+If the file exists → it is replaced
+
+If it doesn’t exist → it is created
+
+### 📌 Tiny exam-grade detail
+
+Unlike echo, printf:
+
+Is consistent across shells
+
+Does not add extra newlines unless you specify them
+
+Is preferred in scripts
+
+#### Pass condition: you can explain:
 - `grep` returns non-zero when no matches (not necessarily “error”)
 
 ---
@@ -365,6 +435,207 @@ Pass condition: no confusion between job spec (`%1`) vs PID.
 - Find files modified in last N days
 - Find and delete a file by inode
 - Find files and run a command on them
+
+    find . -name "*.conf"
+    find . -size +10M
+    find . -type f
+    find . -user root
+    find . -perm 777
+    find . -mtime -7
+    ls -i
+    find . -inum 123456 -delete
+    find . -type f -exec ls -lh {} +
+
+## 🔎 `find` — File Discovery Drills (LFCS)
+
+Goal: Find files fast by **name, size, type, owner, permissions, time**, and safely **act on results**.
+
+---
+
+## 🧠 0) Mental Model
+
+`find <PATH> <TESTS> <ACTIONS>`
+
+- **PATH**: where to search (e.g., `.` or `/etc`)
+- **TESTS**: filters (name, size, type, owner, perms, mtime, inode)
+- **ACTIONS**: what to do with matches (`-print`, `-delete`, `-exec ...`)
+
+---
+
+## 1) Find files by name
+
+Find by exact name:
+
+    find . -name "sshd_config"
+
+Find by wildcard pattern:
+
+    find . -name "*.conf"
+
+Case-insensitive:
+
+    find . -iname "*.conf"
+
+---
+
+## 2) Find files by size
+
+Larger than 10 MB:
+
+    find . -size +10M
+
+Smaller than 10 MB:
+
+    find . -size -10M
+
+Between 10 MB and 100 MB:
+
+    find . -size +10M -size -100M
+
+Tip: common suffixes:
+- `c` bytes
+- `k` KiB
+- `M` MiB
+- `G` GiB
+
+---
+
+## 3) Find files by type
+
+Regular files:
+
+    find . -type f
+
+Directories:
+
+    find . -type d
+
+Symbolic links:
+
+    find . -type l
+
+---
+
+## 4) Find files by owner
+
+Owned by user `root`:
+
+    find . -user root
+
+Owned by group `adm`:
+
+    find . -group adm
+
+Owned by numeric UID (example `0` for root):
+
+    find . -uid 0
+
+---
+
+## 5) Find files by permissions
+
+Exact mode 777 (be careful, this is usually bad):
+
+    find . -perm 777
+
+At least these bits set (e.g., any file writable by group):
+
+    find . -perm -020
+
+Any of these bits set (e.g., writable by group OR others):
+
+    find . -perm /022
+
+Common LFCS checks:
+- world-writable files:
+
+    find / -type f -perm /002 2>/dev/null
+
+- SUID binaries:
+
+    find / -type f -perm -4000 2>/dev/null
+
+- SGID binaries:
+
+    find / -type f -perm -2000 2>/dev/null
+
+---
+
+## 6) Find files modified in last N days
+
+Modified in last 7 days:
+
+    find . -mtime -7
+
+Modified more than 7 days ago:
+
+    find . -mtime +7
+
+Modified exactly 7 days ago (roughly):
+
+    find . -mtime 7
+
+Note:
+- `-mtime` is in **24-hour chunks**.
+- Use `-mmin` for minutes.
+
+Modified in last 60 minutes:
+
+    find . -mmin -60
+
+---
+
+## 7) Find and delete a file by inode (safe method)
+
+### Step A — list inode numbers
+
+Show inode + name in current tree:
+
+    find . -maxdepth 2 -printf '%i %p\n' | head
+
+Or for a single directory:
+
+    ls -i
+
+### Step B — match by inode (confirm first)
+
+Replace `123456`:
+
+    find . -inum 123456 -ls
+
+### Step C — delete by inode
+
+Only after confirming the `-ls` output is correct:
+
+    find . -inum 123456 -delete
+
+Safer: prompt before delete:
+
+    find . -inum 123456 -ok rm -i {} \;
+
+---
+
+## 8) Find files and run a command on them
+
+List files with sizes (fast batching):
+
+    find . -type f -exec ls -lh {} +
+
+Run a command per-file (slower but simple):
+
+    find . -type f -exec ls -lh {} \;
+
+Use `-ok` to confirm each execution:
+
+    find . -type f -ok ls -lh {} \;
+
+Example: search `.conf` and show first 5 lines:
+
+    find . -name "*.conf" -type f -exec sh -c 'echo "=== {} ==="; head -n 5 "{}"' \;
+
+---
+
+## ✅ Your exact commands, corrected as a clean set
 
     find . -name "*.conf"
     find . -size +10M
