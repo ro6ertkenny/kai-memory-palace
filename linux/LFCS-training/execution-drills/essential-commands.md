@@ -492,11 +492,31 @@ Between 10 MB and 100 MB:
 
     find . -size +10M -size -100M
 
-Tip: common suffixes:
-- `c` bytes
-- `k` KiB
-- `M` MiB
-- `G` GiB
+### 🧠 Mental rule (for LFCS)
+
+find always needs:
+where to look first, then what to match
+
+So think:
+
+find WHERE WHAT
+
+Examples:
+
+find . -type f
+find /var -size +1G
+find /home -user bob
+
+⚠️ One more important detail
+
+You can technically omit the path and GNU find will assume .:
+
+find -name "*.conf"
+
+
+But for the exam and for clarity:
+
+Always write the path explicitly (. or /etc or /var).
 
 ---
 
@@ -646,6 +666,10 @@ Example: search `.conf` and show first 5 lines:
     ls -i
     find . -inum 123456 -delete
     find . -type f -exec ls -lh {} +
+
+find . -type f
+find /var -size +1G
+find /home -user bob
 
 ---
 
