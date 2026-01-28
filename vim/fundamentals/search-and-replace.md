@@ -23,6 +23,10 @@ If you edit without a clear target, you are guessing.
 - n → next match
 - N → previous match
 
+You must press enter after typing what you want to search to invoke n & N functionality
+
+
+
 Search narrows the problem space.  
 Use it constantly.
 
@@ -96,11 +100,25 @@ Replace only inside a visual selection:
 ---
 
 ## 🔦 Search Highlight Control
+Turn on Search Highlighting
+
+    :set hlsearch
+
+Turn off Search Highlighting
+
+    :set nohlsearch
+
 Clear search highlighting:
 
     :noh
 
 Do not confuse highlighting with selection.
+
+💡 Optional (nice-to-have later)
+
+If you want Vim to highlight as you type:
+
+    :set incsearch
 
 ---
 
