@@ -1,10 +1,10 @@
 # 🧪 Essential Commands — Execution Drills (LFCS)
 
 Mental mode: Muscle memory.  
-Goal: Be able to execute every task below **without thinking**.
+Goal: Be able to execute every task below **without thinking**
 
-This file is not a tutorial.  
-This is a **hands-on execution checklist + drill pack**.
+This file is not a tutorial  
+This is a **hands-on execution checklist + drill pack**
 
 If you need deeper redirection/pipeline reps, see:
 - `linux/LFCS-training/execution-drills/files-and-text.md`
@@ -46,7 +46,7 @@ Rules of engagement:
 # A) Atomic Drills (Repetition)
 
 #### A1 — Exit codes
-Goal: read success/failure immediately.
+Goal: read success/failure immediately
 
     true
     echo $?
@@ -87,16 +87,18 @@ Because it allows:
 
 Any other number = “something went wrong”
 
-And different numbers can mean different kinds of errors.
+And different numbers can mean different kinds of errors
 
 #### A2 — Safe chaining with && and ||
-Goal: use conditional chaining correctly.
+
+Goal: use conditional chaining correctly
 
     mkdir -p a2 && echo "mkdir ok" || echo "mkdir failed"
     test -f /etc/passwd && echo "exists" || echo "missing"
     test -f /nope && echo "exists" || echo "missing"
 
-##🔗 How this ties to && and ||
+## 🔗 How this ties to && and ||
+
 command && echo "success"
 command || echo "failed"
 
@@ -123,7 +125,7 @@ test -f /etc/passwd && echo "exists" || echo "missing"
 
 test is a command that:
 
-Checks a condition and returns an exit code.
+Checks a condition and returns an exit code
 
 -f /etc/passwd means:
 
@@ -135,13 +137,14 @@ If /etc/passwd exists and is a normal file → exit code = 0 (success)
 
 If it does not exist (or is not a regular file) → exit code ≠ 0 (failure)
 
-It prints nothing. It only sets $?.
+It prints nothing. It only sets $?
+
 
 ### 🧠 Step 2 — && echo "exists"
 
 && means:
 
-“Only run the next command if the previous command succeeded (exit 0).”
+“Only run the next command if the previous command succeeded (exit 0)”
 
 So:
 
@@ -149,11 +152,12 @@ If /etc/passwd exists → this runs:
 
 echo "exists"
 
+
 ### 🧠 Step 3 — || echo "missing"
 
 || means:
 
-“Only run the next command if the previous command failed (exit ≠ 0).”
+“Only run the next command if the previous command failed (exit ≠ 0)”
 
 So:
 
@@ -161,17 +165,17 @@ If test -f /etc/passwd failed → this runs:
 
 echo "missing"
 
-#### -f means: “Check whether the given path exists and is a regular file (not a directory or device).”
+#### -f means: “Check whether the given path exists and is a regular file (not a directory or device)”
 
 ### 🧠 Whole thing in plain English
 
-Check if /etc/passwd exists.
-If it does → print exists.
-If it does not → print missing.
+Check if /etc/passwd exists
+If it does → print exists
+If it does not → print missing
 
 ### 🧠 What $? means
 
-$? = “The exit code of the last command that ran.”
+$? = “The exit code of the last command that ran”
 
 In your case:
 
@@ -203,7 +207,7 @@ This is evaluated as:
 
 ( test -f /etc/passwd && echo "exists" ) || echo "missing"
 
-“If /etc/passwd exists, say so. Otherwise, say it’s missing.”
+“If /etc/passwd exists, say so. Otherwise, say it’s missing”
 
 So:
 
@@ -214,9 +218,9 @@ If test fails → the && part is skipped → whole left side fails → echo "mis
 
 ### 🏁 Final one-line translation
 
-“If /etc/passwd exists, say so. Otherwise, say it’s missing.”
+“If /etc/passwd exists, say so. Otherwise, say it’s missing”
 
-##This is one of the most important rules in all of Linux and scripting.
+## This is one of the most important rules in all of Linux and scripting.
 
 
 ### 🧠 Operator mental model
@@ -225,7 +229,7 @@ Every command is just:
 
 “Do something → return success or failure”
 
-And the shell chains them like logic blocks.
+And the shell chains them like logic blocks
 
 
 ### 🎯 Why this is exam-critical
@@ -244,7 +248,8 @@ test -d /backup && rm -rf /backup || echo "no backup dir"
 
 
 ### 🧱 How it works (very simply)
-test -d /backup
+
+#### test -d /backup
 
 → Checks: “Does a directory named /backup exist?”
 
@@ -254,7 +259,7 @@ If no → failure → skip to ||
 
 && rm -rf /backup
 
-→ If it exists, remove it completely.
+→ If it exists, remove it completely
 
 || echo "no backup dir"
 
@@ -263,7 +268,7 @@ If no → failure → skip to ||
 
 ### 🧠 One-line mental model
 
-“Delete /backup if it exists, otherwise say it’s not there.”
+“Delete /backup if it exists, otherwise say it’s not there”
 
 
 #### ⚠️ Operator note (important but simple)
@@ -272,33 +277,34 @@ This is exactly the kind of one-liner used in scripts and recovery tasks, but yo
 
 rm -rf
 
-Because it deletes without asking.
+Because it deletes without asking
 
-It checks if /backup exists; if it does, it deletes it, otherwise it prints “no backup dir”.
+It checks if /backup exists; if it does, it deletes it, otherwise it prints “no backup dir”
 
 
 ### 🧠 Operator-grade mental model
 
-mkdir -p = “Make this path exist. I don’t care if parts already exist.”
+mkdir -p = “Make this path exist. I don’t care if parts already exist”
 
 
 ### 🎯 Why LFCS loves this
 
-Because provisioning scripts and recovery commands must not fail if rerun.
+Because provisioning scripts and recovery commands must not fail if rerun
 
 
 ### 🏁 Lock-in sentence
 
--p makes mkdir safe, repeatable, and parent-aware.
+-p makes mkdir safe, repeatable, and parent-aware
 
 
 ### A3 — Grouping and redirecting a command group
+
 Goal: redirect output of a group (not only one command).
 
     { date; uptime; echo "OK"; } > report.txt
     cat report.txt
 
-Target: 10 reps.
+Target: 10 reps
 
 ---
 
@@ -317,7 +323,7 @@ Goal: interpret grep exit codes correctly.
 
 #### 🧠 What it does (simple)
 
-It writes the words alpha, beta, and gamma one per line into a file called input.txt.
+It writes the words alpha, beta, and gamma one per line into a file called input.txt
 
 After running it:
 
@@ -336,12 +342,12 @@ gamma
 
 printf = “Print formatted output” (like C’s printf)
 
-It does not automatically add newlines unless you tell it to.
+It does not automatically add newlines unless you tell it to
 
 
 2️⃣ "%s\n"
 
-This is the format string.
+This is the format string
 
 %s = “print a string”
 
@@ -349,12 +355,12 @@ This is the format string.
 
 So:
 
-"%s\n" means: “Print each string, then move to a new line.”
+"%s\n" means: “Print each string, then move to a new line”
 
 
 3️⃣ alpha beta gamma
 
-These are the strings being printed.
+These are the strings being printed
 
 printf will apply the format to each argument:
 
@@ -367,7 +373,7 @@ prints gamma\n
 
 4️⃣ > input.txt
 
-> = “Redirect output into a file (overwrite it).”
+> = “Redirect output into a file (overwrite it)”
 
 So:
 
@@ -381,12 +387,14 @@ If it doesn’t exist → it is created
 
 
 #### printf "%s\n" * > input.txt
+
 ####🧱 Why it’s powerful
+
 * is a glob.
 
 It means:
 
-“All files and directories in the current directory.”
+“All files and directories in the current directory”
 
 So this command:
 
@@ -401,7 +409,7 @@ Then > input.txt writes them into a file
 
 So in one command, you can:
 
-Generate a complete inventory of the current directory into a file.
+Generate a complete inventory of the current directory into a file
 
 That’s extremely useful for:
 
@@ -425,7 +433,7 @@ If you run it in:
 
 A big project directory
 
-* can expand to hundreds or thousands of entries.
+* can expand to hundreds or thousands of entries
 
 You may:
 
@@ -452,16 +460,18 @@ Names with newlines
 Names starting with - (can break other commands)
 
 #### The redirection is destructive
+
 bash
 Copy code
 > input.txt
 Means:
 
-Overwrite input.txt without asking.
+Overwrite input.txt without asking
 
-If input.txt had something important in it — it’s gone.
+If input.txt had something important in it — it’s gone
 
 ####  Shell expansion happens before the command runs
+
 So:
 
 bash
@@ -477,12 +487,14 @@ If there are too many, you can even hit:
 “Argument list too long”
 
 ### 🧠 Operator mental model
+
 * is a chainsaw:
 
-Very fast, very powerful — and can remove things you didn’t intend.
+Very fast, very powerful — and can remove things you didn’t intend
 
 🏁 One-line summary
-It’s powerful because it instantly enumerates everything; it’s dangerous because it does so blindly and can overwrite files or produce massive, unexpected output.
+
+It’s powerful because it instantly enumerates everything; it’s dangerous because it does so blindly and can overwrite files or produce massive, unexpected output
 
 ### 📌 Tiny exam-grade detail
 
@@ -495,12 +507,13 @@ Does not add extra newlines unless you specify them
 Is preferred in scripts
 
 #### Pass condition: you can explain:
+
 - `grep` returns non-zero when no matches (not necessarily “error”)
 
 
 # Job control muscle memory
 
-Goal: manage background/foreground without confusion.
+Goal: manage background/foreground without confusion
 
 Start a long job:
 
@@ -521,7 +534,7 @@ Terminate safely:
     jobs
     kill %1
 
-Pass condition: no confusion between job spec (`%1`) vs PID.
+Pass condition: no confusion between job spec (`%1`) vs PID
 
 
 # 🔐 Local and Remote Login
@@ -563,13 +576,13 @@ find /home -user bob
 
 ⚠️ One more important detail
 
-You can technically omit the path and GNU find will assume .:
+You can technically omit the path and GNU find will assume . :
 
 find -name "*.conf"
 
 But for the exam and for clarity:
 
-Always write the path explicitly (. or /etc or /var).
+Always write the path explicitly (. or /etc or /var)
 
 ---
 
@@ -667,7 +680,7 @@ Any of these bits set (e.g., writable by group OR others):
 
     find . -perm /022
 
-Common LFCS checks:
+#### Common LFCS checks:
 - world-writable files:
 
     find / -type f -perm /002 2>/dev/null
@@ -765,17 +778,17 @@ Example: search `.conf` and show first 5 lines:
 
 ### 🧠 What this is about (in plain English)
 
-This is about using a pre-built file index to find files instantly, instead of searching the disk live.
+This is about using a pre-built file index to find files instantly, instead of searching the disk live
 
 #### 🧱 The two commands
 
 ##### sudo updatedb
 
-Rebuilds the file search database (updates the index of what files exist on the system).
+Rebuilds the file search database (updates the index of what files exist on the system)
 
 ##### locate passwd
 
-Searches that database for any file whose name contains passwd.
+Searches that database for any file whose name contains passwd
 
 #### 🧠 How this works conceptually
 
@@ -785,15 +798,15 @@ locate = search the index (very fast)
 
 So:
 
-You first update the list, then you search the list.
+You first update the list, then you search the list
 
 #### 🏁 One-line summary
 
-updatedb refreshes the file index, and locate passwd quickly finds files named like “passwd” using that index.
+updatedb refreshes the file index, and locate passwd quickly finds files named like “passwd” using that index
 
 #### ⚠️  Important exam note (simple)
 
-locate may show old results if you haven’t run updatedb recently.
+locate may show old results if you haven’t run updatedb recently
 
 ---
 
@@ -815,52 +828,52 @@ locate may show old results if you haven’t run updatedb recently.
 
 ## Globbing = “Pattern matching for filenames”
 
-The shell expands patterns like * and ? into real filenames before the command runs.
+The shell expands patterns like * and ? into real filenames before the command runs
 
 ### * — match anything
 
 ls a*
 
- List all files that start with a.
+ List all files that start with a
 
 
 ### ? — match one character
 
 ls a?
 
- List files named a plus exactly one character (like ab, a1, etc).
+ List files named a plus exactly one character (like ab, a1, etc)
 
 
 ### [] — match one character from a set
 
 ls a[bc]
 
- List files named ab or ac.
+ List files named ab or ac
 
 ### Ranges inside []
 
 ls a[a-c]*
 
- List files that start with a and whose second letter is between a and c.
+ List files that start with a and whose second letter is between a and c
 
 
 ### {} — generate multiple names
 
 mkdir test-{1,2,3}
 
- Creates: test-1, test-2, test-3.
+ Creates: test-1, test-2, test-3
 
 
 ### Exclusions with !
 
 ls [!a]*
 
- List files that do not start with a.
+ List files that do not start with a
 
 
 #### 🏁 One-line summary
 
-Globbing lets the shell expand patterns into filenames so you can operate on many files at once.
+Globbing lets the shell expand patterns into filenames so you can operate on many files at once
 
 ---
 
@@ -883,7 +896,7 @@ df = disk free
 
 -h = human-readable (show sizes in KB/MB/GB instead of raw numbers)
 
-Shows how much disk space is used and free in a human-readable way (GB, MB).
+Shows how much disk space is used and free in a human-readable way (GB, MB)
 
 “How full are my disks?”
 
@@ -893,7 +906,7 @@ df = disk free
 
 -T = type (show the filesystem type, like ext4, xfs)
 
-Shows what filesystem type each mounted filesystem is (ext4, xfs, etc).
+Shows what filesystem type each mounted filesystem is (ext4, xfs, etc)
 
 “What kind of filesystem is this disk using?”
 
@@ -903,9 +916,9 @@ lsblk = list block devices
 
 -f = filesystem info (shows filesystem type, label, UUID, mountpoint)
 
-Shows all disks and partitions, their filesystems, and where they’re mounted.
+Shows all disks and partitions, their filesystems, and where they’re mounted
 
-“Show me the disk layout and what’s on each partition.”
+“Show me the disk layout and what’s on each partition”
 
 #### file -sL /dev/sda1
 
@@ -915,7 +928,7 @@ file = identify file type
 
 -L = follow symlinks
 
-Probes the block device and tells you what filesystem is on it.
+Probes the block device and tells you what filesystem is on it
 
 “What exactly is stored on this partition?”
 
@@ -953,7 +966,7 @@ Probes the block device and tells you what filesystem is on it.
 
 touch = create empty files (or update timestamps if they exist)
 
-This creates two empty files: a.txt and b.txt.
+This creates two empty files: a.txt and b.txt
 
 ## 🔍 Compare files
 
@@ -961,7 +974,7 @@ This creates two empty files: a.txt and b.txt.
 
 diff = show differences between two files
 
-It prints the lines that differ between a.txt and b.txt.
+It prints the lines that differ between a.txt and b.txt
 
 ## 📁 Compare directories
 
@@ -973,7 +986,7 @@ diff = compare
 
 -r = recursive (compare subdirectories too)
 
-This compares two directories and all their contents.
+This compares two directories and all their contents
 
 ## 🔤 Sort text
 
@@ -981,7 +994,7 @@ This compares two directories and all their contents.
 
 sort = sort lines alphabetically
 
-Prints the file’s lines in sorted order.
+Prints the file’s lines in sorted order
 
 ## 🔢 Count lines
 
@@ -991,7 +1004,7 @@ wc = word count
 
 -l = lines
 
-Shows how many lines are in the file.
+Shows how many lines are in the file
 
 ## 🔢 Show line numbers
 
@@ -1003,7 +1016,7 @@ nl = number lines
 
 -a = include empty lines
 
-Prints the file with line numbers on every line.
+Prints the file with line numbers on every line
 
 ## ✂️ Cut columns
 
@@ -1015,7 +1028,7 @@ cut = extract columns
 
 -f 1 = field (column) 1
 
-Prints only the first column of /etc/passwd.
+Prints only the first column of /etc/passwd
 
 ## 🔁 Translate characters
 
@@ -1023,7 +1036,7 @@ Prints only the first column of /etc/passwd.
 
 tr = translate characters
 
-This replaces every , with ; in the input.
+This replaces every , with ; in the input
 
 ## 🧹 Squeeze repeated spaces
 
@@ -1033,7 +1046,7 @@ tr = translate
 
 -s = squeeze repeats
 
-This turns multiple spaces into a single space.
+This turns multiple spaces into a single space
 
 ## 🔢 Show binary/octal view
 
@@ -1045,7 +1058,7 @@ od = octal dump (show file in raw bytes)
 
 -c = show characters
 
-Shows the raw byte content of the file.
+Shows the raw byte content of the file
 
 ## 🔄 Rename files using pattern
 
@@ -1057,11 +1070,11 @@ rename = batch rename files
 
 *.txt = all text files
 
-Renames all .txt files by replacing foo with bar in their names.
+Renames all .txt files by replacing foo with bar in their names
 
 ### 🏁 One-line summary
 
-These are the core Linux tools for creating, comparing, transforming, inspecting, and mass-editing text and files — all high-value LFCS commands.
+These are the core Linux tools for creating, comparing, transforming, inspecting, and mass-editing text and files — all high-value LFCS commands
 
 ---
 
@@ -1081,9 +1094,9 @@ These are the core Linux tools for creating, comparing, transforming, inspecting
 
 join = merge two files by a common column (usually the first column)
 
-It combines matching lines from both files into one output.
+It combines matching lines from both files into one output
 
-“Join two files together where their keys match.”
+“Join two files together where their keys match”
 
 ## 📎 Paste two files side by side
 
@@ -1091,9 +1104,9 @@ It combines matching lines from both files into one output.
 
 paste = merge files horizontally (line 1 with line 1, line 2 with line 2, etc.)
 
-It prints the files next to each other as columns.
+It prints the files next to each other as columns
 
-“Put two files side by side, line by line.”
+“Put two files side by side, line by line”
 
 ## ✂️ Split a file by size or lines
 
@@ -1103,11 +1116,11 @@ split = break a file into smaller files
 
 -n 3 = split into 3 parts
 
-“Cut a big file into 3 smaller pieces.”
+“Cut a big file into 3 smaller pieces”
 
 ### 🏁 One-line summary
 
-join merges by matching keys, paste merges side-by-side, and split breaks a file into smaller parts.
+join merges by matching keys, paste merges side-by-side, and split breaks a file into smaller parts
 
 ---
 
@@ -1127,7 +1140,7 @@ join merges by matching keys, paste merges side-by-side, and split breaks a file
     grep -n root /etc/passwd
     grep -E "root|daemon" /etc/passwd
 
-Note: Perl regex (`grep -P`) may not be available everywhere. Prefer `-E`.
+Note: Perl regex (`grep -P`) may not be available everywhere. Prefer `-E`
 
 ## 🔎 Regex and Text Search (grep) = “Find text in files”
 
@@ -1141,7 +1154,7 @@ g /pattern/ p
 
 Which meant:
 
-“Globally search for this pattern and print the matching lines.”
+“Globally search for this pattern and print the matching lines”
 
 So:
 
@@ -1159,9 +1172,9 @@ grep = globally search with a regex and print the matches
 
 grep = search for text
 
-This prints lines in /etc/passwd that contain root.
+This prints lines in /etc/passwd that contain root
 
-“Show me lines that contain root.”
+“Show me lines that contain root”
 
 ## 🔤 Case-insensitive grep
 
@@ -1171,7 +1184,7 @@ This prints lines in /etc/passwd that contain root.
 
 Matches root, Root, ROOT, etc.
 
-“Find root no matter how it’s capitalized.”
+“Find root no matter how it’s capitalized”
 
 ## 🚫 Invert match
 
@@ -1179,7 +1192,7 @@ Matches root, Root, ROOT, etc.
 
 -v = invert (show lines that do NOT match)
 
-“Show me all lines that do NOT contain root.”
+“Show me all lines that do NOT contain root”
 
 ## 📂 Recursive grep
 
@@ -1187,7 +1200,7 @@ Matches root, Root, ROOT, etc.
 
 -R = recursive (search all subdirectories)
 
-“Search for root in all files under /etc.”
+“Search for root in all files under /etc”
 
 ## 🔢 Show line numbers
 
@@ -1195,7 +1208,7 @@ Matches root, Root, ROOT, etc.
 
 -n = line numbers
 
-“Show me matching lines and tell me what line number they’re on.”
+“Show me matching lines and tell me what line number they’re on”
 
 ## 🧠 Use extended regex
 
@@ -1205,15 +1218,15 @@ Matches root, Root, ROOT, etc.
 
 | = OR operator
 
-“Show lines that contain root OR daemon.”
+“Show lines that contain root OR daemon”
 
 ### ⚠️ Exam note (simple)
 
--P (Perl regex) may not exist everywhere — use -E instead.
+-P (Perl regex) may not exist everywhere — use -E instead
 
 #### 🏁 One-line summary
 
-grep searches text; flags control case, inversion, recursion, line numbers, and regex power.
+grep searches text; flags control case, inversion, recursion, line numbers, and regex power
 
 ---
 
@@ -1245,7 +1258,7 @@ sed = stream editor
 
 p = print
 
-“Show me lines 1 to 10 from the file.”
+“Show me lines 1 to 10 from the file”
 
 ### 🗑️ Delete lines
 
@@ -1255,7 +1268,7 @@ d = delete
 
 '1,5d' = delete lines 1 through 5
 
-“Show the file without lines 1 to 5.”
+“Show the file without lines 1 to 5”
 
 ## 🔁 Substitute text (first match per line)
 
@@ -1267,7 +1280,7 @@ foo = what to find
 
 bar = what to replace it with
 
-“Replace the first foo on each line with bar.”
+“Replace the first foo on each line with bar”
 
 ## 🌍 Substitute globally (all matches)
 
@@ -1275,7 +1288,7 @@ bar = what to replace it with
 
 g = global (all matches in the line)
 
-“Replace all foo with bar everywhere.”
+“Replace all foo with bar everywhere”
 
 ## 🧠 Use groups
 
@@ -1287,11 +1300,11 @@ g = global (all matches in the line)
 
 \1, \2 = refer to captured groups
 
-"Find foobar and swap it to barfoo.”
+"Find foobar and swap it to barfoo”
 
 ##### 🏁 One-line summary
 
-sed lets you print, delete, and rewrite text as it streams past.
+sed lets you print, delete, and rewrite text as it streams past
 
 ---
 
@@ -1325,7 +1338,7 @@ awk = “the Aho–Weinberger–Kernighan text processing language”
 
 And what it does:
 
-A powerful column-based text processor for scanning and transforming text.
+A powerful column-based text processor for scanning and transforming text
 
 
 ## 📄 Print columns
@@ -1346,7 +1359,7 @@ $1 = first column
 
 $1 = first column, $3 = third column
 
-“Using : as the separator, print column 1 and 3.”
+“Using : as the separator, print column 1 and 3”
 
 ## 🔍 Filter by value
 
@@ -1354,7 +1367,7 @@ $1 = first column, $3 = third column
 
 $3 > 1000 = only lines where column 3 is greater than 1000
 
-“Show the names whose UID is greater than 1000.”
+“Show the names whose UID is greater than 1000”
 
 ## 🧠 Use BEGIN and END
 
@@ -1366,7 +1379,7 @@ BEGIN = run before any lines are processed
 
 END = run after all lines are processed
 
-“Add up column 6 for every line and print the total at the end.”
+“Add up column 6 for every line and print the total at the end”
 
 ## ➕ Do arithmetic
 
@@ -1374,11 +1387,11 @@ END = run after all lines are processed
 
 sum+=$6 = keep a running total
 
-“Use awk like a calculator on columns.”
+“Use awk like a calculator on columns”
 
 ### 🏁 One-line summary
 
-awk is a column-aware text processor that can filter, calculate, and summarize data.
+awk is a column-aware text processor that can filter, calculate, and summarize data
 
 ---
 
