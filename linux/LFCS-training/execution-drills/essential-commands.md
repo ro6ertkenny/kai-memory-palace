@@ -43,7 +43,7 @@ Rules of engagement:
 
 ---
 
-### A) Atomic Drills (Repetition)
+# A) Atomic Drills (Repetition)
 
 #### A1 — Exit codes
 Goal: read success/failure immediately.
@@ -73,11 +73,11 @@ Check it:
 
 true
 echo $?
-# -> 0
+### -> 0
 
 false
 echo $?
-# -> 1
+### -> 1
 
 ### 🧱 Why Unix did it this way
 
@@ -196,6 +196,7 @@ test returns only an exit code
 
 The shell is acting like a logic engine
 
+
 ### ⚠️ Subtle but important operator detail
 
 This is evaluated as:
@@ -210,11 +211,13 @@ If test succeeds → echo "exists" runs → that also succeeds → || echo "miss
 
 If test fails → the && part is skipped → whole left side fails → echo "missing" runs
 
+
 ### 🏁 Final one-line translation
 
 “If /etc/passwd exists, say so. Otherwise, say it’s missing.”
 
 ##This is one of the most important rules in all of Linux and scripting.
+
 
 ### 🧠 Operator mental model
 
@@ -223,6 +226,7 @@ Every command is just:
 “Do something → return success or failure”
 
 And the shell chains them like logic blocks.
+
 
 ### 🎯 Why this is exam-critical
 
@@ -238,9 +242,9 @@ Example:
 
 test -d /backup && rm -rf /backup || echo "no backup dir"
 
+
 ### 🧱 How it works (very simply)
 test -d /backup
-
 
 → Checks: “Does a directory named /backup exist?”
 
@@ -250,17 +254,17 @@ If no → failure → skip to ||
 
 && rm -rf /backup
 
-
 → If it exists, remove it completely.
 
 || echo "no backup dir"
 
-
 → If it does not exist, print: no backup dir
+
 
 ### 🧠 One-line mental model
 
 “Delete /backup if it exists, otherwise say it’s not there.”
+
 
 #### ⚠️ Operator note (important but simple)
 
@@ -277,17 +281,18 @@ It checks if /backup exists; if it does, it deletes it, otherwise it prints “n
 
 mkdir -p = “Make this path exist. I don’t care if parts already exist.”
 
+
 ### 🎯 Why LFCS loves this
 
 Because provisioning scripts and recovery commands must not fail if rerun.
+
 
 ### 🏁 Lock-in sentence
 
 -p makes mkdir safe, repeatable, and parent-aware.
 
 
-
-#### A3 — Grouping and redirecting a command group
+### A3 — Grouping and redirecting a command group
 Goal: redirect output of a group (not only one command).
 
     { date; uptime; echo "OK"; } > report.txt
@@ -297,7 +302,7 @@ Target: 10 reps.
 
 ---
 
-### D) Diagnosis Drills (Interpret + Choose)
+# B) Diagnosis Drills (Interpret + Choose)
 
 #### D1 — “No matches” vs “broken command”
 Goal: interpret grep exit codes correctly.
@@ -310,7 +315,7 @@ Goal: interpret grep exit codes correctly.
     cat input.txt | grep beta
     echo $?
 
-🧠 What it does (simple)
+#### 🧠 What it does (simple)
 
 It writes the words alpha, beta, and gamma one per line into a file called input.txt.
 
@@ -325,12 +330,14 @@ alpha
 beta
 gamma
 
-### 🧱 Now, the pieces and “flags”
+#### 🧱 Now, the pieces and “flags”
+
 1️⃣ printf
 
 printf = “Print formatted output” (like C’s printf)
 
 It does not automatically add newlines unless you tell it to.
+
 
 2️⃣ "%s\n"
 
@@ -344,6 +351,7 @@ So:
 
 "%s\n" means: “Print each string, then move to a new line.”
 
+
 3️⃣ alpha beta gamma
 
 These are the strings being printed.
@@ -355,6 +363,7 @@ prints alpha\n
 prints beta\n
 
 prints gamma\n
+
 
 4️⃣ > input.txt
 
@@ -370,6 +379,7 @@ If the file exists → it is replaced
 
 If it doesn’t exist → it is created
 
+
 ### 📌 Tiny exam-grade detail
 
 Unlike echo, printf:
@@ -383,9 +393,8 @@ Is preferred in scripts
 #### Pass condition: you can explain:
 - `grep` returns non-zero when no matches (not necessarily “error”)
 
----
 
-### A4 — Job control muscle memory
+###  Job control muscle memory
 Goal: manage background/foreground without confusion.
 
 Start a long job:
@@ -409,9 +418,8 @@ Terminate safely:
 
 Pass condition: no confusion between job spec (`%1`) vs PID.
 
----
 
-## 🔐 1) Local and Remote Login
+# 🔐 Local and Remote Login
 
 - Switch to a TTY and log in
 - Return to GUI (if present)
@@ -422,77 +430,17 @@ Pass condition: no confusion between job spec (`%1`) vs PID.
     w
     who
     tty
-
 ---
 
-## 🔎 2) Find Files
+# 🔎  Find Files
 
-- Find files by name
-- Find files by size
-- Find files by type
-- Find files by owner
-- Find files by permissions
-- Find files modified in last N days
-- Find and delete a file by inode
-- Find files and run a command on them
-
-    find . -name "*.conf"
-    find . -size +10M
-    find . -type f
-    find . -user root
-    find . -perm 777
-    find . -mtime -7
-    ls -i
-    find . -inum 123456 -delete
-    find . -type f -exec ls -lh {} +
-
-## 🔎 `find` — File Discovery Drills (LFCS)
-
-Goal: Find files fast by **name, size, type, owner, permissions, time**, and safely **act on results**.
-
----
-
-## 🧠 0) Mental Model
+### 🧠 Find Mental Model & rule (for LFCS)
 
 `find <PATH> <TESTS> <ACTIONS>`
 
 - **PATH**: where to search (e.g., `.` or `/etc`)
 - **TESTS**: filters (name, size, type, owner, perms, mtime, inode)
 - **ACTIONS**: what to do with matches (`-print`, `-delete`, `-exec ...`)
-
----
-
-## 1) Find files by name
-
-Find by exact name:
-
-    find . -name "sshd_config"
-
-Find by wildcard pattern:
-
-    find . -name "*.conf"
-
-Case-insensitive:
-
-    find . -iname "*.conf"
-
----
-
-## 2) Find files by size
-
-Larger than 10 MB:
-
-    find . -size +10M
-
-Smaller than 10 MB:
-
-    find . -size -10M
-
-Between 10 MB and 100 MB:
-
-    find . -size +10M -size -100M
-
-### 🧠 Mental rule (for LFCS)
 
 find always needs:
 where to look first, then what to match
@@ -513,12 +461,61 @@ You can technically omit the path and GNU find will assume .:
 
 find -name "*.conf"
 
-
 But for the exam and for clarity:
 
 Always write the path explicitly (. or /etc or /var).
 
 ---
+
+- Find files by name
+- Find files by size
+- Find files by type
+- Find files by owner
+- Find files by permissions
+- Find files modified in last N days
+- Find and delete a file by inode
+- Find files and run a command on them
+
+    find . -name "*.conf"
+    find . -size +10M
+    find . -type f
+    find . -user root
+    find . -perm 777
+    find . -mtime -7
+    ls -i
+    find . -inum 123456 -delete
+    find . -type f -exec ls -lh {} +
+---
+
+## 1) Find files by name
+
+Find by exact name:
+
+    find . -name "sshd_config"
+
+Find by wildcard pattern:
+
+    find . -name "*.conf"
+
+Case-insensitive:
+
+    find . -iname "*.conf"
+
+
+## 2) Find files by size
+
+Larger than 10 MB:
+
+    find . -size +10M
+
+Smaller than 10 MB:
+
+    find . -size -10M
+
+Between 10 MB and 100 MB:
+
+    find . -size +10M -size -100M
+
 
 ## 3) Find files by type
 
@@ -534,7 +531,6 @@ Symbolic links:
 
     find . -type l
 
----
 
 ## 4) Find files by owner
 
@@ -550,7 +546,6 @@ Owned by numeric UID (example `0` for root):
 
     find . -uid 0
 
----
 
 ## 5) Find files by permissions
 
@@ -579,7 +574,6 @@ Common LFCS checks:
 
     find / -type f -perm -2000 2>/dev/null
 
----
 
 ## 6) Find files modified in last N days
 
@@ -603,11 +597,10 @@ Modified in last 60 minutes:
 
     find . -mmin -60
 
----
 
 ## 7) Find and delete a file by inode (safe method)
 
-### Step A — list inode numbers
+#### Step A — list inode numbers
 
 Show inode + name in current tree:
 
@@ -617,13 +610,15 @@ Or for a single directory:
 
     ls -i
 
-### Step B — match by inode (confirm first)
+
+#### Step B — match by inode (confirm first)
 
 Replace `123456`:
 
     find . -inum 123456 -ls
 
-### Step C — delete by inode
+
+#### Step C — delete by inode
 
 Only after confirming the `-ls` output is correct:
 
@@ -633,7 +628,6 @@ Safer: prompt before delete:
 
     find . -inum 123456 -ok rm -i {} \;
 
----
 
 ## 8) Find files and run a command on them
 
@@ -654,25 +648,7 @@ Example: search `.conf` and show first 5 lines:
     find . -name "*.conf" -type f -exec sh -c 'echo "=== {} ==="; head -n 5 "{}"' \;
 
 ---
-
-## ✅ Your exact commands, corrected as a clean set
-
-    find . -name "*.conf"
-    find . -size +10M
-    find . -type f
-    find . -user root
-    find . -perm 777
-    find . -mtime -7
-    ls -i
-    find . -inum 123456 -delete
-    find . -type f -exec ls -lh {} +
-
-find . -type f
-find /var -size +1G
-find /home -user bob
-
----
-
+???????????????????????????????????????????????
 ## 📚 3) Locate Files Using Database
 
 - Update locate database
