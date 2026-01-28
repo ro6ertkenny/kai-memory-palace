@@ -134,7 +134,13 @@ Repeat:
 - `V` → `>` / `<`
 - `u` / `Ctrl + r`
 
-Always return to Normal mode.
+Always return to Normal mode.i
+
+---
+
+## 🧠 LFCS-grade memory hook
+
+Ctrl+g = “Where am I and what file is this?”
 
 ---
 
