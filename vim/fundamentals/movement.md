@@ -20,16 +20,18 @@ If you edit before you position the cursor precisely, you are guessing.
 ## 🧱 Core Movement Keys (non-negotiable)
 
 Character-wise movement:
+
 - `h` → left
 - `j` → down
 - `k` → up
 - `l` → right
 
-Arrow keys are forbidden.
+Arrow keys are forbidden
 
 ---
 
 ## 🧩 Word Movement
+
 - `w` → next word start
 - `b` → previous word start
 - `e` → end of word
@@ -40,6 +42,7 @@ Use words, not characters, whenever possible.
 ---
 
 ## 🧵 Line Movement
+
 - `0` → start of line
 - `^` → first non-whitespace character
 - `$` → end of line
@@ -49,6 +52,7 @@ YAML work depends on **line precision**.
 ---
 
 ## 🔍 Character Find (surgical movement)
+
 - `f<char>` → find forward on line
 - `t<char>` → move before character
 - `;` → repeat last find
@@ -63,6 +67,7 @@ Use this instead of spamming `l`.
 ---
 
 ## 📄 Screen Movement
+
 - `Ctrl + f` → page down
 - `Ctrl + b` → page up
 - `Ctrl + d` → half-page down
@@ -73,16 +78,31 @@ Half-page movement is preferred.
 ---
 
 ## 🧭 File Extremes
+
 - `gg` → top of file
 - `G` → bottom of file
 - `:N` → go to line N
 
-Example:
-- `:42`
+### 🧱 Select everything (vi “select all”)
 
----
+#### ggVG
+
+What this does:
+
+gg → go to top
+
+V → line visual mode
+
+G → go to bottom (everything selected)
+
+##### 🧠 One-line memory hook
+
+gg = top, ggVG = select all
+
+-
 
 ## 🧱 Paragraph / Block Movement
+
 - `}` → next paragraph
 - `{` → previous paragraph
 
@@ -94,6 +114,7 @@ Useful for:
 ---
 
 ## 🧪 Daily Drill (5 minutes)
+
 Open **any file**.
 
 Repeat continuously:
@@ -109,6 +130,7 @@ No editing. Only movement.
 ---
 
 ## 🧯 Common Mistakes
+
 - Using arrow keys
 - Overusing `hjkl` instead of word motion
 - Editing before positioning
@@ -119,6 +141,7 @@ If you catch any of these, slow down.
 ---
 
 ## ✅ Exit Criteria
+
 You are done with this file when:
 - movement no longer requires thought
 - the cursor lands where you expect
