@@ -1,224 +1,313 @@
-# 🧪 Essential Commands — Execution Drills (LFCS)
+# 🧪 Essential Commands — Execution Drill (LFCS)
 
-Mental mode: Muscle memory.  
-Goal: Be able to execute every task below **without thinking**.
+Mental mode: **pure mechanics • speed • zero hesitation • operator accuracy**
 
-This file is not a tutorial.  
-This is a **hands-on execution checklist + drill pack**.
+Scope: **authoritative LFCS essential command set only**
 
----
-
-## 🧰 Drill Framework
-
-Drill types:
-- **A: Atomic** — one skill, repeat until automatic
-- **B: Timed** — same skill under time pressure
-- **C: Failure Injection** — break intentionally; recover fast
-- **D: Diagnosis** — interpret output; choose the correct fix
-- **E: Composition** — 3–6 primitives chained (exam style)
-
-Rules:
-- Prefer idempotent actions
-- Always know `>` vs `>>`
-- Know when you need sudo
-- Always verify outcomes
+Order: **foundation-first**
 
 ---
 
-# 🧪 Phase 0 — Shell Execution + Job Control
+# 🥇 LAYER 0 — Shell Execution Model
 
-## Setup (once)
+## A0.1 — Command success and exit codes
 
-    mkdir -p ~/lfcs-labs/execution-drills/phase-0
-    cd ~/lfcs-labs/execution-drills/phase-0
+1. Run a command that succeeds
+2. Print its exit code
+3. Run a command that fails
+4. Print its exit code
 
----
-
-# A) Atomic Drills
-
-## A1 — Exit codes
-
-    true
-    echo $?
-
-    false
-    echo $?
-
-Target: 10 reps.
+Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-## A2 — Safe chaining
+## A0.2 — Sequential vs conditional execution
 
-    mkdir -p a2 && echo "mkdir ok" || echo "mkdir failed"
-    test -f /etc/passwd && echo "exists" || echo "missing"
-    test -f /nope && echo "exists" || echo "missing"
-
-Target: 10 reps.
-
----
-
-## A3 — Grouping + redirection
-
-    { date; uptime; echo "OK"; } > report.txt
-    cat report.txt
-
-Target: 10 reps.
+1. Run two commands sequentially regardless of success
+2. Run a command that only executes on success
+3. Run a command that only executes on failure
+4. Chain success and failure handling in one line
 
 ---
 
-# B) Diagnosis Drills
+## A0.3 — STDOUT overwrite vs append
 
-## B1 — grep exit codes
-
-    printf "%s\n" alpha beta gamma > input.txt
-
-    cat input.txt | grep zzz
-    echo $?
-
-    cat input.txt | grep beta
-    echo $?
-
-Pass: you can explain the difference in exit codes.
+1. Write text to a file (overwrite)
+2. Append text to the same file
+3. Verify the result
 
 ---
 
-# C) Job Control
+## A0.4 — STDERR handling
 
-    sleep 3000 &
-    jobs
-
-    fg %1
-    (Ctrl+Z)
-    bg %1
-
-    jobs
-    kill %1
-
-Pass: no confusion between job number and PID.
+1. Generate an error and capture only STDERR to a file
+2. Confirm STDOUT is not captured
+3. Suppress error output completely
 
 ---
 
-# 🔐 Local and Remote Login
+## A0.5 — Pipes
 
-    w
-    who
-    tty
-
-(Also practice switching TTYs and SSH to localhost / another host.)
+1. Send command output through a pipeline
+2. Count resulting lines
+3. Filter for a matching pattern in a pipeline
 
 ---
 
-# 🔎 Find Files
+## A0.6 — tee (view + save)
 
-## Find patterns
-
-    find . -name "*.conf"
-    find . -size +10M
-    find . -type f
-    find . -user root
-    find . -perm 777
-    find . -mtime -7
-
-## Inode deletion
-
-    ls -i
-    find . -inum 123456 -ls
-    find . -inum 123456 -delete
-
-## Exec
-
-    find . -type f -exec ls -lh {} +
-    find . -type f -exec ls -lh {} \;
+1. Capture piped output to a file while displaying it
+2. Append to an existing file using tee
 
 ---
 
-# 📚 Locate
+# 🥈 LAYER 1 — Navigation & Filesystem Awareness
 
-    sudo updatedb
-    locate passwd
+## A1.1 — Determine current location
 
----
-
-# 🧩 Globbing
-
-    ls a*
-    ls a?
-    ls a[bc]
-    ls a[a-c]*
-    mkdir test-{1,2,3}
-    ls [!a]*
+1. Print working directory
+2. List contents
+3. List with metadata
+4. Identify file type of a target
 
 ---
 
-# 💽 Filesystem Inspection
+## A1.2 — Inspect space usage
 
-    df -h
-    df -T
-    lsblk -f
-    file -sL /dev/sda1
-
----
-
-# 📝 Text & File Manipulation
-
-    touch a.txt b.txt
-    diff a.txt b.txt
-    diff -ur dir1 dir2
-    sort file.txt
-    wc -l file.txt
-    nl -ba file.txt
-    cut -d ':' -f 1 /etc/passwd
-    tr ',' ';' < file.csv
-    tr -s ' ' < file.txt
-    od -bc file.txt
-    rename 's/foo/bar/' *.txt
+1. Show filesystem capacity
+2. Show directory size
+3. Compare sizes of two directories
 
 ---
 
-# 🔗 Join / Paste / Split
+# 🥉 LAYER 2 — Create / Move / Delete
 
-    join a.txt b.txt
-    paste a.txt b.txt
-    split -n 3 bigfile.txt
+## A2.1 — File creation and directory creation
 
----
-
-# 🔎 grep
-
-    grep root /etc/passwd
-    grep -i root /etc/passwd
-    grep -v root /etc/passwd
-    grep -R "root" /etc
-    grep -n root /etc/passwd
-    grep -E "root|daemon" /etc/passwd
+1. Create an empty file
+2. Create a directory
+3. Create nested directories in one command
 
 ---
 
-# 🧹 sed
+## A2.2 — Copy operations
 
-    sed -n '1,10p' file.txt
-    sed '1,5d' file.txt
-    sed 's/foo/bar/' file.txt
-    sed 's/foo/bar/g' file.txt
-    sed -E 's/(foo)(bar)/\2\1/' file.txt
+1. Copy a file
+2. Copy a directory recursively
+3. Copy while preserving metadata
 
 ---
 
-# 🧮 awk
+## A2.3 — Move and rename
 
-    awk '{print $1}' /etc/passwd
-    awk -F: '{print $1, $3}' /etc/passwd
-    awk '$3 > 1000 {print $1}' /etc/passwd
-    ps aux | awk 'BEGIN {sum=0} {sum+=$6} END {print sum}'
+1. Rename a file
+2. Move a file into another directory
+3. Move and rename in one operation
 
 ---
 
-# ✅ Completion Criteria
+## A2.4 — Removal
 
-You are done when:
+1. Remove a file
+2. Remove an empty directory
+3. Remove a directory recursively
 
-- Exit codes and chaining are automatic
-- Job control is automatic
-- You can execute every command here without looking anything up
+---
+
+# 🏅 LAYER 3 — Viewing & Inspecting File Content
+
+## A3.1 — Direct output
+
+1. Display entire file
+2. Display first N lines
+3. Display last N lines
+
+---
+
+## A3.2 — Interactive inspection
+
+1. Open a file for scrolling inspection
+2. Search inside the viewer
+
+---
+
+## A3.3 — Content metrics
+
+1. Count lines
+2. Count words
+3. Count bytes
+
+---
+
+# 🏅 LAYER 4 — Search
+
+## A4.1 — Locate files by name
+
+1. Search from current directory
+2. Search system-wide (where permitted)
+
+---
+
+## A4.2 — Locate by attribute
+
+1. Find by file type
+2. Find by size
+3. Find by owner
+4. Find by permissions
+5. Find by modification time
+
+---
+
+## A4.3 — Locate executables
+
+1. Identify command path
+2. Identify all related command locations
+
+---
+
+# 🏅 LAYER 5 — Text Filtering Primitives
+
+## A5.1 — Pattern matching
+
+1. Extract matching lines from a file
+2. Count matches
+3. Invert the match
+
+---
+
+## A5.2 — Field extraction
+
+1. Extract a specific column from structured text
+2. Change the delimiter and repeat
+
+---
+
+## A5.3 — Sorting and uniqueness
+
+1. Sort input
+2. Remove duplicate lines
+3. Count unique values
+
+---
+
+## A5.4 — Character translation
+
+1. Replace characters in a stream
+2. Delete characters from a stream
+
+---
+
+## A5.5 — Stream metrics
+
+1. Count lines from piped input
+2. Count words from piped input
+
+---
+
+# 🏅 LAYER 6 — Links
+
+## A6.1 — Hard links
+
+1. Create a hard link to a file
+2. Verify both names reference the same inode
+
+---
+
+## A6.2 — Soft links
+
+1. Create a symbolic link
+2. Verify link target
+3. Observe behavior when target is removed
+
+---
+
+# 🏅 LAYER 7 — Permissions & Ownership
+
+## A7.1 — View permissions
+
+1. List file permissions
+2. Identify numeric mode
+
+---
+
+## A7.2 — Modify permissions
+
+1. Set exact numeric permissions
+2. Add execute permission
+3. Remove write permission
+
+---
+
+## A7.3 — Ownership
+
+1. Change file owner
+2. Change file group
+3. Change owner and group in one command
+
+---
+
+## A7.4 — Default permissions
+
+1. Display current umask
+2. Change umask
+3. Create a file and verify resulting permissions
+
+---
+
+# 🏅 LAYER 8 — Archive & Compression
+
+## A8.1 — Archive creation
+
+1. Create a tar archive
+2. List archive contents
+3. Extract archive
+
+---
+
+## A8.2 — Compression
+
+1. Compress a file
+2. Decompress a file
+3. Create a compressed archive in one step
+
+---
+
+# 🏅 LAYER 9 — File Comparison
+
+## A9.1 — Byte comparison
+
+1. Compare two files for exact match
+
+---
+
+## A9.2 — Line comparison
+
+1. Show differences between two text files
+
+---
+
+# 🏅 LAYER 10 — Remote Operations
+
+## A10.1 — Remote login
+
+1. Connect to a remote system
+2. Execute a simple remote command and return
+
+---
+
+## A10.2 — Remote copy
+
+1. Copy file to a remote system
+2. Copy file from a remote system
+
+---
+
+# 🔁 EXECUTION STANDARD
+
+Train each block until:
+
+- no syntax lookup
+- no hesitation
+- no trial-and-error
+- clean first execution
 
