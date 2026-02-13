@@ -1,437 +1,206 @@
 # 🧪 Essential Commands — Answer Key (LFCS)
 
-Grouped by execution surface for rapid operator recall
+Grouped by foundation layer for rapid operator recall  
+All references are canonical learning homes.
 
 ---
 
-# 🐚 Shell
-
-## Exit Codes
+# 🥇 LAYER 0 — Shell Execution Model
 
 true  
 echo $?  
 false  
-echo $?
-
+echo $?  
 0 = success  
-non-zero = failure  
 
-Memory: 0 means “all good”
+cmd1 ; cmd2  
+cmd && echo OK  
+cmd || echo FAIL  
+cmd && echo OK || echo FAIL  
 
----
+echo "text" > file  
+echo "text" >> file  
 
-## Conditional Chaining
+ls /nope 2> err.txt  
+ls /nope 2> /dev/null  
 
-command && echo "success"  
-command || echo "failed"
+command | wc -l  
+command | grep pattern  
 
-&& runs if exit code = 0  
-|| runs if exit code ≠ 0  
+command | tee file  
+command | tee -a file  
 
-Example:  
-test -f /etc/passwd && echo "exists" || echo "missing"
-
----
-
-## mkdir Safe Creation
-
-mkdir -p path
-
--p = parents  
-Safe to re-run  
-
-Memory: -p = parent-aware + repeatable
+→ [bash-basics](../../shell-and-bash/bash/bash-basics.md)  
+→ [bash-pipelines](../../shell-and-bash/bash/bash-pipelines.md)
 
 ---
 
-## Group + Redirect
+# 🥈 LAYER 1 — Navigation & Filesystem Awareness
 
-{ date; uptime; echo "OK"; } > report.txt
-
-{ } = group commands  
-> = overwrite  
-
-Memory: group first, redirect once
-
----
-
-## Job Control
-
-sleep 3000 &  
-jobs  
-fg %1  
-Ctrl+Z  
-bg %1  
-kill %1  
-
-& = background  
-%1 = job spec (not PID)  
-
-Memory: jobs → fg/bg → kill
-
----
-
-## Globbing
-
-* = match anything  
-? = match one character  
-[] = character set  
-[a-c] = range  
-{1,2,3} = generate names  
-[!a]* = exclude pattern  
-
-Memory: shell expands before command runs
-
----
-
-# 💽 Filesystem
-
-## Disk Usage
+pwd  
+ls -l  
+ls -lh  
+file target  
 
 df -h  
--h = human readable  
+du -sh dir  
+du -sh dir1 dir2  
 
-“How full are my disks?”
-
-df -T  
--T = filesystem type  
-
-“What filesystem type?”
+→ [files-and-metadata-inspection](../../foundations/files-and-metadata-inspection.md)
 
 ---
 
-## Block Devices
+# 🥉 LAYER 2 — Create / Move / Delete
 
-lsblk -f  
--f = filesystem info  
+touch file  
 
-Show devices, UUID, mountpoint
+mkdir dir  
+mkdir -p a/b/c  
 
----
+cp src dst  
+cp -r dir1 dir2  
+cp -a src dst  
 
-## Identify Filesystem on Device
+mv old new  
+mv file /path/  
+mv file /path/newname  
 
-file -sL /dev/sda1  
+rm file  
+rmdir dir  
+rm -r dir  
 
--s = special files  
--L = follow symlink  
-
-Memory: inspect the real device
-
----
-
-# 🔤 Text
-
-## Create Files
-
-touch a.txt b.txt  
-
-Create empty file or update timestamp
+→ [filesystem-access-control](../../foundations/filesystem-access-control.md)
 
 ---
 
-## Compare Files
+# 🏅 LAYER 3 — Viewing & Inspecting Content
 
-diff a.txt b.txt  
-diff -u file1 file2  
--u = unified format  
+cat file  
+head -n 10 file  
+tail -n 10 file  
+less file  
 
-diff -ur dir1 dir2  
--r = recursive  
+wc -l file  
+wc -w file  
+wc -c file  
 
-Memory: -u readable, -r recursive
-
----
-
-## Sort
-
-sort file.txt  
-
-Alphabetical sort
+→ [files-and-metadata-inspection](../../foundations/files-and-metadata-inspection.md)
 
 ---
 
-## Count Lines
+# 🏅 LAYER 4 — Search
 
-wc -l file.txt  
-
--l = lines
-
----
-
-## Number Lines
-
-nl -ba file.txt  
-
--b = number all  
--a = include empty lines
-
----
-
-## Cut Columns
-
-cut -d ':' -f 1 /etc/passwd  
-
--d = delimiter  
--f = field  
-
-Memory: cut = columns
-
----
-
-## Translate Characters
-
-tr ',' ';' < file.csv  
-
-Character swap  
-Does not modify file  
-
-Memory: tr = characters
-
----
-
-## Squeeze Spaces
-
-tr -s ' ' < file.txt  
-
--s = squeeze repeats
-
----
-
-## Octal Dump
-
-od -bc file.txt  
-
--b = octal bytes  
--c = show characters  
-
-Memory: use when bytes look wrong
-
----
-
-## Rename Batch
-
-rename 's/foo/bar/' *.txt  
-
-Substitute in filenames
-
----
-
-# 🔎 Search
-
-## locate (database search)
-
-sudo updatedb  
-locate passwd  
-
-updatedb = rebuild index  
-locate = search index  
-
-Memory: locate is instant but may be stale
-
----
-
-## find Basics
-
-find WHERE WHAT
+find . -name "file"  
+find / -name "file"  
 
 find . -type f  
-find /var -size +1G  
-find /home -user bob  
-
-Memory: find path first
-
----
-
-## Find by Name
-
-find . -name "*.conf"  
-find . -iname "*.conf"
-
--name = case sensitive  
--iname = ignore case
-
----
-
-## Find by Size
-
 find . -size +10M  
-find . -size -10M  
+find . -user user  
+find . -perm 644  
+find . -mtime -7  
 
-+ = larger than  
-- = smaller than
+locate file  
+which cmd  
+whereis cmd  
 
----
-
-## Find by Type
-
--type f = file  
--type d = directory  
--type l = symlink  
+→ [system-inspection](../../foundations/system-inspection.md)
 
 ---
 
-## Find by Permissions
-
--perm 777 = exact  
--perm -020 = must include bits  
--perm /022 = any of bits  
-
-Memory:  
-MODE = exact  
--MODE = include  
-/MODE = any
-
-World writable:  
-find / -type f -perm /002 2>/dev/null  
-
-SUID:  
-find / -type f -perm -4000 2>/dev/null  
-
-SGID:  
-find / -type f -perm -2000 2>/dev/null  
-
-2>/dev/null = hide errors  
-
----
-
-## Modified Time
-
--mtime -7  
--mtime +7  
--mmin -60  
-
--mtime = days  
--mmin = minutes  
-
----
-
-## Inode Search
-
-ls -i  
-find . -inum 123456 -ls  
-find . -inum 123456 -delete  
-
-Memory: confirm before delete
-
----
-
-## find -exec
-
-find . -type f -exec ls -lh {} +  
-+ = batch  
-
-find . -type f -exec ls -lh {} \;  
-\; = one-by-one  
-
--ok = confirm before run  
-
-Memory: + fast, ; slow, -ok safe
-
----
-
-## grep
+# 🏅 LAYER 5 — Text Filtering Primitives
 
 grep pattern file  
-grep -i pattern file  
+grep -c pattern file  
 grep -v pattern file  
-grep -n pattern file  
-grep -R pattern dir  
-grep -E "a|b" file  
 
--i = ignore case  
--v = invert  
--n = line numbers  
--R = recursive  
--E = extended regex  
+cut -d: -f1 file  
 
-Memory: prefer -E over -P
+sort file  
+uniq file  
+sort file | uniq -c  
 
----
+tr 'a' 'A'  
+tr -d 'x'  
 
-# 🔗 Streams
+command | wc -l  
+command | wc -w  
 
-## join
-
-join a.txt b.txt  
-
-Match by first column (key)  
-
-Memory: SQL-style join
+→ [grep](../../shell-and-bash/text-processing/grep.md)  
+→ [cut-sort-uniq-tr](../../shell-and-bash/text-processing/cut-sort-uniq-tr.md)
 
 ---
 
-## paste
+# 🏅 LAYER 6 — Links
 
-paste a.txt b.txt  
+ln file hardlink  
+ls -li  
 
-Match by line number  
+ln -s target link  
+ls -l  
 
-Memory: horizontal merge
-
----
-
-## split
-
-split -n 3 file  
-
--n = number of pieces  
-
-Memory: one file → many
+→ [advanced-filesystem-permissions](../../foundations/advanced-filesystem-permissions.md)
 
 ---
 
-## sed
+# 🏅 LAYER 7 — Permissions & Ownership
 
-sed -n '1,10p' file  
--n = no auto print  
-p = print  
+ls -l  
 
-sed '1,5d' file  
-d = delete  
+chmod 644 file  
+chmod +x file  
+chmod -w file  
 
-sed 's/foo/bar/'  
-s = substitute  
+chown user file  
+chgrp group file  
+chown user:group file  
 
-sed 's/foo/bar/g'  
-g = global  
+umask  
+umask 022  
+touch test  
+ls -l  
 
-sed -E 's/(foo)(bar)/\2\1/'  
--E = extended regex  
-\1 \2 = capture groups  
-
-Memory: s/FIND/REPLACE/
+→ [advanced-filesystem-permissions](../../foundations/advanced-filesystem-permissions.md)
 
 ---
 
-## awk
+# 🏅 LAYER 8 — Archive & Compression
 
-awk '{print $1}' file  
+tar -cf archive.tar dir  
+tar -tf archive.tar  
+tar -xf archive.tar  
 
-' ' = protect program  
-{} = action block  
-$1 = first field  
+gzip file  
+gunzip file.gz  
 
-awk -F: '{print $1,$3}' file  
--F = field separator  
+bzip2 file  
+bunzip2 file.bz2  
 
-awk '$3 > 1000 {print $1}' file  
+xz file  
+unxz file.xz  
 
-BEGIN {sum=0}  
-{sum+=$6}  
-END {print sum}  
+tar -czf archive.tar.gz dir  
+tar -xzf archive.tar.gz  
 
-Memory: BEGIN → process lines → END  
-
-awk = column-aware processor
+→ [archives-and-compression-tar](../../foundations/archives-and-compression-tar.md)
 
 ---
 
-# ✅ Completion Criteria
+# 🏅 LAYER 9 — File Comparison
 
-You are ready when:
+cmp file1 file2  
+diff file1 file2  
 
-Exit codes and chaining are automatic  
-Job control is automatic  
-Command surfaces execute without lookup
+→ [grep](../../shell-and-bash/text-processing/grep.md)
+
+---
+
+# 🏅 LAYER 10 — Remote Operations
+
+ssh user@host  
+ssh user@host command  
+
+scp file user@host:/path/  
+scp user@host:/path/file .  
+
+→ [ssh-operator-basics](../../networking/ssh-operator-basics.md)
 
