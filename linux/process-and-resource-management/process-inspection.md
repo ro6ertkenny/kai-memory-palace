@@ -17,6 +17,7 @@ You must be able to:
 - understand basic process states
 - extract a PID for further action
 - verify whether a process exists or is gone
+- identify what process owns a port or open file (lsof)
 
 ---
 
@@ -25,6 +26,12 @@ You must be able to:
 `ps` = **process status**
 
 It shows a **snapshot** of processes at the moment you run it (not a live view like `top`).
+
+Live view tools (useful context):
+- `top` = live process view (built-in on most systems)
+- `htop` = nicer live view (may not be installed)
+
+LFCS: you must be fluent with `ps`.
 
 ---
 
@@ -82,6 +89,14 @@ By name:
 
     ps aux | grep spotify
 
+Better by name (no grep false positives):
+
+    pgrep spotify
+
+Show PID + command:
+
+    pgrep -a spotify
+
 By PID:
 
     ps -p 12345
@@ -89,6 +104,10 @@ By PID:
 Custom output (high-signal):
 
     ps -o pid,user,%cpu,%mem,stat,etime,cmd -p 12345
+
+Extra useful fields (PPID shows parent):
+
+    ps -o pid,ppid,user,%cpu,%mem,stat,etime,cmd -p 12345
 
 ---
 
@@ -112,6 +131,36 @@ If it prints `gone`, the process is truly dead.
 
 ---
 
+## 🔒 lsof (LFCS practical inspection)
+
+`lsof` answers: “what has this resource open?”
+
+Process owns this port:
+
+    sudo lsof -i :8080
+
+Show listeners (TCP LISTEN only):
+
+    sudo lsof -nP -iTCP -sTCP:LISTEN
+
+Which process holds a file open:
+
+    sudo lsof /path/to/file
+
+What a PID has open:
+
+    sudo lsof -p 12345 | head
+
+Why unmount fails (“device busy”):
+
+    sudo lsof /mountpoint
+
+Flags (memory-ready):
+- `-n` = no DNS lookups
+- `-P` = numeric ports (no service names)
+
+---
+
 ## 🧪 Practical Inspection Workflow (Exam Style)
 
 1) List everything:
@@ -127,15 +176,47 @@ If it prints `gone`, the process is truly dead.
 
 4) Inspect it:
 
-    ps -o pid,user,%cpu,%mem,stat,etime,cmd -p PID
+    ps -o pid,ppid,user,%cpu,%mem,stat,etime,cmd -p PID
 
 5) Decide what to do only after inspection
 
 ---
 
-## 🏁 Mental Model
+## 🔧 Operator workflow (LFCS execution)
 
-Inspect → Understand → Decide → Act → Verify
+### “Something is wrong” triage loop
 
-EOF
+1) Identify offenders (CPU/MEM):
+
+    ps aux --sort=-%cpu | head
+    ps aux --sort=-%mem | head
+
+2) Confirm identity + parent + runtime:
+
+    ps -o pid,ppid,user,stat,etime,cmd -p <PID>
+
+3) If the complaint is “port/file busy”, confirm resource owner:
+
+    sudo lsof -i :<PORT>
+    sudo lsof /path/or/mount
+
+4) Only then control/kill (see process-control.md)
+
+---
+
+## 🔗 Drill references (not duplicated here)
+
+- `linux/LFCS-training/execution-drills/ps-drills.md`
+- `linux/LFCS-training/execution-drills/pgrep-pkill-drills.md`
+- `linux/LFCS-training/execution-drills/lsof-drills.md`
+
+---
+
+## 🪝 Exam memory hook
+
+Inspect before action:
+
+    pgrep -a <name>
+    ps -o pid,ppid,stat,etime,cmd -p <PID>
+    sudo lsof -i :<PORT>
 

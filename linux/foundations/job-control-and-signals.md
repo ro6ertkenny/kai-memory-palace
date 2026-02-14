@@ -25,6 +25,25 @@ Job control is a **shell feature** layered on top of the process model.
 
 ---
 
+## ✅ Safe command order (LFCS)
+
+1) Start / observe jobs in your shell:
+
+    jobs
+
+2) Stop / resume safely:
+
+    Ctrl+Z
+    bg %1
+    fg %1
+
+3) Verify with system-wide tools when needed:
+
+    pgrep -a <name>
+    ps -o pid,stat,etime,cmd -p <PID>
+
+---
+
 # 🧱 Part 1 — Foreground and Background
 
 Run a command normally:
@@ -112,6 +131,7 @@ Important ones:
 - SIGKILL (9)  = die immediately (cannot be caught)
 - SIGSTOP      = stop (cannot be ignored)
 - SIGCONT      = continue
+- SIGINT (2)   = Ctrl+C interrupt (may be handled)
 
 You can send these manually by PID:
 
@@ -185,6 +205,10 @@ Remove the job from the shell’s hangup (SIGHUP) list but keep it in the job ta
 - systemd services are **not jobs**
 - They are still processes, but managed by systemd instead of your shell
 
+If something “comes back” after you kill it, check if systemd is managing it:
+
+    systemctl status <unit> --no-pager
+
 ---
 
 # 🧠 Common Confusions
@@ -198,12 +222,11 @@ Ctrl+C sends **SIGINT** (interrupt).
 SIGINT asks a process to stop, but the program can handle or ignore it.
 That is why Ctrl+C sometimes does not terminate a process.
 
-
 Ctrl+Z sends **SIGSTOP** (stop).
 
 ---
 
-# 🧪 Practical Drills
+## 🧪 Practical Drills
 
     sleep 1000
     Ctrl+Z
@@ -222,6 +245,13 @@ Then log out and back in and confirm it’s still running.
 
 ---
 
+## 🔗 Drill references (not duplicated here)
+
+- `linux/LFCS-training/execution-drills/job-control-drills.md`
+- `linux/LFCS-training/execution-drills/nohup-disown-drills.md`
+
+---
+
 ## ✅ Outcome
 
 You should be able to:
@@ -232,5 +262,20 @@ You should be able to:
 - Keep work running across SSH disconnects
 
 That is **execution control**.
-EOF
+
+---
+
+## 🪝 Exam memory hook
+
+Three controls:
+
+- Ctrl+C = SIGINT (interrupt)
+- Ctrl+Z = SIGSTOP (stop)
+- fg/bg = resume control
+
+Shell triage:
+
+    jobs
+    bg %1
+    fg %1
 

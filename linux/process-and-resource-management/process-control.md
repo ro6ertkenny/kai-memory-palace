@@ -4,6 +4,12 @@ Mental mode: **Act deliberately and reversibly**
 
 This document covers how to **control processes**: stopping them, resuming them, terminating them, and mass-managing them using signals and job control.
 
+Includes LFCS/KodeKloud surface:
+- kill / pkill / killall
+- escalation strategy
+- nice / renice (priority)
+- job control basics (shell-level)
+
 ---
 
 ## 🎯 Goals
@@ -14,6 +20,7 @@ You must be able to:
 - terminate runaway processes safely
 - understand graceful vs forced termination
 - verify whether a process is truly gone
+- adjust process priority (nice/renice)
 
 ---
 
@@ -119,6 +126,39 @@ Guardrail: kills everything with that process name.
 
 ---
 
+## 🎚️ Priority Control (nice / renice) — KodeKloud/LFCS
+
+### Mental model
+
+- Lower priority = higher nice value
+- Higher priority = lower (or negative) nice value
+- Negative nice generally requires sudo
+
+### Start a command with a nice value
+
+Run with lower priority (be “nicer” to the system):
+
+    nice -n 10 <command>
+
+Run with higher priority (requires privileges on many systems):
+
+    sudo nice -n -5 <command>
+
+### Change priority of an existing process
+
+Set nice to 10:
+
+    sudo renice 10 -p PID
+
+Check nice value (NI column):
+
+    ps -o pid,ni,cmd -p PID
+
+Memory:
+- NI bigger → runs “less aggressively”
+
+---
+
 ## 🎛️ Job Control (Shell-Level)
 
 Job control applies to your current terminal session.
@@ -155,5 +195,52 @@ Kill a job by job number:
 
 `T` indicates a stopped process.
 
-EOF
+---
+
+## 🔧 Operator workflow (LFCS execution)
+
+### Runaway process (safe loop)
+
+1) Identify PID:
+
+    pgrep -a <name>
+
+2) Inspect:
+
+    ps -o pid,ppid,user,stat,etime,cmd -p <PID>
+
+3) Terminate politely:
+
+    kill <PID>
+
+4) Verify:
+
+    ps -p <PID> || echo "gone"
+
+5) Escalate only if needed:
+
+    kill -9 <PID>
+
+6) If it returns, check systemd management:
+
+    systemctl status <unit> --no-pager
+
+---
+
+## 🔗 Drill references (not duplicated here)
+
+- `linux/LFCS-training/execution-drills/kill-escalation-drills.md`
+- `linux/LFCS-training/execution-drills/nice-renice-drills.md`
+- `linux/LFCS-training/execution-drills/job-control-drills.md`
+
+---
+
+## 🪝 Exam memory hook
+
+Inspect → TERM → verify → KILL:
+
+    ps -o pid,stat,etime,cmd -p <PID>
+    kill <PID>
+    ps -p <PID> || echo gone
+    kill -9 <PID>
 
