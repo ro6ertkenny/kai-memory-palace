@@ -1,309 +1,104 @@
-i# 🔥 Firewall Operator Basics (nftables / iptables) — LFCS-Level
+# 🔥 Firewall Operator Basics (UFW) — Operator Canonical (LFCS)
 
-Mental mode: Prove whether firewall is involved, list rules, make the smallest change, persist if required, verify.
+Goal: prove **whether the firewall is involved and allow only what is required**.
 
-LFCS expects you to operate at the level of:
-
-- list active rules
-- open/close a port
-- allow SSH (avoid locking yourself out)
-- verify listeners and reachability
-- persist changes (when applicable)
-
-This guide is distro-agnostic:
-
-- Prefer **nftables** when present
-- Fall back to **iptables** when that’s what exists
+Firewall is never step one.
 
 ---
 
-## 🎯 Operator Goals
+## 🧠 Operator mental model
 
-You must be able to:
+Listener → address → route → firewall.
 
-- Determine what firewall tooling exists
-- Determine whether traffic is being blocked locally
-- Allow inbound to a known port (TCP/UDP)
-- Allow SSH safely
-- Persist the change (if required by the system)
-- Verify with `ss`, `curl`, and remote tests
+Timeout → firewall/routing  
+Refused → no listener
 
 ---
 
-## 🧭 First Principle: Don’t Guess
+## ✅ Safe command order
 
-If a service is listening but remote clients cannot connect:
+Verify listener first:
 
-1) Confirm it is listening locally
-2) Confirm you are testing the right address and port
-3) Then check firewall rules
+    sudo ss -lntup | grep -E ':(PORT)\b'
 
----
+Check firewall:
 
-## 🔎 Identify Which Firewall Tooling Exists
+    sudo ufw status verbose
 
-Run:
+Allow SSH before enabling remotely:
 
-    command -v nft && echo "nftables available"
-    command -v iptables && echo "iptables available"
-    command -v ufw && echo "ufw available"
-    command -v firewall-cmd && echo "firewalld available"
-
-For LFCS, the safest baseline is:
-
-- nftables or iptables
-
-If ufw/firewalld exist, they may be a higher-level interface over nftables/iptables.
+    sudo ufw allow OpenSSH
 
 ---
 
-## ✅ Verify The Service Is Listening (Before Touching Firewall)
+## 🔎 Core workflows
 
-List listeners:
+### Enable firewall safely
 
-    ss -lntup
-    ss -lnup
+    sudo ufw allow OpenSSH
+    sudo ufw enable
 
-Examples:
+### Allow a TCP port
 
-- TCP 80:
+    sudo ufw allow PORT/tcp
 
-      ss -lntp | grep ':80 '
+### Allow from specific subnet
 
-- TCP 22 (SSH):
+    sudo ufw allow from 192.168.1.0/24 to any port 22 proto tcp
 
-      ss -lntp | grep ':22 '
+### Deny a port
 
-If the service is not listening, firewall changes will not help.
+    sudo ufw deny PORT/tcp
 
----
+### Delete a rule
 
-## 🧱 nftables — Core Operator Commands
-
-List ruleset:
-
-    sudo nft list ruleset
-
-List tables:
-
-    sudo nft list tables
-
-List a specific table/chain (common pattern):
-
-    sudo nft list table inet filter
-    sudo nft list chain inet filter input
-
-Common tables:
-
-- `inet filter` (covers IPv4+IPv6)
-- `ip filter` / `ip6 filter`
+    sudo ufw status numbered
+    sudo ufw delete <N>
 
 ---
 
-## 🧱 iptables — Core Operator Commands
+## 🧪 Verification workflow
 
-List rules:
+    sudo ufw status verbose
+    sudo ss -lntup | grep -E ':(PORT)\b'
+    curl http://127.0.0.1:PORT
 
-    sudo iptables -L -n -v
-    sudo iptables -S
+Remote test from client:
 
-List NAT table (if relevant):
-
-    sudo iptables -t nat -L -n -v
-    sudo iptables -t nat -S
-
-For IPv6 (if needed):
-
-    sudo ip6tables -L -n -v
-    sudo ip6tables -S
+    nc -vz <server-ip> PORT
 
 ---
 
-## 🛡️ Safe Rule Changes (LFCS-Level)
+## 🧯 Failure-mode debugging
 
-### Rule strategy (operator-safe)
+UFW inactive but traffic blocked:
 
-- Allow a specific port (TCP/UDP)
-- Prefer minimal scope (port + protocol)
-- Verify immediately
-- Persist only after success
+→ another firewall system exists.
 
----
+Rule present but still failing:
 
-## ✅ Allow SSH (avoid lockout)
+→ service bound to 127.0.0.1 or routing issue.
 
-### nftables (typical inet filter)
+Locked out of SSH:
 
-Add an allow rule for SSH:
-
-    sudo nft add rule inet filter input tcp dport 22 ct state new,established accept
-
-If you also need return traffic:
-
-    sudo nft add rule inet filter input ct state established,related accept
-
-Note: Ordering matters. If there is a default drop earlier, insert instead of add.
-
-Insert at top (position 0) when needed:
-
-    sudo nft insert rule inet filter input position 0 tcp dport 22 ct state new,established accept
+    sudo ufw allow OpenSSH
+    sudo ufw reload
 
 ---
 
-### iptables
+## 🔗 Drill references
 
-Allow SSH:
-
-    sudo iptables -I INPUT 1 -p tcp --dport 22 -j ACCEPT
-
-If established traffic isn’t already permitted (often it is), add:
-
-    sudo iptables -I INPUT 1 -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+- linux/LFCS-training/execution-drills/firewall-ufw-basics.md
+- linux/LFCS-training/execution-drills/service-reachability-debug.md
 
 ---
 
-## ✅ Allow a TCP Port (example: 8080)
+## 🪝 Exam memory hook
 
-### nftables
+Always:
 
-    sudo nft add rule inet filter input tcp dport 8080 ct state new,established accept
-
----
-
-### iptables
-
-    sudo iptables -I INPUT 1 -p tcp --dport 8080 -j ACCEPT
-
----
-
-## ✅ Allow a UDP Port (example: 53)
-
-### nftables
-
-    sudo nft add rule inet filter input udp dport 53 accept
-
----
-
-### iptables
-
-    sudo iptables -I INPUT 1 -p udp --dport 53 -j ACCEPT
-
----
-
-## 🧪 Verification Checklist (Must Do Every Time)
-
-Local verification:
-
-1) Listening:
-
-       ss -lntup | grep ':8080 '
-
-2) Local request:
-
-       curl -sS http://127.0.0.1:8080/ | head
-
-Remote verification (from another machine, if available):
-
-- curl / nc to the host IP:port
-
-If local works but remote doesn’t:
-
-- firewall or routing is likely involved
-
----
-
-## 💾 Persistence (Distro-Dependent)
-
-LFCS systems may persist rules via different mechanisms.
-
-### nftables persistence (common pattern)
-
-If `/etc/nftables.conf` exists:
-
-- Save your intended ruleset there (careful: replace with known-good config)
-- Ensure nftables service is enabled
-
-Check:
-
-    systemctl status nftables || true
-
-Enable:
-
-    sudo systemctl enable --now nftables
-
-Note: Persistence details vary by distro. If unsure, keep the change minimal and verify functionality.
-
----
-
-### iptables persistence (common pattern)
-
-Some distros require an iptables persistence service/package.
-
-At LFCS level:
-
-- It is acceptable to make the change and verify in the running system
-- If persistence is required, look for:
-
-    /etc/iptables/
-    iptables-save
-    iptables-restore
-
-Example (if applicable):
-
-    sudo iptables-save | sudo tee /etc/iptables/rules.v4
-
----
-
-## ⛔ Operator Rules
-
-- Never change firewall rules before confirming the service is listening.
-- Always allow SSH before experimenting remotely.
-- Insert allow rules at the top when a default-drop policy exists.
-- Verify with `ss` + `curl` every time.
-- Keep changes minimal and reversible.
-
----
-
-## 🔁 Reversal / Cleanup (Know How To Undo)
-
-### nftables
-
-List with handles (so you can delete a specific rule):
-
-    sudo nft -a list chain inet filter input
-
-Delete by handle:
-
-    sudo nft delete rule inet filter input handle <HANDLE>
-
----
-
-### iptables
-
-List with line numbers:
-
-    sudo iptables -L INPUT -n --line-numbers
-
-Delete by line number:
-
-    sudo iptables -D INPUT <N>
-
----
-
-## 🔗 Cross-Links
-
-- Networking debugging checklist
-- Ports and listeners
-- Network and DNS failures playbook
-
----
-
-## 🏁 Exit Criteria
-
-You are done when:
-
-- You can identify the firewall toolchain quickly
-- You can list rules
-- You can open a port safely without breaking SSH
-- You can verify end-to-end connectivity
+    sudo ss -lntup
+    ip -br a
+    ip route
+    sudo ufw status
 
