@@ -311,3 +311,214 @@ Train each block until:
 - no trial-and-error
 - clean first execution
 
+
+# APPENDIX — KodeKloud Alignment Index (not a drill)
+
+#### Shell execution & redirection (already drilled)
+    echo, true, false, $? , ;, &&, ||, >, >>, <, 2>, 2>>, &>, |, tee
+    Deep links:
+    - ../../shell-and-bash/bash/bash-basics.md
+    - ../../shell-and-bash/bash/bash-pipelines.md
+
+#### SSH essentials (add to drill as optional reps, keep in scope)
+    ssh -V
+    ssh -v user@host
+    Deep link:
+    - ../../networking/ssh-operator-basics.md
+
+#### Host identity (NOT essential-commands drill scope; route to foundations)
+    hostnamectl (set-hostname / static hostname workflows)
+    Deep link:
+    - ../../foundations/system-inspection.md
+
+#### “Find hidden files” (still essential; add as optional rep)
+    ls -la /path
+    Deep link:
+    - ../../foundations/files-and-metadata-inspection.md
+
+#### Manual discovery (route to shell-and-bash/bash)
+    apropos "keywords"
+    Deep link:
+    - ../../shell-and-bash/bash/man-basics.md
+
+#### Filesystem mount inspection (NOT essential-commands scope; storage wing)
+    findmnt /dev/...
+    mount -o ro,noexec,nosuid ...
+    umount /mnt
+    Deep link:
+    - ../../filesystems-and-storage/mounting-and-unmounting.md
+
+#### Archives & compression (already in scope)
+    tar -cf/-tf/-xf
+    gzip/gunzip
+    bzip2/bunzip2
+    xz/unxz
+    Deep link:
+    - ../../foundations/archives-and-compression-tar.md
+
+#### Compare (already in scope)
+    diff
+    cmp
+    Deep link:
+    - ../../shell-and-bash/text-processing/grep.md
+
+---
+
+## 2) Add the cheat-sheet commands into canonical wing docs (merge checklist)
+
+This is a routing plan. For each item, paste the command(s) into the correct operator doc.
+
+### A) linux/networking/
+File: ssh-operator-basics.md
+Add:
+    ssh -V
+    ssh -v user@host
+    scp file user@host:/path/
+    scp user@host:/path/file .
+
+From PDF: ssh/scp examples and debug flags.  
+
+---
+
+### B) linux/shell-and-bash/bash/
+File: man-basics.md
+Add:
+    apropos "NFS mounts"
+Explain: search manpage names/descriptions for keywords.
+
+From PDF: apropos usage.  
+
+---
+
+### C) linux/foundations/
+File: system-inspection.md
+Add:
+    hostnamectl (static hostname workflows)
+    uptime
+    lscpu
+    free --mega
+    df /
+    du -sh /bin/
+From PDF: system inspection commands.  
+
+---
+
+### D) linux/package-management/
+File: package-management.md
+Add (Rob standard is apt-get; keep the cheat sheet as “alias/alt syntax”):
+    apt search "term"
+    apt install pkg
+    apt-get remove --auto-remove -y pkg
+    dpkg --search /path/to/file
+    dpkg --listfiles pkg | grep '^/bin'
+From PDF: apt/dpkg examples.  
+
+---
+
+### E) linux/process-and-resource-management/
+File: process-inspection.md / process-control.md / signals-and-sigkill.md
+Add:
+    ps lax
+    ps u 1
+    pgrep -a name
+    lsof -p 1
+    kill -SIGHUP <pid>
+    renice 9 <pid>
+From PDF: ps/pgrep/lsof/kill/renice.  
+
+---
+
+### F) linux/process-and-resource-management/ (scheduling)
+File: services-and-daemons.md or a scheduling doc (if present)
+Add:
+    crontab -l
+    anacron -n -f
+    atq
+    atrm <jobid>
+From PDF: cron/anacron/at commands.  
+
+---
+
+### G) linux/foundations/ or linux/security/
+SELinux items (ONLY if you’re in an SELinux-enabled distro):
+    ls -Z /bin/sudo
+    chcon -t TYPE file
+    setenforce 0
+    semanage user -l
+    restorecon -R /path
+From PDF: SELinux commands.
+
+Suggested home:
+    foundations/selinux-operator-basics.md
+
+---
+
+### H) linux/filesystems-and-storage/
+Storage and mounts:
+    lsblk
+    fdisk /dev/...
+    cfdisk
+    mkfs.xfs ...
+    mkfs.ext4 ...
+    mount /dev/... /mnt
+    umount /mnt
+    mkswap /dev/...
+    swapon --show
+    swapon / swapoff
+    findmnt /dev/...
+From PDF: storage/mount/swap commands.
+
+Suggested homes (choose where you want them):
+    filesystems-and-storage/storage-inspection.md
+    filesystems-and-storage/filesystem-creation-and-tuning.md
+    filesystems-and-storage/mounting-and-unmounting.md
+
+LVM + RAID + quotas + ACLs (clearly non-essential domain):
+    pvcreate/pvs/pvremove
+    vgcreate/vgextend/vgreduce/vgs
+    lvcreate/lvresize/lvremove
+    mdadm --create ...
+    setfacl/getfacl
+    xfs_quota ...
+From PDF: storage advanced topics.
+
+Suggested homes:
+    filesystems-and-storage/lvm-operator-basics.md
+    filesystems-and-storage/acls-and-the-acl-mask.md
+
+---
+
+### I) linux/foundations/ (users and groups are NOT essential commands)
+User/group lifecycle commands from PDF:
+    useradd/usermod/userdel
+    groupadd/groupmod/groupdel
+    gpasswd
+    chage
+Suggested home:
+    foundations/users-and-groups.md
+    foundations/user-lifecycle-management.md
+
+---
+
+### J) git/ (not linux essential commands)
+Git commands from PDF:
+    git add
+    git commit -m
+    git branch
+    git checkout
+    git log --raw
+    git merge
+    git pull/push
+    git clone
+Suggested home:
+    git/README.md or git/change-workflow.md
+
+---
+
+## 3) Rules to prevent scope corruption (permanent)
+
+- essential-commands.md drill stays “Essential Commands” + shell mechanics + archives + compare + ssh/scp only.
+- Everything else from the cheat sheet is routed to its wing:
+  users/groups, storage, networking, running systems, packages, SELinux, git.
+
+---
