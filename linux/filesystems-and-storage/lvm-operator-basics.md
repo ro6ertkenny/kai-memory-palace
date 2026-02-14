@@ -1,36 +1,26 @@
 # 🧱 LVM — Operator Basics
-*Logical Volume Manager: resizing, composing, and surviving disk reality*
+Logical Volume Manager: resizing, composing, and surviving disk reality
 
 ---
 
-## 🎯 Purpose
+## Purpose
 
-This document teaches you to:
+You must be able to:
 
-- Understand **what LVM is and why it exists**
-- Read and reason about:
-  - Physical Volumes (PV)
-  - Volume Groups (VG)
-  - Logical Volumes (LV)
-- Perform **safe, exam-grade operations**:
-  - Create
-  - Extend
-  - Reduce
-  - Inspect
-  - Mount
-- Debug common LVM failures:
-  - “No space left”
-  - “Device not found”
-  - “Filesystem won’t mount”
-  - “LV is full but disk is not”
-
-LFCS expects you to be **operationally competent** with LVM.
+- Understand the LVM object model:
+  - PV (Physical Volume)
+  - VG (Volume Group)
+  - LV (Logical Volume)
+- Create PV/VG/LV, format, mount, and persist
+- Extend storage safely (most common)
+- Reduce storage safely (rare, dangerous)
+- Debug common failures
 
 ---
 
-## 🧠 Mental Model
+## Mental model
 
-LVM is a **virtualization layer for block devices**.
+LVM is a virtualization layer for block devices.
 
 Stack:
 
@@ -40,24 +30,17 @@ Stack:
         ↓
     Volume Group (VG)  ← pool of storage
         ↓
-    Logical Volume (LV) ← looks like a disk
+    Logical Volume (LV) ← virtual block device
 
-Filesystems live **on LVs**, not directly on disks.
-
-Think:
-
-> “LVM lets me resize and compose disks **without caring** which disk the blocks came from.”
+Filesystems live on LVs, not directly on disks.
 
 ---
 
-## 🧱 The Objects
+## The objects
 
----
+### PV (Physical Volume)
 
-# 1) Physical Volume (PV)
-
-- A disk or partition prepared for LVM
-- Created with:
+Create:
 
     pvcreate /dev/sdb
 
@@ -66,16 +49,13 @@ Inspect:
     pvs
     pvdisplay
 
----
+### VG (Volume Group)
 
-# 2) Volume Group (VG)
-
-- A **pool of storage** made of one or more PVs
-- Created with:
+Create:
 
     vgcreate vg_data /dev/sdb
 
-Extend later:
+Extend pool:
 
     vgextend vg_data /dev/sdc
 
@@ -84,16 +64,13 @@ Inspect:
     vgs
     vgdisplay
 
----
+### LV (Logical Volume)
 
-# 3) Logical Volume (LV)
-
-- A **virtual block device** carved from a VG
-- Created with:
+Create:
 
     lvcreate -L 20G -n lv_data vg_data
 
-Appears as:
+Device path:
 
     /dev/vg_data/lv_data
 
@@ -104,22 +81,29 @@ Inspect:
 
 ---
 
-## 🧪 Canonical Creation Flow
+## Canonical creation flow (exam-grade)
 
-    lsblk
+    lsblk -f
     pvcreate /dev/sdb
     vgcreate vg_data /dev/sdb
     lvcreate -L 20G -n lv_data vg_data
     mkfs.ext4 /dev/vg_data/lv_data
-    mount /dev/vg_data/lv_data /mnt/data
+    sudo mkdir -p /mnt/data
+    sudo mount /dev/vg_data/lv_data /mnt/data
+    blkid /dev/vg_data/lv_data
 
-Persist in `/etc/fstab` like any other block device.
+Persist like any block device in `/etc/fstab` (prefer UUID):
+
+    sudo vi /etc/fstab
+    sudo mount -a
+    sudo findmnt --verify
 
 ---
 
-## 🔍 Inspection Commands You Must Know
+## Inspection commands you must know
 
-    lsblk
+LVM layers:
+
     pvs
     vgs
     lvs
@@ -127,174 +111,172 @@ Persist in `/etc/fstab` like any other block device.
     vgdisplay
     lvdisplay
 
-Also:
+System context:
 
+    lsblk -f
     blkid
     findmnt
-    df -h
+    df -hT
 
 ---
 
-## 📈 Growing Storage (Most Common Operation)
+## Growing storage (common)
 
-Scenario:
+Goal:
 
-> “The filesystem is full but the disk is not.”
+“Filesystem is full but VG has free space.”
 
-Steps:
-
-1) Add disk (or partition)
+1) Add disk to VG (PV -> VG):
 
     pvcreate /dev/sdc
     vgextend vg_data /dev/sdc
 
-2) Extend LV
+2) Extend LV:
 
     lvextend -L +10G /dev/vg_data/lv_data
 
-Or use all free space:
+Or consume all free space:
 
     lvextend -l +100%FREE /dev/vg_data/lv_data
 
-3) Grow filesystem
+3) Grow filesystem:
 
-For ext4:
+ext4:
 
     resize2fs /dev/vg_data/lv_data
 
-For xfs:
+xfs (must be mounted):
 
     xfs_growfs /mnt/data
 
 ---
 
-## 📉 Shrinking Storage (Dangerous, Rare)
+## Shrinking storage (rare, dangerous)
 
-⚠️ **Never shrink a filesystem while mounted.**
+Rule: never shrink while mounted. Shrink filesystem first, then LV.
 
-General pattern:
+Pattern (ext4 only; xfs cannot shrink):
 
-1) Unmount
+1) Unmount:
 
-    umount /mnt/data
+    sudo umount /mnt/data
 
-2) Check filesystem
+2) Check filesystem:
 
-    e2fsck -f /dev/vg_data/lv_data
+    sudo e2fsck -f /dev/vg_data/lv_data
 
-3) Shrink filesystem first
+3) Shrink filesystem first:
 
-    resize2fs /dev/vg_data/lv_data 15G
+    sudo resize2fs /dev/vg_data/lv_data 15G
 
-4) Shrink LV
+4) Shrink LV second:
 
-    lvreduce -L 15G /dev/vg_data/lv_data
+    sudo lvreduce -L 15G /dev/vg_data/lv_data
 
-5) Remount
+5) Remount:
 
-    mount /mnt/data
-
-> Filesystem first, LV second.  
-> Reversing this **destroys data**.
+    sudo mount /dev/vg_data/lv_data /mnt/data
 
 ---
 
-## 🧯 Common Failure Modes
+## Activation / discovery (common debug path)
 
----
+If LVs disappear after boot or device changes:
 
-### “No space left on device” but VG has space
+Scan:
 
-Check:
+    pvscan
+    vgscan
+    lvscan
 
-    df -h
-    vgs
-    lvs
+Activate a VG:
 
-Fix:
+    vgchange -ay vg_data
 
-> Extend the LV, then grow the filesystem.
-
----
-
-### “Filesystem won’t mount”
-
-Check:
-
-    lsblk
-    blkid
-    lvdisplay
-    fsck /dev/vg_data/lv_data
-
-Often:
-
-- Wrong device
-- Corrupt FS
-- LV not active
-
-Activate:
+Activate an LV:
 
     lvchange -ay vg_data/lv_data
 
 ---
 
-### “Device not found”
+## Common failure modes
+
+### “No space left on device” but disk seems fine
+
+Check which layer is full:
+
+    df -hT /mnt/data
+    vgs
+    lvs
+
+Fix:
+- extend LV
+- grow filesystem
+
+### “Device not found” / “VG not found”
 
 Check:
 
+    pvs
     vgs
-    lvs
     lvscan
 
-May need:
+Fix:
 
     vgchange -ay
+    lvchange -ay vg_data/lv_data
+
+### “Filesystem won’t mount”
+
+Check:
+
+    lsblk -f
+    blkid /dev/vg_data/lv_data
+    lvdisplay /dev/vg_data/lv_data
+
+Then consider filesystem check:
+
+    sudo fsck /dev/vg_data/lv_data
 
 ---
 
-### “Disk added but no space appears”
+## Operator rules
 
-You forgot:
+- Always inspect first:
 
-    pvcreate
-    vgextend
-
----
-
-## 🧠 Operator Rules
-
-- Filesystems live on **LVs**, not disks
-- Always inspect:
-
-    lsblk
+    lsblk -f
     pvs
     vgs
     lvs
 
-- Always grow in this order:
+- Grow order:
 
     Disk → PV → VG → LV → Filesystem
 
-- Always shrink in this order:
+- Shrink order (ext4 only):
 
     Filesystem → LV
 
----
-
-## 🧪 Exam-Grade Tasks You Should Be Able To Do
-
-- Create PV, VG, LV from scratch
-- Format and mount an LV
-- Extend an LV and filesystem
-- Diagnose “disk full” correctly
-- Identify which layer is actually full
+- Do not confuse disk paths with LV paths.
 
 ---
 
-## ⚠️ Dangerous Mistakes
+## Exam-grade tasks
 
-- ❌ Shrinking LV before filesystem
-- ❌ Formatting the wrong device
-- ❌ Confusing disk vs LV
-- ❌ Forgetting to grow the filesystem aft
+- Create PV/VG/LV, format, mount, persist via fstab
+- Extend LV and filesystem correctly
+- Identify which layer is full and fix the correct layer
+- Reactivate VGs/LVs after detection issues
+
+---
+
+## Related drills
+
+- linux/LFCS-training/execution-drills/
+
+---
+
+## Exam memory hook
+
+LVM is block-device virtualization. Always reason in layers: PV → VG → LV → FS.
 

@@ -1,135 +1,122 @@
 # Mounting and Unmounting Filesystems
 
-This document explains what mounting really means in Linux, how to inspect the live mount tree, and how filesystems are attached and detached from the running system.
+What mounting means, how to inspect the live mount tree, and how to detach safely.
 
 ---
 
-## The core mental model
+## Core mental model
 
-Linux is not "a disk".
+Linux is a **tree of mountpoints**, not “a disk”.
 
-Linux is:
-
-A tree of mountpoints built from multiple filesystems.
-
-Each filesystem is grafted into the namespace at a directory.
-
-Mounting does not move files.
-It attaches a filesystem to a path.
-
+Mounting attaches a filesystem to a path.
 Unmounting removes that attachment.
 
----
-
-## Device, filesystem, mountpoint (three different things)
-
-- Device: a block device (e.g. /dev/sda2, /dev/loop0, a disk image)
-- Filesystem: ext4, xfs, vfat, etc (the on-disk data structure)
-- Mountpoint: a directory where that filesystem is attached (e.g. /, /home, /mnt)
-
-These are not the same thing.
+Mounting does not move files.
+It grafts a filesystem into the namespace at a directory.
 
 ---
 
-## Three ways to inspect mounts (three views of the same truth)
+## Device vs filesystem vs mountpoint
 
-1) mount
-- Human-readable view of the kernel mount table
-
-2) findmnt
-- Structured, tree-based view (best tool for humans)
-
-3) /proc/self/mounts
-- Raw kernel truth
-
-Tools like mount and findmnt ultimately read from /proc/self/mounts.
-
-Modern systems have many mounts:
-- Real disk filesystems
-- Plus many virtual kernel filesystems (proc, sysfs, tmpfs, cgroup, etc)
-
-This is normal.
+- Device: block device (example: /dev/sda2)
+- Filesystem: on-disk structure (ext4, xfs, vfat)
+- Mountpoint: directory where attached (/, /home, /mnt/data)
 
 ---
 
-## Focused inspection commands
+## Inspect mounts (three views)
+
+1) Structured (best):
+
+    findmnt
+
+2) Classic:
+
+    mount
+
+3) Kernel raw truth:
+
+    cat /proc/self/mounts
+
+---
+
+## Focused inspection
 
 What backs / ?
 
-findmnt /
-df -hT /
+    findmnt /
+    df -hT /
 
 Full topology:
 
-lsblk -f
-findmnt
+    lsblk -f
+    findmnt
 
 ---
 
-## Loopback mounts (filesystem inside a file)
+## Mount / unmount basics
 
-A regular file can be treated as a block device via a loop device:
+Mount by device:
+
+    sudo mount /dev/sdb1 /mnt/data
+
+Unmount by mountpoint:
+
+    sudo umount /mnt/data
+
+Unmount by device:
+
+    sudo umount /dev/sdb1
+
+---
+
+## “Target is busy”
+
+A filesystem is busy if any process:
+- has cwd inside it
+- has files open in it
+
+Find offenders:
+
+    sudo lsof +f -- /mnt/data
+    sudo fuser -vm /mnt/data
+
+Resolve:
+- exit shells
+- stop services
+- close files
+
+Then unmount cleanly.
+
+---
+
+## Last resort unmounts
+
+Lazy unmount (detach now, cleanup later):
+
+    sudo umount -l /mnt/data
+
+Force unmount (dangerous; avoid unless required):
+
+    sudo umount -f /mnt/data
+
+---
+
+## Loop mounts (filesystem inside a file)
+
+Pattern:
 
 file -> /dev/loopN -> filesystem -> mountpoint
 
-This is how:
-- disk images
-- ISOs
-- many container layers
+Mount an ISO:
 
-work internally.
-
----
-
-## What happens when you mount and unmount
-
-When mounted:
-
-The mountpoint directory is hidden.
-The root of the mounted filesystem appears there.
-
-When unmounted:
-
-The graft is removed.
-The original directory is visible again.
-No data is deleted.
-
-Files live in the filesystem, not in the directory.
-
----
-
-## "Target is busy"
-
-A filesystem is busy if any process:
-- Has its current working directory inside it
-- Or has any file open inside it
-
-Even a shell "standing in the directory" makes it busy.
-
-Correct workflow:
-1) Find who is using it (fuser / lsof)
-2) Exit or stop those processes
-3) Then unmount cleanly
-
-Lazy unmount:
-
-umount -l
-
-Detaches now, cleans up when processes exit.
-Last resort tool.
-
----
-
-## Big mental model
-
-Mounting is namespace surgery.
-
-You are grafting and ungrafting filesystems into a live tree.
+    sudo mkdir -p /mnt/iso
+    sudo mount -o loop file.iso /mnt/iso
+    sudo umount /mnt/iso
 
 ---
 
 ## Exam memory hook
 
-Linux is a tree of mountpoints, not a disk.
+Mounting is namespace grafting. Linux is a tree of mountpoints, not a disk.
 
----

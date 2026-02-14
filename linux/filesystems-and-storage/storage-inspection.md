@@ -1,25 +1,23 @@
 # storage-inspection.md
-LFCS Day 3 — Filesystems & Storage
 
-Goal: Reliably inspect disks, partitions, filesystems, and mounts before making any changes.
+Goal: Reliably inspect disks, partitions, filesystems, mounts, and swap **before** making changes.
 
---------------------------------------------------------------------
+---
 
-MENTAL MODEL
+## Mental model
 
-- Before you format, mount, fsck, or resize anything, you must know:
-  - What disks exist
-  - What partitions exist
-  - What filesystems exist
-  - What is currently mounted
-- Most catastrophic Linux storage mistakes come from touching the wrong device.
+- Catastrophic storage mistakes come from touching the wrong device.
 - Inspection is always step zero.
+- You must answer:
+  - What block devices exist?
+  - What partitions exist?
+  - What filesystems exist (type/UUID/label)?
+  - What is mounted, where, and with what options?
+  - What is swap, and is it active?
 
---------------------------------------------------------------------
+---
 
-THE CORE INSPECTION COMMANDS
-
-You should be fluent with these:
+## Core inspection commands (operator baseline)
 
     lsblk
     lsblk -f
@@ -27,254 +25,224 @@ You should be fluent with these:
     findmnt
     df -hT
     mount
-    fdisk -l
+    sudo fdisk -l
+    swapon --show
 
-Together, these tell you:
-- What exists
-- What type it is
-- What is mounted
-- Where it is mounted
-- How full it is
+---
 
---------------------------------------------------------------------
+## lsblk — primary map
 
-LSBLK — YOUR PRIMARY MAP
-
-Show block devices:
+Show devices:
 
     lsblk
 
-Show block devices WITH filesystems and UUIDs:
+Show filesystems + UUIDs + mountpoints:
 
     lsblk -f
 
-Typical output shows:
+Target a single disk:
 
-- Disk:     sda, sdb, nvme0n1, mmcblk0
-- Partitions: sda1, sda2, etc.
-- Filesystem type: ext4, xfs, vfat, etc.
-- UUID
-- Mountpoint (if mounted)
+    lsblk -f /dev/sdb
 
-This is usually the FIRST command you run.
+Operator rule:
+- verify whether you are looking at a disk (`/dev/sdb`) vs a partition (`/dev/sdb1`)
+- verify mountpoints before formatting or fsck
 
---------------------------------------------------------------------
+---
 
-BLKID — AUTHORITATIVE IDENTIFIERS
+## blkid — authoritative identifiers
 
-Show filesystem identifiers:
+All identifiers:
 
     blkid
 
-Show specific device:
+Specific device:
 
     blkid /dev/sdb1
 
-Shows:
+Use cases:
+- copy UUID into `/etc/fstab`
+- confirm TYPE and LABEL
 
-- UUID
-- TYPE
-- LABEL (if any)
+---
 
-Use this to copy UUIDs into /etc/fstab.
+## findmnt — runtime mount truth (best human view)
 
---------------------------------------------------------------------
-
-FINDMNT — WHAT IS MOUNTED (TREE VIEW)
-
-Show all mounts:
+Full mount tree:
 
     findmnt
 
-Show a specific mount:
+Specific mountpoint:
 
     findmnt /mnt/data
 
-Show source of a mount:
+Custom columns:
 
     findmnt -o SOURCE,TARGET,FSTYPE,OPTIONS
 
-This shows the actual kernel mount table, not guesses.
+Rule:
+- `findmnt` reflects the kernel’s current mount table (runtime truth)
 
---------------------------------------------------------------------
+---
 
-MOUNT — CLASSIC VIEW
+## mount — classic view
+
+All mounts:
 
     mount
 
-Or cleaner:
+Readable view:
 
     mount | column -t
 
-Shows:
+Use for quick option inspection, but prefer `findmnt` for structure.
 
-- What is mounted
-- Where
-- With what options
+---
 
-Less structured than findmnt, but still useful.
+## df — filesystem capacity view
 
---------------------------------------------------------------------
-
-DF — SPACE USAGE (FILESYSTEM VIEW)
-
-Show filesystem usage:
+All filesystem usage:
 
     df -hT
 
-Check specific path:
+Path-focused:
 
     df -hT /home
 
-Shows:
+Rule:
+- `df` = filesystem usage
+- `du` = directory usage (covered elsewhere)
 
-- Filesystem
-- Type
-- Size
-- Used
-- Available
-- Mount point
+---
 
-Important: df shows FILESYSTEM usage, not directory usage.
+## fdisk / cfdisk — partition table view
 
---------------------------------------------------------------------
-
-FDISK — PARTITION TABLE VIEW
-
-List all disks and partitions:
+List partitions on all disks:
 
     sudo fdisk -l
 
-Shows:
-
-- Disk sizes
-- Partition layout
-- Partition types
-- Start/end sectors
-
-Use this to confirm partitioning before formatting.
-
---------------------------------------------------------------------
-
-PUTTING IT ALL TOGETHER (SAFE WORKFLOW)
-
-Before touching a disk:
-
-1) See everything:
-
-    lsblk -f
-
-2) Confirm identifiers:
-
-    blkid
-
-3) Confirm what is mounted:
-
-    findmnt
-
-4) Confirm partition layout:
+List partitions on one disk:
 
     sudo fdisk -l /dev/sdb
 
-5) Confirm space usage (if relevant):
+Interactive partitioning (safer UI than raw fdisk):
+
+    sudo cfdisk /dev/sdb
+
+Operator rule:
+- partitioning changes the disk layout; confirm target disk first with `lsblk`
+
+---
+
+## Swap inspection
+
+Show active swap devices/files:
+
+    swapon --show
+
+Show overall memory + swap:
+
+    free -h
+
+Swap in `/etc/fstab` is usually:
+- a partition (TYPE=swap)
+- or a swapfile (not covered here unless you add it later)
+
+---
+
+## Safe pre-change workflow
+
+Before touching a disk:
+
+1) Map devices + FS:
+
+    lsblk -f
+
+2) Confirm UUID/TYPE:
+
+    blkid
+
+3) Confirm mount truth:
+
+    findmnt
+    swapon --show
+
+4) Confirm partition table:
+
+    sudo fdisk -l /dev/sdb
+
+5) Confirm filesystem usage (if relevant):
 
     df -hT
 
-Only then proceed.
+Proceed only after inspection is clean.
 
---------------------------------------------------------------------
+---
 
-COMMON PITFALLS
+## “Is this device safe to touch?”
 
-- Confusing /dev/sda and /dev/sdb
-- Confusing disk and partition (/dev/sdb vs /dev/sdb1)
-- Formatting a disk that is already mounted
-- Mounting over a non-empty directory
-- Trusting device names instead of UUIDs
+A device/partition should:
 
---------------------------------------------------------------------
+- NOT appear in `findmnt`
+- NOT show a mountpoint in `lsblk -f`
+- NOT appear in `swapon --show` (swap is “in use” too)
 
-HOW TO TELL IF A DEVICE IS SAFE TO TOUCH
-
-A device or partition should:
-
-- NOT appear in findmnt
-- NOT show a mountpoint in lsblk -f
-
-Check:
+Checks:
 
     lsblk -f
     findmnt | grep sdb
+    swapon --show | grep sdb
 
-If it is mounted: DO NOT format or fsck it.
+If mounted or swap-active: do not format, fsck, or repartition it.
 
---------------------------------------------------------------------
+---
 
-VIRTUAL FILESYSTEMS (YOU WILL SEE THESE)
+## Virtual filesystems (normal)
 
-In df or findmnt you will see:
+You will see in `df` / `findmnt`:
 
 - tmpfs
 - devtmpfs
 - proc
 - sysfs
+- cgroup*
 
-These are normal. They are not disks.
+These are normal, not disk-backed partitions.
 
---------------------------------------------------------------------
+---
 
-REAL-WORLD EXAMPLES
+## LFCS drills (inspection only)
 
-“What disk is my root filesystem on?”
-
-    findmnt /
-
-“What filesystem is /home using?”
-
-    df -hT /home
-
-“What partitions exist on /dev/sdb?”
-
-    lsblk /dev/sdb
-    sudo fdisk -l /dev/sdb
-
-“What is mounted at /mnt/data?”
-
-    findmnt /mnt/data
-
---------------------------------------------------------------------
-
-LFCS DRILLS
-
-DRILL 1: Full system inventory
+Drill 1: inventory
 
     lsblk -f
     blkid
     findmnt
     df -hT
+    swapon --show
 
-DRILL 2: Pick a disk and analyze it
+Drill 2: analyze a disk safely
 
-    sudo fdisk -l /dev/sdb
     lsblk -f /dev/sdb
+    sudo fdisk -l /dev/sdb
 
-DRILL 3: Answer questions using only inspection tools
+Drill 3: answer with inspection
 
-- Where is / mounted from?
-- What filesystem is /home?
-- Is /dev/sdb1 mounted?
-- What is the UUID of /dev/sda1?
+- What backs `/`?
+- What filesystem type is `/home`?
+- Is `/dev/sdb1` mounted?
+- Is any swap active on `/dev/sdb*`?
+- What is the UUID of `/dev/sda1`?
 
---------------------------------------------------------------------
+---
 
-EXAM STANDARD
+## Related drills
 
-You must be able to:
+- linux/LFCS-training/execution-drills/
 
-- Identify disks, partitions, and filesystems
-- Determine what is mounted and where
-- Find UUIDs and filesystem types
-- Confirm a device is safe before modifying it
-- Explain the difference between disk view, filesystem view, and mount view
+---
 
---------------------------------------------------------------------
+## Exam memory hook
+
+Inspection prevents disasters. Always confirm: device, filesystem, mount, swap.
+

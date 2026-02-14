@@ -1,13 +1,13 @@
-# /etc/fstab and Persistent Mounts
+# fstab-and-persistent-mounts.md
 
-This document explains how Linux decides what to mount at boot and how to validate that plan safely.
+How Linux decides what to mount at boot and how to validate that plan safely.
 
 ---
 
-## The core mental model
+## Core mental model
 
-/etc/fstab is the declarative plan for the mount tree.
-The kernel’s mount table is the runtime reality.
+- `/etc/fstab` is the declarative plan.
+- The kernel mount table is runtime reality.
 
 At boot:
 
@@ -17,50 +17,69 @@ fstab -> systemd -> mount syscalls -> live mount tree
 
 ## fstab line format
 
-<what> (device)   <where> (mountpoint)   <type>   <options>   <dump>   <fsck pass>
+    <what>   <where>   <type>   <options>   <dump>   <pass>
 
 Example:
 
-UUID=...  /home  ext4  defaults  0  2
+    UUID=...  /home  ext4  defaults  0  2
 
 ---
 
-## Why UUID= is used
+## Why UUID= is preferred
 
-Device names like /dev/sda2 can change.
+Device names like `/dev/sda2` can change.
+UUID identifies the filesystem and is stable.
 
-UUID identifies the filesystem itself and is stable.
+Get UUID:
+
+    blkid
+    lsblk -f
 
 ---
 
-## The last two numbers (quick intuition)
+## The last two numbers
 
 dump:
 - usually 0
-- legacy backup tool, mostly ignored
 
 pass:
 - 1 = check first (root /)
-- 2 = check later (/home, etc)
-- 0 = do not fsck (swap, special)
+- 2 = check later (other local filesystems)
+- 0 = never fsck (swap, special, some network mounts)
 
 ---
 
-## Verifying fstab safely
+## Validation (do not skip)
 
-Never reboot blindly.
+Validate fstab entries:
 
-Always run:
+    sudo findmnt --verify
 
-sudo findmnt --verify
+Apply mounts without reboot:
 
-If this reports errors, your system may not boot.
+    sudo mount -a
+
+Inspect runtime mount truth:
+
+    findmnt
+
+---
+
+## Swap entries in fstab
+
+Swap is often defined in fstab with type `swap`.
+
+Example:
+
+    UUID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx  none  swap  sw  0  0
+
+Inspect active swap:
+
+    swapon --show
 
 ---
 
-## Mental model
+## Exam memory hook
 
-fstab is the plan.
-The live mount tree is the execution.
+fstab is the plan. Validate it with `findmnt --verify` before reboot.
 
----

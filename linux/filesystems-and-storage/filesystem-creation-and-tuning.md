@@ -1,37 +1,38 @@
 # filesystem-creation-and-tuning.md
-LFCS Day 3 — Filesystems & Storage
 
-Goal: Create filesystems safely, label them, tune ext filesystems, and understand resizing and formatting workflows.
+Goal: Create filesystems safely, label them, and understand resizing workflows (ext4 vs xfs).
 
---------------------------------------------------------------------
+---
 
-MENTAL MODEL
+## Mental model
 
-- A disk or partition is just raw space until formatted.
-- mkfs creates a filesystem structure on a device.
-- Formatting DESTROYS existing data.
-- Filesystems have tunable parameters (check intervals, labels, reserved space).
-- ext4 uses mkfs.ext4 and tune2fs.
-- xfs uses mkfs.xfs and xfs_growfs.
+- A disk/partition is raw space until formatted.
+- `mkfs*` creates the filesystem structure on a device.
+- Formatting destroys existing data.
+- Filesystems have identifiers:
+  - TYPE (ext4/xfs/vfat)
+  - UUID (stable identifier)
+  - LABEL (human-friendly name)
 
---------------------------------------------------------------------
+---
 
-DANGEROUS COMMAND WARNING
+## Dangerous command warning
 
 Formatting wipes data.
 
-Always confirm target device:
+Before any `mkfs`:
 
     lsblk -f
     blkid
+    findmnt
 
-If you format the wrong disk, the data is gone.
+If the target is mounted or swap-active: stop.
 
---------------------------------------------------------------------
+---
 
-CREATING FILESYSTEMS
+## Create filesystems (mkfs.*)
 
-Create ext4:
+ext4:
 
     sudo mkfs.ext4 /dev/sdb1
 
@@ -39,24 +40,22 @@ Explicit type:
 
     sudo mkfs -t ext4 /dev/sdb1
 
-Create XFS:
+xfs:
 
     sudo mkfs.xfs /dev/sdb1
 
-Create FAT32 (vfat):
+vfat (FAT32):
 
     sudo mkfs.vfat /dev/sdb1
 
---------------------------------------------------------------------
-
-VERIFY AFTER FORMATTING
+Verify after formatting:
 
     lsblk -f
-    blkid
+    blkid /dev/sdb1
 
---------------------------------------------------------------------
+---
 
-LABELS AND UUIDS
+## Labels and UUIDs
 
 Show identifiers:
 
@@ -71,7 +70,7 @@ Or:
 
     sudo tune2fs -L DATA /dev/sdb1
 
-Set XFS label:
+Set xfs label:
 
     sudo xfs_admin -L DATA /dev/sdb1
 
@@ -79,11 +78,15 @@ Mount by label:
 
     sudo mount LABEL=DATA /mnt/data
 
---------------------------------------------------------------------
+Mount by UUID (preferred for fstab):
 
-TUNING EXT FILESYSTEMS (tune2fs)
+    sudo mount UUID=xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx /mnt/data
 
-Show current settings:
+---
+
+## Tune ext filesystems (tune2fs)
+
+Show settings:
 
     sudo tune2fs -l /dev/sdb1
 
@@ -95,142 +98,100 @@ Set time-based check interval:
 
     sudo tune2fs -i 3m /dev/sdb1
 
-Disable automatic checks (not usually not recommended):
-
-    sudo tune2fs -c 0 -i 0 /dev/sdb1
-
---------------------------------------------------------------------
-
-RESERVED BLOCKS (EXT FILESYSTEMS)
-
-By default ~5% is reserved for root.
-
-Show reserved blocks:
+Reserved blocks (show + set):
 
     sudo tune2fs -l /dev/sdb1 | grep -i reserved
-
-Set reserved to 1%:
-
     sudo tune2fs -m 1 /dev/sdb1
 
-On large data volumes, lowering this is common.
+---
 
---------------------------------------------------------------------
+## Resizing filesystems (operator view)
 
-RESIZING FILESYSTEMS
+### ext4
 
-EXT FILESYSTEMS
-
-Grow or shrink (filesystem must usually be unmounted):
+Resize (often unmounted; depends on scenario):
 
     sudo resize2fs /dev/sdb1
 
-XFS FILESYSTEMS
+### xfs
 
-XFS can only grow, not shrink.
+XFS can grow, not shrink.
 
 Grow mounted filesystem:
 
     sudo xfs_growfs /mnt/data
 
---------------------------------------------------------------------
+---
 
-SAFE WORKFLOW FOR A NEW DISK
+## Safe workflow for a new disk (high-level)
 
-1) Identify disk:
+1) Inspect:
 
-    lsblk
+    lsblk -f
+    blkid
+    findmnt
 
-2) Partition it (if needed):
+2) Partition (if needed):
 
     sudo fdisk /dev/sdb
+    sudo cfdisk /dev/sdb
 
-3) Create filesystem:
+3) Format:
 
     sudo mkfs.ext4 /dev/sdb1
 
-4) Create mount point:
+4) Mount:
 
     sudo mkdir -p /mnt/data
-
-5) Mount:
-
     sudo mount /dev/sdb1 /mnt/data
 
-6) Get UUID and add to fstab:
+5) Add to fstab (UUID):
 
     blkid /dev/sdb1
     sudo vi /etc/fstab
-
-7) Validate:
-
     sudo mount -a
+    sudo findmnt --verify
 
---------------------------------------------------------------------
+---
 
-ADVANCED: FILESYSTEM FEATURES (EXT)
+## Common mistakes
 
-List features:
-
-    sudo tune2fs -l /dev/sdb1
-
-Some features:
-
-- journaling
-- extents
-- metadata checksums
-
-Changing features:
-
-- May require unmount
-- May require fsck
-- May make filesystem incompatible with older kernels
-
-For LFCS: know this exists; do not experiment on important disks.
-
---------------------------------------------------------------------
-
-COMMON MISTAKES
-
-- Formatting the disk instead of the partition (/dev/sdb vs /dev/sdb1)
+- Formatting disk instead of partition (`/dev/sdb` vs `/dev/sdb1`)
 - Formatting a mounted filesystem
-- Forgetting to verify with lsblk -f
-- Forgetting to add to /etc/fstab
+- Trusting device names instead of UUIDs
+- Forgetting to verify after mkfs
 
---------------------------------------------------------------------
+---
 
-LFCS DRILLS
+## LFCS drills
 
-DRILL 1: Create and mount a test filesystem
+Drill 1: format + mount
 
-    lsblk
+    lsblk -f
     sudo mkfs.ext4 /dev/sdb1
     sudo mkdir -p /mnt/test
     sudo mount /dev/sdb1 /mnt/test
     df -hT /mnt/test
 
-DRILL 2: Label and mount by label
+Drill 2: label + mount by label
 
     sudo tune2fs -L TESTFS /dev/sdb1
     sudo umount /mnt/test
     sudo mount LABEL=TESTFS /mnt/test
 
-DRILL 3: Tune check intervals
+Drill 3: show ext settings
 
     sudo tune2fs -l /dev/sdb1
-    sudo tune2fs -c 20 -i 2m /dev/sdb1
 
---------------------------------------------------------------------
+---
 
-EXAM STANDARD
+## Related drills
 
-You must be able to:
+- linux/LFCS-training/execution-drills/
 
-- Create filesystems with mkfs
-- Identify filesystem types, labels, and UUIDs
-- Change labels
-- Tune ext filesystem check behavior
-- Resize filesystems (conceptually and practically)
-- Understand that XFS can grow but not shrink
+---
 
---------------------------------------------------------------------
+## Exam memory hook
+
+Always verify target device before mkfs. UUID is stable; /dev/sdX names are not.
+
