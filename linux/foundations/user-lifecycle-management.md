@@ -1,103 +1,152 @@
 # User Lifecycle Management
 
-This document covers how to create, modify, delete, and recover (rebirth) Linux user accounts, and how to handle orphaned files safely.
+Create, modify, delete, and recover (rebirth) Linux user accounts.  
+Includes safe workflows for orphaned files and password aging.
 
 ---
 
-## Creating users with useradd
+## Create users (useradd)
 
-Basic form:
+Basic:
 
-sudo useradd marshall
+    sudo useradd marshall
 
-Common useful flags:
+Common flags:
 
-- -u 1001   = specify UID
-- -m        = create home directory
-- -d /home/marshall = specify home path
-- -s /bin/bash = specify login shell
+    -u 1001        set UID
+    -g group       set primary group
+    -G g1,g2       set supplementary groups
+    -m             create home directory
+    -d /home/name  set home directory
+    -s /bin/bash   set login shell
 
 Example:
 
-sudo useradd -u 1001 -m -d /home/marshall -s /bin/bash marshall
+    sudo useradd -u 1001 -m -d /home/marshall -s /bin/bash marshall
+
+Create with explicit primary group:
+
+    sudo groupadd marshall
+    sudo useradd -g marshall -m -s /bin/bash marshall
 
 ---
 
-## Deleting users with userdel
+## Set / change passwords (passwd)
 
-Delete account only:
+Set a password:
 
-sudo userdel marshall
+    sudo passwd marshall
+
+Lock / unlock an account:
+
+    sudo passwd -l marshall
+    sudo passwd -u marshall
+
+---
+
+## Password aging (chage)
+
+Show aging:
+
+    sudo chage -l marshall
+
+Set max days:
+
+    sudo chage -M 90 marshall
+
+Force password change at next login:
+
+    sudo chage -d 0 marshall
+
+---
+
+## Modify users (usermod)
+
+Add user to supplementary group (critical: preserve existing groups):
+
+    sudo usermod -aG sudo marshall
+
+-a = append (do not overwrite existing groups)
+-G = set supplementary groups
+
+Change login shell:
+
+    sudo usermod -s /bin/bash marshall
+
+Change home directory (and move files):
+
+    sudo usermod -d /home/marshall -m marshall
+
+---
+
+## Delete users (userdel)
+
+Delete account only (files remain):
+
+    sudo userdel marshall
 
 Delete account and home directory:
 
-sudo userdel -r marshall
-
-Note:
-Deleting a user does not automatically delete their files unless -r is used.
+    sudo userdel -r marshall
 
 ---
 
-## Modifying users with usermod
+## Manage groups (groupadd/groupmod/groupdel)
 
-Add user to supplementary group:
+Create group:
 
-sudo usermod -aG sudo marshall
+    sudo groupadd devs
 
-Important:
-Always use -a with -G or you will overwrite existing groups.
+Rename group:
 
----
+    sudo groupmod -n engineers devs
 
-## Default settings
+Delete group:
 
-System-wide defaults:
-
-/etc/default/useradd
-/etc/login.defs
-
-These control:
-
-- default shell
-- UID ranges
-- home directory base path
-- password aging defaults
+    sudo groupdel engineers
 
 ---
 
-## /etc/skel
+## Manage group membership (gpasswd)
 
-Files in:
+Add user to group:
 
-/etc/skel
+    sudo gpasswd -a marshall sudo
 
-Are copied into a new user's home directory when -m is used.
+Remove user from group:
 
-Typically includes:
-
-.bashrc
-.profile
-.bash_logout
+    sudo gpasswd -d marshall sudo
 
 ---
 
-## Rebirth a user with the same UID
+## Defaults and templates
 
-If a user was deleted but their files still exist:
+Defaults:
 
-sudo useradd -u 1001 -m -d /home/marshall marshall
+    cat /etc/default/useradd
+    cat /etc/login.defs
 
-This re-attaches the old files to the new account.
+Skeleton files copied into new home dirs when using -m:
+
+    ls -la /etc/skel
+
+---
+
+## Rebirth a user with the same UID (recover ownership)
+
+If a user was deleted but their files still exist, recreate using the old UID:
+
+    sudo useradd -u 1001 -m -d /home/marshall marshall
+
+This re-attaches ownership to the new account identity.
 
 ---
 
 ## Orphaned files
 
-Files whose owner no longer exists:
+Find files without a valid owner or group:
 
-sudo find / -nouser -o -nogroup
-
-This often happens after deleting users without cleaning up.
+    sudo find / -nouser -o -nogroup
 
 ---
 
@@ -112,17 +161,29 @@ This often happens after deleting users without cleaning up.
 
 ## Key commands
 
-useradd
-userdel
-usermod
-getent passwd marshall
-id marshall
-find / -nouser -o -nogroup
+    useradd
+    usermod
+    userdel
+    groupadd
+    groupmod
+    groupdel
+    gpasswd
+    passwd
+    chage
+    getent passwd marshall
+    id marshall
+    sudo find / -nouser -o -nogroup
+
+---
+
+## Related drills
+
+- Execution drills directory:
+  - ../LFCS-training/execution-drills/
 
 ---
 
 ## Exam memory hook
 
-Deleting a user does not delete their files unless you explicitly tell Linux to do so.
+Deleting a user does **not** delete their files unless you explicitly use `userdel -r`.
 
----

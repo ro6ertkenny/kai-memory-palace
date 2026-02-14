@@ -1,47 +1,48 @@
 # sudo and Privilege Delegation
 
-This document explains how Linux delegates administrative privileges, how sudo works, how to inspect and control access, and how to debug privilege problems.
+How Linux delegates administrative privilege, how sudo policy is evaluated,
+and how to debug access issues safely.
 
 ---
 
 ## sudo vs su
 
 su:
-- Switches to another user (usually root)
-- Starts a shell as that user
-- No per-command auditing by default
+- switches to another user (often root)
+- starts a shell as that user
+- limited per-command auditing by default
 
 sudo:
-- Executes a single command as another user (usually root)
-- Enforces policy
-- Logs usage
-- Is the standard administrative access mechanism on modern systems
+- executes a single command as another user (often root)
+- enforces policy
+- logs usage
+- standard admin mechanism on modern systems
 
 ---
 
-## What can I run with sudo?
+## Inspect sudo capability
 
-Check your permissions:
+Show what *you* can run:
 
-sudo -l
+    sudo -l
 
-Check another user:
+Show what another user can run:
 
-sudo -l -U marshall
+    sudo -l -U marshall
 
 ---
 
 ## Where sudo rules live
 
-Main file:
+Main config:
 
-/etc/sudoers
+    /etc/sudoers
 
 Drop-in directory:
 
-/etc/sudoers.d/
+    /etc/sudoers.d/
 
-Files in /etc/sudoers.d/ are read in addition to the main file.
+Drop-ins are read in addition to the main file.
 
 ---
 
@@ -49,48 +50,33 @@ Files in /etc/sudoers.d/ are read in addition to the main file.
 
 Never edit sudoers with a normal editor.
 
-Use:
+    sudo visudo
 
-sudo visudo
-
-visudo:
-- Checks syntax before saving
-- Prevents locking yourself out of sudo
+visudo validates syntax before saving (prevents lockout).
 
 ---
 
-## Why we prefer drop-in files
+## Prefer drop-in files
 
-- Safer than editing the main file
-- Cleaner separation of concerns
-- Easy to audit
-- Easy to remove
-- Package-friendly
-
----
-
-## Creating a sudo rule with tee and heredoc
-
-Example: give marshall full sudo
-
-sudo tee /etc/sudoers.d/marshall <<'EOF'
-marshall ALL=(ALL) ALL
-EOF
-
-Then fix permissions:
-
-sudo chmod 440 /etc/sudoers.d/marshall
+- safer than editing the main file
+- clean separation
+- easy to audit/remove
+- package-friendly
 
 ---
 
-## File permissions matter
+## Create a sudo rule (drop-in)
 
-sudoers files must be:
+Example: give marshall full sudo.
 
-- Owned by root
-- Mode 440
+    sudo tee /etc/sudoers.d/marshall > /dev/null <<'EOF'
+    marshall ALL=(ALL) ALL
+    EOF
 
-Otherwise sudo will refuse to work.
+Fix permissions:
+
+    sudo chmod 440 /etc/sudoers.d/marshall
+    sudo chown root:root /etc/sudoers.d/marshall
 
 ---
 
@@ -98,69 +84,64 @@ Otherwise sudo will refuse to work.
 
 Allow only apt-get:
 
-marshall ALL=(ALL) /usr/bin/apt-get
-
-This allows:
-
-sudo apt-get update
-
-But not:
-
-sudo bash
+    marshall ALL=(ALL) /usr/bin/apt-get
 
 ---
 
-## Group-based sudo
+## Group-based sudo (Debian/Ubuntu)
 
-On Debian/Ubuntu systems:
+Members of group `sudo` get sudo access.
 
-- Members of group sudo get sudo access
+Inspect:
 
-Check:
-
-getent group sudo
+    getent group sudo
+    id marshall
 
 Remove user from sudo group:
 
-sudo gpasswd -d marshall sudo
-
----
-
-## Why marshall had full sudo
-
-Because:
-
-- He was in the sudo group
-- Or had a rule in /etc/sudoers.d/
+    sudo gpasswd -d marshall sudo
 
 ---
 
 ## Debugging sudo problems
 
 1. Check group membership:
-   id marshall
-   getent group sudo
+
+    id marshall
+    getent group sudo
 
 2. Check explicit rules:
-   sudo -l -U marshall
 
-3. Check files in:
-   /etc/sudoers.d/
+    sudo -l -U marshall
+
+3. Inspect drop-in files:
+
+    sudo ls -l /etc/sudoers.d/
+
+4. Validate sudoers syntax:
+
+    sudo visudo
 
 ---
 
 ## Key commands
 
-sudo -l
-sudo -l -U marshall
-visudo
-getent group sudo
-gpasswd -d marshall sudo
+    sudo -l
+    sudo -l -U marshall
+    visudo
+    getent group sudo
+    gpasswd -d marshall sudo
+
+---
+
+## Related drills
+
+- Execution drills directory:
+  - ../LFCS-training/execution-drills/
 
 ---
 
 ## Exam memory hook
 
-sudo is policy-driven command delegation, not just "become root".
+sudo is **policy-driven command delegation**, not just “become root”.
 
----

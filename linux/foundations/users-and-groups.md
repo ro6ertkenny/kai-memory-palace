@@ -1,128 +1,157 @@
 # Users and Groups in Linux
 
-This document explains what users and groups really are in Linux, how identity is resolved, and why names like marshall are just labels over numeric IDs.
-
----
-
-## Core concept
-
-Linux does not care about usernames.
-It cares about numeric identities:
+Linux enforces access using **numeric identities**, not names.
 
 - UID = User ID (number)
 - GID = Group ID (number)
 
-User and group names (root, marshall, sudo) are human-friendly labels mapped to those numbers.
+User/group names are labels that map to these numbers.
 
 ---
 
-## UID and GID vs names
+## Core mental model
 
-- Every process runs as a UID and GID
-- Files store numbers, not names
-- The system resolves numbers to names using name service sources
+- Processes run as UID/GID (effective identity).
+- Files store **UID/GID numbers** in metadata.
+- Name resolution maps numbers ↔ names via NSS.
 
-To view numeric owners/groups:
+Show numeric ownership:
 
-ls -ln
+    ls -ln
 
 ---
 
-## /etc/passwd
+## Identity databases
 
-The passwd database maps username -> UID/GID and other account fields.
+### /etc/passwd (user database)
 
-Query safely with getent:
+Maps: username → UID/GID + account fields
 
-getent passwd marshall
+Preferred query interface:
 
-Field layout:
+    getent passwd marshall
 
-name:x:UID:GID:comment:home:shell
+Format:
+
+    name:x:UID:GID:comment:home:shell
 
 Notes:
-- The x means the password hash is stored elsewhere (see /etc/shadow)
+- `x` means the password hash is stored in `/etc/shadow`
 
----
+### /etc/shadow (password hashes + aging)
 
-## /etc/group
+Restricted file (root only):
 
-The group database maps group name -> GID and supplementary members.
+    sudo ls -l /etc/shadow
+
+Inspect password aging for a user:
+
+    sudo chage -l marshall
+
+### /etc/group (group database)
+
+Maps: group name → GID + member list
 
 Query:
 
-getent group marshall
-getent group sudo
+    getent group sudo
 
-Field layout:
+Format:
 
-groupname:x:GID:members
-
----
-
-## getent is the correct interface
-
-Do not rely on reading /etc/passwd and /etc/group directly in automation.
-Use getent because identity may come from multiple sources.
-
-Examples:
-
-getent passwd marshall
-getent group sudo
+    groupname:x:GID:members
 
 ---
 
 ## NSS (Name Service Switch)
 
-NSS controls where identity data is sourced and in what order.
+Identity can come from multiple sources (files, LDAP, etc.). Always prefer `getent`.
 
-Config file:
+Config:
 
-/etc/nsswitch.conf
+    cat /etc/nsswitch.conf
 
-Typical entries:
+Typical:
 
-passwd: files systemd
-group:  files systemd
+    passwd: files systemd
+    group:  files systemd
 
 ---
 
 ## Primary vs supplementary groups
 
-Check effective identity:
+Show effective identity:
 
-id marshall
+    id marshall
 
 Primary group:
-- The GID field in the passwd entry
+- the GID field in the passwd entry
 
 Supplementary groups:
-- Memberships listed in group entries
+- memberships listed in group entries
 
 ---
 
-## Why you see: marshall : marshall sudo
+## Group membership: read + change
 
-Because the user marshall has:
-- primary group marshall
-- supplementary group sudo
+List a user’s groups:
 
-Verify:
+    id marshall
+    groups marshall
 
-id marshall
-getent group sudo
+Inspect a group:
+
+    getent group sudo
+
+Add user to supplementary group (preferred via usermod):
+
+    sudo usermod -aG sudo marshall
+
+Remove user from a group (Debian/Ubuntu):
+
+    sudo gpasswd -d marshall sudo
 
 ---
 
-## Key commands
+## Key commands (identity resolution)
 
-id marshall
-getent passwd marshall
-getent group marshall
-getent group sudo
+    id marshall
+    getent passwd marshall
+    getent group marshall
+    getent group sudo
+    ls -ln
+
+---
+
+## LFCS operator failure scenarios
+
+### “Who owns this file?”
+1. Check numeric owner/group
+2. Resolve UID/GID to names
+
+    ls -ln target
+    getent passwd <UID>
+    getent group <GID>
+
+### “User appears in /etc/passwd but login fails”
+Check:
+- shell path
+- password aging / locked status
+- home directory existence
+
+    getent passwd marshall
+    sudo chage -l marshall
+    sudo ls -ld /home/marshall
+
+---
+
+## Related drills
+
+- Execution drills directory:
+  - ../LFCS-training/execution-drills/
 
 ---
 
 ## Exam memory hook
 
-Linux enforces ownership and permissions using numeric IDs, not names
+Linux enforces ownership and permissions using **numeric IDs**, not names.
+
