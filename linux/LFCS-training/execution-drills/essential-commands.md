@@ -8,9 +8,9 @@ Order: **foundation-first**
 
 ---
 
-# 🥇 LAYER 0 — Shell Execution Model
+# 🥇 LAYER 1 — Shell Execution Model
 
-## A0.1 — Command success and exit codes
+## Command success and exit codes
 
 1. Run a command that succeeds
 2. Print its exit code
@@ -21,7 +21,7 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-## A0.2 — Sequential vs conditional execution
+## Sequential vs conditional execution
 
 1. Run two commands sequentially regardless of success
 2. Run a command that only executes on success
@@ -30,7 +30,7 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-## A0.3 — STDOUT overwrite vs append
+## STDOUT overwrite vs append
 
 1. Write text to a file (overwrite)
 2. Append text to the same file
@@ -38,7 +38,7 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-## A0.4 — STDERR handling
+## STDERR handling
 
 1. Generate an error and capture only STDERR to a file
 2. Confirm STDOUT is not captured
@@ -46,7 +46,7 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-## A0.5 — Pipes
+## Pipes
 
 1. Send command output through a pipeline
 2. Count resulting lines
@@ -54,16 +54,16 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-## A0.6 — tee (view + save)
+## tee (view + save)
 
 1. Capture piped output to a file while displaying it
 2. Append to an existing file using tee
 
 ---
 
-# 🥈 LAYER 1 — Navigation & Filesystem Awareness
+# 🥈 LAYER 2 — Navigation & Filesystem Awareness
 
-## A1.1 — Determine current location
+## Determine current location
 
 1. Print working directory
 2. List contents
@@ -72,7 +72,7 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-## A1.2 — Inspect space usage
+## Inspect space usage
 
 1. Show filesystem capacity
 2. Show directory size
@@ -80,9 +80,9 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-# 🥉 LAYER 2 — Create / Move / Delete
+# 🥉 LAYER 3 — Create / Move / Delete
 
-## A2.1 — File creation and directory creation
+## File creation and directory creation
 
 1. Create an empty file
 2. Create a directory
@@ -90,7 +90,7 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-## A2.2 — Copy operations
+## Copy operations
 
 1. Copy a file
 2. Copy a directory recursively
@@ -98,7 +98,7 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-## A2.3 — Move and rename
+## Move and rename
 
 1. Rename a file
 2. Move a file into another directory
@@ -106,7 +106,7 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-## A2.4 — Removal
+## Removal
 
 1. Remove a file
 2. Remove an empty directory
@@ -114,9 +114,9 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-# 🏅 LAYER 3 — Viewing & Inspecting File Content
+# 🏅 LAYER 4 — Viewing & Inspecting File Content
 
-## A3.1 — Direct output
+## Direct output
 
 1. Display entire file
 2. Display first N lines
@@ -124,14 +124,14 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-## A3.2 — Interactive inspection
+## Interactive inspection
 
 1. Open a file for scrolling inspection
 2. Search inside the viewer
 
 ---
 
-## A3.3 — Content metrics
+## Content metrics
 
 1. Count lines
 2. Count words
@@ -139,16 +139,16 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-# 🏅 LAYER 4 — Search
+# 🏅 LAYER 5 — Search
 
-## A4.1 — Locate files by name
+## Locate files by name
 
 1. Search from current directory
 2. Search system-wide (where permitted)
 
 ---
 
-## A4.2 — Locate by attribute
+## Locate by attribute
 
 1. Find by file type
 2. Find by size
@@ -158,16 +158,16 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-## A4.3 — Locate executables
+## Locate executables
 
 1. Identify command path
 2. Identify all related command locations
 
 ---
 
-# 🏅 LAYER 5 — Text Filtering Primitives
+# 🏅 LAYER 6 — Text Filtering Primitives
 
-## A5.1 — Pattern matching
+## Pattern matching
 
 1. Extract matching lines from a file
 2. Count matches
@@ -175,14 +175,14 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-## A5.2 — Field extraction
+## Field extraction
 
 1. Extract a specific column from structured text
 2. Change the delimiter and repeat
 
 ---
 
-## A5.3 — Sorting and uniqueness
+## Sorting and uniqueness
 
 1. Sort input
 2. Remove duplicate lines
@@ -190,30 +190,30 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-## A5.4 — Character translation
+## Character translation
 
 1. Replace characters in a stream
 2. Delete characters from a stream
 
 ---
 
-## A5.5 — Stream metrics
+## Stream metrics
 
 1. Count lines from piped input
 2. Count words from piped input
 
 ---
 
-# 🏅 LAYER 6 — Links
+# 🏅 LAYER 7 — Links
 
-## A6.1 — Hard links
+## Hard links
 
 1. Create a hard link to a file
 2. Verify both names reference the same inode
 
 ---
 
-## A6.2 — Soft links
+## Soft links
 
 1. Create a symbolic link
 2. Verify link target
@@ -221,16 +221,16 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-# 🏅 LAYER 7 — Permissions & Ownership
+# 🏅 LAYER 8 — Permissions & Ownership
 
-## A7.1 — View permissions
+## View permissions
 
 1. List file permissions
 2. Identify numeric mode
 
 ---
 
-## A7.2 — Modify permissions
+## Modify permissions
 
 1. Set exact numeric permissions
 2. Add execute permission
@@ -238,7 +238,7 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-## A7.3 — Ownership
+## Ownership
 
 1. Change file owner
 2. Change file group
@@ -246,7 +246,7 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-## A7.4 — Default permissions
+## Default permissions
 
 1. Display current umask
 2. Change umask
@@ -254,9 +254,9 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-# 🏅 LAYER 8 — Archive & Compression
+# 🏅 LAYER 9 — Archive & Compression
 
-## A8.1 — Archive creation
+## Archive creation
 
 1. Create a tar archive
 2. List archive contents
@@ -264,7 +264,7 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-## A8.2 — Compression
+## Compression
 
 1. Compress a file
 2. Decompress a file
@@ -272,30 +272,30 @@ Repeat until meaning of `0` vs non-zero is instant.
 
 ---
 
-# 🏅 LAYER 9 — File Comparison
+# 🏅 LAYER 10 — File Comparison
 
-## A9.1 — Byte comparison
+## Byte comparison
 
 1. Compare two files for exact match
 
 ---
 
-## A9.2 — Line comparison
+## Line comparison
 
 1. Show differences between two text files
 
 ---
 
-# 🏅 LAYER 10 — Remote Operations
+# 🏅 LAYER 11 — Remote Operations
 
-## A10.1 — Remote login
+## Remote login
 
 1. Connect to a remote system
 2. Execute a simple remote command and return
 
 ---
 
-## A10.2 — Remote copy
+## Remote copy
 
 1. Copy file to a remote system
 2. Copy file from a remote system
@@ -366,7 +366,7 @@ Train each block until:
 
 ## 2) Add the cheat-sheet commands into canonical wing docs (merge checklist)
 
-This is a routing plan. For each item, paste the command(s) into the correct operator doc.
+This is a routing plan. For each item, paste the command(s) into the correct operator doc
 
 ### A) linux/networking/
 File: ssh-operator-basics.md
@@ -376,7 +376,7 @@ Add:
     scp file user@host:/path/
     scp user@host:/path/file .
 
-From PDF: ssh/scp examples and debug flags.  
+From PDF: ssh/scp examples and debug flags  
 
 ---
 
@@ -384,9 +384,9 @@ From PDF: ssh/scp examples and debug flags.
 File: man-basics.md
 Add:
     apropos "NFS mounts"
-Explain: search manpage names/descriptions for keywords.
+Explain: search manpage names/descriptions for keywords
 
-From PDF: apropos usage.  
+From PDF: apropos usage  
 
 ---
 
@@ -399,7 +399,7 @@ Add:
     free --mega
     df /
     du -sh /bin/
-From PDF: system inspection commands.  
+From PDF: system inspection commands  
 
 ---
 
@@ -411,7 +411,7 @@ Add (Rob standard is apt-get; keep the cheat sheet as “alias/alt syntax”):
     apt-get remove --auto-remove -y pkg
     dpkg --search /path/to/file
     dpkg --listfiles pkg | grep '^/bin'
-From PDF: apt/dpkg examples.  
+From PDF: apt/dpkg examples  
 
 ---
 
@@ -424,7 +424,7 @@ Add:
     lsof -p 1
     kill -SIGHUP <pid>
     renice 9 <pid>
-From PDF: ps/pgrep/lsof/kill/renice.  
+From PDF: ps/pgrep/lsof/kill/renice  
 
 ---
 
@@ -435,7 +435,7 @@ Add:
     anacron -n -f
     atq
     atrm <jobid>
-From PDF: cron/anacron/at commands.  
+From PDF: cron/anacron/at commands  
 
 ---
 
@@ -480,7 +480,7 @@ LVM + RAID + quotas + ACLs (clearly non-essential domain):
     mdadm --create ...
     setfacl/getfacl
     xfs_quota ...
-From PDF: storage advanced topics.
+From PDF: storage advanced topics
 
 Suggested homes:
     filesystems-and-storage/lvm-operator-basics.md
@@ -519,6 +519,6 @@ Suggested home:
 
 - essential-commands.md drill stays “Essential Commands” + shell mechanics + archives + compare + ssh/scp only.
 - Everything else from the cheat sheet is routed to its wing:
-  users/groups, storage, networking, running systems, packages, SELinux, git.
+  users/groups, storage, networking, running systems, packages, SELinux, git
 
 ---
