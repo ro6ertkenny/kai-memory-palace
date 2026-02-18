@@ -355,12 +355,46 @@ This becomes muscle memory
 
 ### Task: Overwrite an existing file using standard output redirection
 
+<details>
+<summary>Answer</summary>
+
+## Redirect STDOUT overwrite ( > )
+
+    echo "one" > out.txt
+    cat out.txt
+
+Target: 10 reps. Always inspect the file
+
+🔹 Step 1
+
+ echo "one" > out.txt
+
+> means:
+
+Create the file (or erase it if it exists), then write into it
+
+So now out.txt contains:
+
+ one
+
+🎯 The Entire Point
+
+ > = overwrite (destroy old contents)
+
+🧠 Ultra Lock-In
+
+ > wipes the file first
+
+</details>
+
+---
+
 ### Task: Append to an existing file using standard output redirection
 
 <details>
 <summary>Answer</summary>
 
-## Redirect STDOUT overwrite vs append
+## Redirect STDOUT append ( >> )
 
     echo "one" > out.txt
     echo "two" >> out.txt
@@ -372,21 +406,15 @@ Target: 10 reps. Always inspect the file
 
  echo "one" > out.txt
 
- > means:
-
- Create the file (or erase it if it exists), then write into it
-
-So now out.txt contains:
-
- one
+Creates/overwrites the file first so you have a known starting point
 
 🔹 Step 2
 
-echo "two" >> out.txt
+ echo "two" >> out.txt
 
- >> means:
+>> means:
 
- Add to the end of the file. Do NOT erase it
+Add to the end of the file. Do NOT erase it
 
 So now out.txt contains:
 
@@ -402,15 +430,12 @@ Shows:
  one
  two
 
-### 🎯 The Entire Point
-
- > = overwrite (destroy old contents)
+🎯 The Entire Point
 
  >> = append (add to end)
 
-#### 🧠 Ultra Lock-In
+🧠 Ultra Lock-In
 
- > wipes the file first
  >> keeps what’s already there
 
 </details>
