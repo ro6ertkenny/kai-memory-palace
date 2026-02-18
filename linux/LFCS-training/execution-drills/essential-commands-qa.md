@@ -683,7 +683,7 @@ Examples:
  find /home -user bob  
  /home = where to search  
  -user bob = owned by user bob  
-“Find files in /home that are owned by user bob”  
+ “Find files in /home that are owned by user bob”  
 
 #### ⚠️ One more important detail  
 
@@ -709,17 +709,17 @@ Write commands to locate files by:
 <details>
 <summary>Answer</summary>
 
-1) Find files by name  
+## Find files by name  
 
-Find by exact name:  
+#### Find by exact name:  
 
  find . -name "sshd_config"  
 
-Find by wildcard pattern:  
+#### Find by wildcard pattern:  
 
  find . -name "*.conf"  
 
-Case-insensitive:  
+#### Case-insensitive:  
 
  find . -iname "*.conf"  
 
@@ -737,17 +737,17 @@ Write commands that locate files:
 <details>
 <summary>Answer</summary>
 
-2) Find files by size  
+## Find files by size  
 
-Larger than 10 MB:  
+#### Larger than 10 MB:  
 
  find . -size +10M  
 
-Smaller than 10 MB:  
+#### Smaller than 10 MB:  
 
  find . -size -10M  
 
-Between 10 MB and 100 MB:  
+#### Between 10 MB and 100 MB:  
 
  find . -size +10M -size -100M  
 
@@ -760,17 +760,17 @@ Between 10 MB and 100 MB:
 <details>
 <summary>Answer</summary>
 
-3) Find files by type  
+### Find files by type  
 
-Regular files:  
+#### Regular files:  
 
  find . -type f  
 
-Directories:  
+#### Directories:  
 
  find . -type d  
 
-Symbolic links:  
+#### Symbolic links:  
 
  find . -type l  
 
@@ -783,17 +783,17 @@ Symbolic links:
 <details>
 <summary>Answer</summary>
 
-4) Find files by owner  
+### Find files by owner  
 
-Owned by user root:  
+#### Owned by user root:  
 
  find . -user root  
 
-Owned by group adm:  
+#### Owned by group adm:  
 
  find . -group adm  
 
-Owned by numeric UID (example 0 for root):  
+#### Owned by numeric UID (example 0 for root):  
 
  find . -uid 0  
 
@@ -815,17 +815,17 @@ Write commands that locate files based on:
 <details>
 <summary>Answer</summary>
 
-5) Find files by permissions  
+### Find files by permissions  
 
-Exact mode 777 (be careful, this is usually bad):  
+#### Exact mode 777 (be careful, this is usually bad):  
 
  find . -perm 777  
 
-At least these bits set (e.g., any file writable by group):  
+#### At least these bits set (e.g., any file writable by group):  
 
  find . -perm -020  
 
-Any of these bits set (e.g., writable by group OR others):  
+#### Any of these bits set (e.g., writable by group OR others):  
 
  find . -perm /022  
 
@@ -836,23 +836,23 @@ Any of these bits set (e.g., writable by group OR others):
 
  -perm 777 = exact permissions 777  
 
-“Find files whose permissions are exactly 777”  
+ “Find files whose permissions are exactly 777”  
 
  find . -perm -020  
  -perm -020 = at least these bits set (- means must include)  
 
  020 = group write bit  
 
-“Find files that are writable by the group.”  
+ “Find files that are writable by the group”  
 
  find . -perm /022  
  -perm /022 = any of these bits set (/ means any match)  
 
  022 = group write OR others write  
 
-“Find files that are writable by group or others”  
+ “Find files that are writable by group or others”  
 
-🧠 Tiny memory hook  
+##### 🧠 Tiny memory hook  
 
  -perm MODE = exact match  
 
@@ -862,7 +862,7 @@ Any of these bits set (e.g., writable by group OR others):
 
 Common LFCS checks:  
 
-world-writable files:  
+##### world-writable files:  
 
  find / -type f -perm /002 2>/dev/null  
 
@@ -876,9 +876,9 @@ world-writable files:
 
  2>/dev/null = hide error messages  
 
-“Find files anywhere on the system that anyone can write to”  
+ “Find files anywhere on the system that anyone can write to”  
 
-SUID binaries:  
+#### SUID binaries:  
 
  find / -type f -perm -4000 2>/dev/null  
 
@@ -886,9 +886,9 @@ SUID binaries:
 
  2>/dev/null = hide error messages  
 
-“Find all files that run with the owner’s privileges (SUID)”  
+ “Find all files that run with the owner’s privileges (SUID)”  
 
-SGID binaries:  
+#### SGID binaries:  
 
  find / -type f -perm -2000 2>/dev/null  
 
@@ -896,7 +896,7 @@ SGID binaries:
 
  2>/dev/null = hide error messages  
 
-“Find all files that run with the group’s privileges (SGID)”  
+ “Find all files that run with the group’s privileges (SGID)”  
 
 What this means in the command:  
 
@@ -1000,16 +1000,17 @@ Demonstrate understanding that -mtime is in 24-hour chunks and -mmin is minute-b
 <details>
 <summary>Answer</summary>
 
-6) Find files modified in last N days  
-Modified in last 7 days:  
+### Find files modified in last N days  
+
+#### Modified in last 7 days:  
 
  find . -mtime -7  
 
-Modified more than 7 days ago:  
+#### Modified more than 7 days ago:  
 
  find . -mtime +7  
 
-Modified exactly 7 days ago (roughly):  
+#### Modified exactly 7 days ago (roughly):  
 
  find . -mtime 7  
 
@@ -1018,7 +1019,7 @@ Note:
  -mtime is in 24-hour chunks  
 Use -mmin for minutes  
 
-Modified in last 60 minutes:  
+#### Modified in last 60 minutes:  
 
  find . -mmin -60  
 
@@ -1038,9 +1039,9 @@ Demonstrate a safe inode-based deletion workflow:
 <details>
 <summary>Answer</summary>
 
-7) Find and delete a file by inode (safe method)  
+#### Find and delete a file by inode (safe method)  
 
-Step A — list inode numbers  
+##### Step A — list inode numbers  
 
 Show inode + name in current tree:  
 
@@ -1052,7 +1053,7 @@ Or for a single directory:
 
  find . -maxdepth 2 -printf '%i %p\n' | head  
 
-find = search  
+##### find = search  
 
  . = start in the current directory  
 
@@ -1080,13 +1081,13 @@ find = search
 
 This command prints the inode number and name of every file and directory under your current directory (up to 2 levels deep), then shows only the first 10 results  
 
-Step B — match by inode (confirm first)  
+##### Step B — match by inode (confirm first)  
 
 Replace 123456:  
 
  find . -inum 123456 -ls  
 
-Step C — delete by inode  
+##### Step C — delete by inode  
 
 Only after confirming the -ls output is correct:  
 
@@ -1115,7 +1116,7 @@ Demonstrate understanding of `{}`, `+`, `;`, and `-ok`
 <details>
 <summary>Answer</summary>
 
-8) Use find to locate files, then run another command on each result:  
+### Use find to locate files, then run another command on each result:  
 
 List files with sizes (fast batching):  
 
@@ -1162,7 +1163,7 @@ One-by-one (slower, but simple)
  find . -type f -exec ls -lh {} ;  
  ; = end of the -exec command (run once per file)  
 
-“Run ls -lh separately for each file (slower)  
+ “Run ls -lh separately for each file (slower)  
 
 Confirm before each run  
 “Find all files and ask me before running ls -lh on each one”  
@@ -1223,8 +1224,8 @@ Demonstrate understanding of:
 
 # 📚 Locate Files Using Database  
 
-Update locate database  
-Find a file using locate  
+#### Update locate database  
+#### Find a file using locate  
 
  sudo updatedb  
  locate passwd  
@@ -1372,7 +1373,7 @@ Be able to answer:
 <details>
 <summary>Answer</summary>
 
-💽 5) Filesystem Inspection  
+# 💽 Filesystem Inspection  
 
 Filesystem Inspection = “Look at disks and filesystems”  
 
@@ -1552,7 +1553,7 @@ In /etc/passwd, fields look like this:
 
 So -f 1 prints just:  
 
-username  
+ username  
 
 One-line summary  
 
@@ -1863,7 +1864,7 @@ Demonstrate understanding that paste aligns by line number, not by matching valu
 
  paste a.txt b.txt  
 
-paste = merge files horizontally (line 1 with line 1, line 2 with line 2, etc.)  
+ paste = merge files horizontally (line 1 with line 1, line 2 with line 2, etc.)  
 
 It prints the files next to each other as columns  
 
@@ -2078,31 +2079,31 @@ These are the ones you should expect, recognize instantly, and be able to use wi
 
  grep -i root file.txt  
 
-Simp: match root, Root, ROOT  
+####  match root, Root, ROOT  
 
 🔹 -v — invert match  
 
  grep -v root file.txt  
 
-Simp: show lines that do NOT contain root  
+#### show lines that do NOT contain root  
 
 🔹 -n — line numbers  
 
  grep -n root file.txt  
 
-Simp: show matching lines with their line number  
+#### show matching lines with their line number  
 
 🔹 -r or -R — recursive  
 
  grep -R root /etc  
 
-Simp: search all files under a directory tree  
+#### search all files under a directory tree  
 
 🔹 -E — extended regex (important)  
 
  grep -E "root|daemon" /etc/passwd  
 
-Simp: allow OR (|), grouping, and cleaner patterns  
+#### allow OR (|), grouping, and cleaner patterns  
 
 #### 📌 Exam note:  
 
