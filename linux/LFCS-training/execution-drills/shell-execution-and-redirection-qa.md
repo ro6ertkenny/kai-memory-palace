@@ -521,69 +521,56 @@ Target: 10 reps.
 
 ### Task: Redirect both standard output and standard error using classic file descriptor ordering
 
+<details>
+<summary>Answer</summary>
+
+## Redirect both — classic form
+
+    ls /no/such/path > all.txt 2>&1
+    cat all.txt
+
+Target: 10 reps
+
+🎯 What This Is Teaching
+
+Capture **normal output and error output into the same file**
+
+🧠 Ultra Lock-In
+
+2>&1 copies STDERR to wherever STDOUT is pointing **at that moment**
+
+So:
+
+> all.txt      → STDOUT goes to the file  
+2>&1           → STDERR follows STDOUT into the same file
+
+</details>
+
+---
+
 ### Task: Redirect both standard output and standard error using Bash shorthand redirection
 
 <details>
 <summary>Answer</summary>
 
-## Redirect both: classic vs modern
-
-Classic:
-
-    ls /no/such/path > all.txt 2>&1
-    cat all.txt
-
-Modern:
+## Redirect both — bash shorthand
 
     ls /no/such/path &> all.txt
     cat all.txt
 
-### 🧠 What This Is Teaching
+Target: 10 reps
 
-How to redirect errors only
+🎯 What This Is Teaching
 
-🔹 Step 1
+Bash shortcut for:
 
- ls /no/such/path 2> err.txt
+    > all.txt 2>&1
 
-What happens?
+🧠 Ultra Lock-In
 
- The path does not exist
-
- ls produces an error message
-
- 2> means:
-
-Send error output (stderr) into err.txt
-
-So the error message does NOT show on your screen
-
-It goes into err.txt
-
-🔹 Step 2
-
- cat err.txt
-
-This shows what was saved
-
-You’ll see:
-
- ls: cannot access '/no/such/path': No such file or directory
-
-#### 🎯 The Whole Point
-
- > = redirect normal output
-
- 2> = redirect error output
-
-That’s it
-
-#### 🧠 Ultra Lock-In
-
- 2> catches errors only
+&> = send STDOUT **and** STDERR to the same destination
 
 </details>
-
 ---
 
 ### Task: Explain the purpose of /dev/null and identify the three common redirection patterns used to discard output
