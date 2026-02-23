@@ -28,6 +28,6 @@ Create a softlink with a relative path of the dogfile ... relative to the direct
 
 You can also softlink to different directories
 
+Lab - Files, Directories, Hard and Soft Links - Question:
 
-
-
+Create a soft link to /tmp directory. Create this link in /home/bob directory and call it link_to_tmp.
