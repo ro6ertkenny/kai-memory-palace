@@ -30,4 +30,6 @@ You can also softlink to different directories
 
 Lab - Files, Directories, Hard and Soft Links - Question:
 
-Create a soft link to /tmp directory. Create this link in /home/bob directory and call it link_to_tmp.
+Create a soft link to /tmp directory. Create this link in /home/bob directory and call it link_to_tmp
+
+##  ln -s /home/bob /tmp/link_to_tmp
