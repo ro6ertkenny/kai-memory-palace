@@ -123,11 +123,21 @@ if we want to find either enabled or disabled use the or operator:
 ## egrep -r '/dev/[a-z]*[0-9]?' /etc/
 the digit at the end is optional with the ? operator 
 
+### Subexpresssions 
 
+## egrep -r '/dev/([a-z]*[0-9]?)*' /etc/
 
+## egrep -r '/dev/(([a-z]|[A-Z])*[0-9]?)*' /etc
 
-  
+## egrep -r 'https[^:]' /etc/
 
+## egrep -r 'http[^s:]' /etc/
+
+### [^]: Negated Ranges or Sets
+
+## egrep -r '/[^a-z]' /etc/
+
+** regexr.com **
 
 
 ro6ert@ro6bx:~/Documents/LINUX/KodeKloud/Analyze-Text-Using-Basic-Regular-Expressions$ ls
