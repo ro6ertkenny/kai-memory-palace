@@ -108,7 +108,22 @@ the question mark character will let the previous element exist precisely zero o
 ## egrep -r 'disabled?' /etc
 
 
- 
+if we want to find either enabled or disabled use the or operator:
+
+## egrep -r 'enabled|disabled' /etc
+
+### Ranges or Sets
+
+## egrep -r 'c[au]t' /etc/
+
+## egrep -r '/dev/[a-z]*' /etc/
+
+## egrep -r '/dev/[a-z]*[0-9]' /etc
+
+## egrep -r '/dev/[a-z]*[0-9]?' /etc/
+the digit at the end is optional with the ? operator 
+
+
 
 
   
