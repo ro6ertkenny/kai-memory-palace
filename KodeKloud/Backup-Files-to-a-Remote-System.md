@@ -42,3 +42,9 @@ To restore a disk image from a file back to a disk, simply reverse the input and
 Avoid running these dd commands on a virtual machine unless you are absolutely sure you want to overwrite the virtual disk, as this operation can result in data loss.
 
 This guide demonstrated how to use native Linux tools—rsync for file synchronization and dd for full disk imaging—to perform backup operations in a simple and efficient way.
+
+
+ro6ert@ro6bx:~/Documents/LINUX/KodeKloud/Backup-Files-to-a-Remote-System$ ls
+Disk-Imaging.png  Syncing-Two-Directories.png
+
+
