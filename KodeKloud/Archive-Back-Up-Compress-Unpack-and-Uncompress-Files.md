@@ -163,5 +163,11 @@ Or using the shorthand version:
 
 Tar archives store file permissions and ownership information. If you extract files archived with a different user, you might not preserve the original ownership unless you run the command with elevated privileges (using sudo).
 
+ro6ert@ro6bx:~/Documents/LINUX/KodeKloud/Archive-Backup-Compress-Unpack-and-Uncompress-Files$ ls
+'Archiving(Packing)-Compressing-and-Backup-1.png'
+'Archiving(Packing).png'
+ Packing-Files-and-Directories-with-tar-1.png
+ Packing-Files-and-Directories-with-tar-2.png
+ Packing-Files-and-Directories-with-tar-3.png
 
 
