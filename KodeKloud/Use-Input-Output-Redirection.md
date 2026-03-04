@@ -174,3 +174,13 @@ Piping is a powerful technique that lets you pass the output of one command dire
 
 By mastering these techniques for redirecting input, output, and error streams, as well as leveraging pipes, you can customize the behavior of Linux commands to suit a wide range of tasks. These methods not only simplify command-line operations but also enable you to automate processing within scripts effectively.
 
+ro6ert@ro6bx:~/Documents/LINUX/KodeKloud/Use-Input-Output-Redirection$ ls
+Heredoc-and-Here-String.png  Redirecting-Output-2.png
+Piping-1.png                 Redirecting-Output-3.png
+Piping-2.png                 Redirecting-Output-4.png
+Redirecting-Errors.png       Redirecting-Output-5.png
+Redirecting-Input.png        Redirecting-Output-6.png
+Redirecting-Output-1.png     stdin-stdout-and-stderr.png
+
+
+
