@@ -1,56 +1,6 @@
-Archive, Back Up, Compress, Unpack, and Uncompress Files (Optional)
+# Archive, Back Up, Compress, Unpack, and Uncompress Files (Optional)
 
 When you archive files, you combine all files and directories into one file (e.g., backup.tar). This process is called archiving. Once created, the archive can be compressed (for example, to backup.tar.gz) to reduce the storage space needed. Finally, copying the compressed file to a remote location adds an extra layer of protection to your data.
-
-Most Linux sytems have at least 3 compression utilities pre-installed:
-
-- gizip
-- bzip2
-- xz
-
-They compress the file and automatically delete the file afterwards if you don't tell it to keep it (-k | --keep):
-
-#### gzip file1
-
-#### gzip --keep file1
-
-#### gizip --list file1
-
-    file1.gz
-
-    compressed | uncompressed | ratio | name
-    71          78              39.7%   file1
-
-#### bzip2 file2
-    file2.bz2
-
-#### xz file3
-    file3.xz
-
-To uncompress the files:
-
-#### gunzip file1.gz       
-
-    gzip --decompress file1.gz
-
-#### bunzip file2.bz2
-    
-    bzip2 --decompress file2.bz2
-
-#### unxz file3.xz
-
-    xz --decompress file3.xz
-
-
-## ** to compress files and directories use zip:
-
-#### zip archive file1
-#### zip archive.zip file1
-
-#### zip -r archive.zip Pictures/
-
-#### unzip archive.zip
-
 
 ### Archiving Files Using Tar
 
