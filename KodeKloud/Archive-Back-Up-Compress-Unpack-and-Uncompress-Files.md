@@ -6,29 +6,6 @@ When you archive files, you combine all files and directories into one file (e.g
 
 Tar (tape archive) was originally developed for backing up files to magnetic tapes. Although magnetic tapes are less common now, tar remains a critical tool because of its efficient way of packing and unpacking files.
 
-#### tar --create --file archive.tar file1
-
-#### gzip archive.tar
-
-#### gzip --keep archive.tar
-
-#### tar --create --gzip --file archive.tar.gz file1
-####    tar czf archive.tar.gz file1
-
-#### tar --create --bzip2 --file archive.tar.bz2 file1
-####    tar cjf archive.tar.bz2 file1
-
-#### tar create --xz --file archive.tar.xz file1 
-####    tar cJf archive.tar.xz file1
-
-#### tar --create --autocompress --file archive.tar.gz file1
-
-#### tar caf archive.xz file1
-
-#### tar --extract --file archive.tar.gz
-
-#### tar xf archive.tar.gz file1
-
 
 Tar works by combining multiple files and directories into a single file, commonly known as a tarball. This technique simplifies file transfers, uploads, or downloads, as you are working with a single file instead of many.
 
