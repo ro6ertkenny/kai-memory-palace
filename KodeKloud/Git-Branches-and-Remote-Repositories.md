@@ -82,7 +82,9 @@ check the hidden git directory:
 
 #### git clone git@github.com:jerem ...
 
+Git is a powerful tool with a wide range of features. If you ever need assistance or a reminder of a command’s options, simply type “git” and press the tab key twice to see a list of commands. For in-depth information on any command, you can consult the manual pages:
 
+#### man git-add
 
 ro6ert@ro6bx:~/Documents/LINUX/KodeKloud/Git-Branches-and-Remote-Repositories$ ls
 Git-Branches-10.png  Git-Branches-8.png       git-merge.png
