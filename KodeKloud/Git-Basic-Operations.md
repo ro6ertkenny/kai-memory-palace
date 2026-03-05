@@ -43,34 +43,51 @@ Most modern Linux distributions come with Git pre-installed. However, if you nee
 #### sudo apt install git
 
 You might see output similar to this:
+
 Reading package lists... Done
 Building dependency tree... Done
 Reading state information... Done
 git is already the newest version (1:2.43.0-1ubuntu7).
 0 upgraded, 0 newly installed, 0 to remove and 4 not upgraded.
+
 After installing Git, the first crucial step is to set your username and email address. These details are embedded in each commit to identify the contributor.
+
 Configuring Git User Details To set your identity globally, run the following commands:
-git config --global user.name "jeremy"
-git config --global user.email "jeremy@kodekloud.com"
+
+#### git config --global user.name "jeremy"
+#### git config --global user.email "jeremy@kodekloud.com"
+
 If you want to specify a unique identity for a particular repository, simply omit the --global flag and run the commands inside that repository.
+
 Now, let’s create a directory for our project and initialize a Git repository:
-mkdir project
-cd project/
-git init
+
+#### mkdir project
+#### cd project/
+#### git init
+
 After executing git init, you should see a message indicating that an empty Git repository has been created. For example:
+
 hint: Using 'master' as the name for the initial branch. This default branch name
 hint: is subject to change. To configure the initial branch name to use in all
 hint: of your new repositories, which will suppress this warning, call:
 hint:
 hint:   git config --global init.defaultBranch <name>
 Initialized empty Git repository in /home/jeremy/project/.git/
+
 Listing the contents of the hidden .git directory will reveal various files and folders where Git stores repository data:
-ls .git
+
+#### ls .git
+
 A sample output might look like this:
-branches  config  description  HEAD  hooks  info  objects  refs
+
+#### branches  config  description  HEAD  hooks  info  objects  refs
+
 To review your repository configuration (including your user details), check the config file:
-cat .git/config
+
+#### cat .git/config
+
 This should output something similar to:
+
 [core]
         repositoryformatversion = 0
         filemode = true
@@ -79,12 +96,16 @@ This should output something similar to:
 [user]
         name = jeremy
         email = jeremy@kodekloud.com
-​
-Tracking File Changes
+
+## Tracking File Changes
+
 Imagine you’re just beginning your journey in the project directory. Let’s create two files—file1 and file2—and add an initial line of code to each:
-echo "This is the ORIGINAL line of code in file1" > file1
-echo "This is the ORIGINAL line of code in file2" > file2
+
+#### echo "This is the ORIGINAL line of code in file1" > file1
+#### echo "This is the ORIGINAL line of code in file2" > file2
+
 It’s important to note that Git does not automatically track every file change continuously. Instead, you must explicitly instruct Git when changes occur using commands like git add and git commit. This process creates a snapshot of your project at that moment in time.
+
 This initial setup demonstrates how Git monitors code modifications and manages repository settings within the .git directory. In our next lesson, we will explore how to stage changes and commit them, integrating your work seamlessly with that of your teammates.
 
 
