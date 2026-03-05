@@ -2,6 +2,10 @@
 
 ### regex means Regular Expression(s)
 
+Used for advanced text searching. In earlier lessons, we relied on simple search patterns for precise text pieces (such as passwords). But as search conditions become more complex, regex helps to refine those queries. For instance, if you need to extract all IP addresses (e.g., 203.102.3.5) from hundreds of application files, a naive pattern that only looks for numbers separated by periods might accidentally capture values like 5.23 that don’t represent valid IP addresses.
+
+Just like in mathematics where you can define conditions for an integer (for example, when x is greater than 3 and less than 8 so that x is 4, 5, 6, or 7), regex lets you specify and combine conditions to form patterns that match only the text meeting those criteria.
+
 For more complex search instructions, we can specify some conditions, tie them all together, and our search pattern only matches what perfectly fits within those conditions
 
 Regex Operators:
@@ -43,8 +47,12 @@ shows a bunch of 7's
 
 ## anywhere you put a '.' in your expression it will match any character in that spot:
 
+To match whole words rather than sub-strings within larger words, leverage grep’s -w option:
+
 ## grep -r 'c.t' /etc/
  there must be exactly one character in between c & t ... 'c..t' would match exactly 2 characters in between
+
+For a recursive search with whole word matching, use:
 
 ## grep -wr 'c.t' /etc/
  matches whole words
@@ -66,6 +74,8 @@ the period matches any one character and it says the previous element can exist 
 
 any sequence of characters where zero appers one or more times ... we might be tempted to use something like this:
 
+Be aware that the asterisk can also make the preceding character optional. For instance, the pattern 0* will match lines regardless of whether the digit 0 is present:
+
 ## grep -r '0*' /etc
 
 but this also shows lines that contain no zeros at all because the * lets the previous character exist one or more times ... but also zero times!
@@ -80,10 +90,15 @@ meta characters lose their special meaning ... so the + sign isn't an operator .
 
 so we need to use the \ versions of them:
 
+To search for lines where the digit 0 appears one or more times, use the plus operator (+). Note that grep’s Basic Regular Expressions (BRE) require you to escape the plus sign:
+
 ## grep -r '0\+' /etc
 
 
 It's really hard to keep track of ... so use Extended Regex Operators intead
+
+Using Extended Regular Expressions with grep’s -E option eliminates the need for escaping the plus sign.
+When working with grep, consider using the -E option for Extended Regular Expressions to simplify your patterns and avoid confusion with escaped characters.
 
 ## grep -Er '0+' /etc/ 
 or 
@@ -136,6 +151,8 @@ the digit at the end is optional with the ? operator
 ### [^]: Negated Ranges or Sets
 
 ## egrep -r '/[^a-z]' /etc/
+
+Understanding how to strategically place operators like ^ and $ for anchoring searches, . for matching any character, and * or + for repetitions is key to building efficient regular expre
 
 ** regexr.com **
 
