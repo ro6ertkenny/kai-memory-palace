@@ -16,6 +16,8 @@ Below, we detail how each tool works and how to configure them for your needs.
 
 Cron is best suited for repetitive tasks that run at regular intervals—whether every few minutes, specific hours, days, or even months.
 
+Cron can miss jobs when power is off ... use Anacron to avoid this
+
 The basic syntax for a cron job consists of five time-and-date fields followed by the command to be executed. When editing the system-wide cron table (found at `/etc/crontab`), a username field is included. The time fields are as follows:
 
 * Minute (0–59)
@@ -123,9 +125,14 @@ An alternative to adding jobs to the cron table directly is by placing scripts i
 ```bash  theme={null}
 $ touch shellscript
 $ sudo cp shellscript /etc/cron.hourly/
+$ sudo chmod +rx /etc/cron.hourly/shellscript
+
+To remove the cron type:
+
+$ sudo rm /etc/cron.hourly/shellscript
 ```
 
-Make sure the script is both readable and executable. To remove it, simply delete the file from the directory.
+Make sure the script is both readable and executable. To remove it, simply delete the file from the directory. 
 
 ***
 
@@ -226,6 +233,8 @@ $ atq
 ```
 
 Here, the first number is the job ID. To inspect a job's details, use the `-c` option, similar to using `cat`. To remove a job, execute:
+
+#### at -c 1
 
 ```bash  theme={null}
 $ atrm 1
