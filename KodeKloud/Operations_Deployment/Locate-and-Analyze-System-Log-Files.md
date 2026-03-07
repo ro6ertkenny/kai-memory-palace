@@ -50,6 +50,16 @@ If you are unsure where specific logs are stored—such as SSH logs that give de
 ```bash  theme={null}
 $ grep -r 'ssh' /var/log/
 ```
+#### grep -rni
+
+Search recursively
+Ignore case
+Show line numbers
+
+Limit to log files only:
+
+#### grep -rni ssh /var/log --include="*.log"
+
 
 The output might look like this:
 
@@ -185,6 +195,11 @@ Jun 30 15:34:11 kodekloud kernel: blacklist: Loading compiled-in revocation X.50
 Jun 30 15:34:11 kodekloud kernel: btrfs loaded, crc32c=crc32c-intel, zoned=yes, fsverity=yes
 ```
 
+### Grep Expressions to filter output with -g option
+
+#### journalctl -p info -g '^b^
+
+
 ### Filtering Logs by Time Range
 
 To filter journal logs by time, use the `-S` (since) and `-U` (until) options. For instance, to view logs between 1 a.m. and 2 a.m.:
@@ -205,6 +220,11 @@ Mar 03 01:13:06 kodekloud systemd-timesyncd[521]: Network configuration changed,
 Mar 03 01:13:06 kodekloud systemd-timesyncd[521]: Initial synchronization to time server 185.125.190.56:123 (ntp.ubuntu.com).
 ...
 ```
+
+### Until Option -U
+
+#### journalctl -S 01:00 -U 02:00
+
 
 ### Viewing Logs by Boot Session
 
