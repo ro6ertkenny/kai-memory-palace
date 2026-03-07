@@ -90,7 +90,7 @@ drwxr-xr-x  2 jeremy jeremy 4096 Jun  5 01:47 .ssh
 jeremy@kodekloud:~$
 ```
 
-Next, convert the key to a binary format using the `gpg --dearmor` command:
+Next, convert the key to a binary format using the `gpg --dearmor` command: (GNU Privacy Guard = gpg) + (GNU's Not Unix = GNU)
 
 ```bash  theme={null}
 jeremy@kodekloud:~$ gpg --dearmor docker.key
