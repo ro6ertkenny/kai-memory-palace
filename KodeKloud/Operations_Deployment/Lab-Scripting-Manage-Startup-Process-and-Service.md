@@ -41,7 +41,9 @@ How do we run script.sh that is located in our current directory?
 
 ## Solution:
 
-#### 
+We can run the script like this:
+
+#### ./script.sh
 
 
 ## Task:
