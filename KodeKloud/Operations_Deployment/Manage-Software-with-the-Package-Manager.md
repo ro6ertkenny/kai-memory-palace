@@ -2,7 +2,7 @@
 
 > This article explains how to manage software on Ubuntu using the apt package manager, covering installation, updates, upgrades, and removals.
 
-This article explains how to install, update, upgrade, and remove software on Ubuntu using the apt package manager. Ubuntu simplifies software management by handling installation, upgrades, and dependency resolution with apt. Follow the examples below for practical guidance on managing your system's packages.
+This article explains how to install, update, upgrade, and remove software on Ubuntu using the apt package manager. Ubuntu simplifies software management by handling installation, upgrades, and dependency resolution with apt. Follow the examples below for practical guidance on managing your system's packages ... apt stands for Advanced Package Tool.
 
 ## Updating the Package Database
 
