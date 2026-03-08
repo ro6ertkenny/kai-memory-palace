@@ -66,6 +66,8 @@ In this example, the "used" value might appear high, but the "available" column 
   Use the "free -h" command as a quick reference to ensure your system has adequate memory, especially when running high-load applications.
 </Callout>
 
+** Lookup more detail on pronunciation and meaning of Mi and Gi ("Mabibabytes & Gibabytes"??) ** 
+
 ─────────────────────────────────────────────
 
 ## Analyzing CPU Load with uptime
@@ -75,9 +77,22 @@ The "uptime" command provides key data about system load and uptime. The output 
 ```bash  theme={null}
 $ uptime
 17:24:55 up 32 min,  1 user,  load average: 0.05, 0.05, 0.01
+
+The first # (0.05) tells us the load average for the last one minute
+The second # (0.05) tells us the load average for the last five minutes
+The third # (0.01) tells us the load average for last fifteen minutes
+
 ```
 
 A load average of 1.0 over the last minute indicates that one CPU core has been fully utilized on average. For systems with multiple cores, a load average higher than the number of cores suggests some processes are waiting for CPU time. Consistently high load averages may signal the need to upgrade hardware or optimize running processes.
+
+To see details on what is using the CPU resources run this command:
+
+#### lscpu
+
+To see details about other hardware on the system run this command:
+
+#### lspci
 
 ─────────────────────────────────────────────
 
@@ -166,11 +181,25 @@ __________
   Using the "-p" option with fsck.ext4 is especially useful when the file system has many errors, as it automates the repair process.
 </Callout>
 
+### REMEMBER: -p "filesystem problems"
+
+#### -f forces a check even if the file system reports that it's healthy
+
 ─────────────────────────────────────────────
 
 ## Verifying Key Processes and Services
 
-Ensuring that critical services are running is vital for system stability. The following command displays systemd unit dependencies in a tree-like structure, helping you visualize service relationships.
+Ensuring that critical services are running is vital for system stability. The following command displays systemd unit dependencies in a tree-like structure, helping you visualize service relationships. 
+
+Transparent or white circle next to the name means that this particular unit is currently inactive
+
+A green cicle next to a unit name means it's currently active
+
+Typical sevices that need to always be running/active/green are:
+
+- ssh.service
+- cron.service
+- atd.service
 
 ```bash  theme={null}
 $ systemctl list-dependencies
