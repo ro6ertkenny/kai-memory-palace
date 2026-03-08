@@ -43,6 +43,7 @@ Let’s consider the parameter `net.ipv6.conf.default.disable_ipv6`. A value of 
 $ sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
 net.ipv6.conf.default.disable_ipv6 = 1
 ```
+#### -w is the option to write a value to a parameter
 
 You can verify the updated setting with:
 
@@ -72,6 +73,10 @@ $ man sysctl.d
 ```
 
 Listing the directory contents with `ls /etc/sysctl.d` will also display sample configuration files that serve as formatting examples.
+
+Must have a .conf extention on the configuration file 
+
+#### Ex// Filename.conf
 
 ## Filtering Specific Parameters
 
@@ -112,6 +117,11 @@ To permanently change `vm.swappiness` to 20, follow these steps:
 <Callout icon="lightbulb" color="#1CB2FE">
   Editing kernel parameters in `/etc/sysctl.conf` is an alternative, though this file may be overwritten during system upgrades. It is recommended to use `/etc/sysctl.d` for persistent customizations.
 </Callout>
+
+You can also edit kernel parameters by typing:
+
+#### sudo vim /etc/sysctl.conf
+
 
 ## Summary Table
 
