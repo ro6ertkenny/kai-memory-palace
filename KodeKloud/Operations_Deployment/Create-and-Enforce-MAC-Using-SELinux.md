@@ -14,13 +14,17 @@ Since AppArmor is enabled by default on Ubuntu systems, you must stop its servic
 sudo systemctl stop apparmor.service
 ```
 
-After stopping the service, ensure that AppArmor does not automatically start on boot.
+After stopping the service, ensure that AppArmor does not automatically start on boot
+
+#### sudo systemctl disable apparmor.service
 
 ***
 
 ## Installing SELinux and AuditD
 
 To get started with SELinux, install the SELinux utilities along with the AuditD package. The SELinux package includes essential tools and default security policies, and AuditD logs system events—a critical resource when building custom SELinux policies.
+
+#### sudo apt install selinux-basics auditd
 
 Below is a sample installation output. Your output may vary:
 
@@ -81,6 +85,8 @@ This command modifies the GRUB bootloader to include the parameter necessary to 
 
 After activating SELinux, verify the bootloader settings. In the `/etc/default/grub` file, you should see the following line instructing the kernel to load SELinux:
 
+#### cat /etc/default/grub
+
 ```bash  theme={null}
 GRUB_CMDLINE_LINUX="security=selinux"
 ```
@@ -93,6 +99,7 @@ jeremy@kodekLOUD:~$ ls -a /
 ..             boot                home              lost+found        proc  sbin.usr-is-merged  root  snap
 .autolabel    cdrom               lib               media             mnt   run     srv       tmp    usr
 ```
+## There should have been a file called .autorelabel ?
 
 Now, reboot your system to allow SELinux to relabel the filesystem. The relabeling process might take some time depending on the number of files:
 
@@ -102,7 +109,10 @@ sudo reboot
 
 During the first boot after enabling SELinux, the bootloader pauses for 30 seconds to allow intervention if necessary. Once complete, subsequent boots will operate normally. After rebooting, verify SELinux status by running:
 
+#### ls -Z /
+
 ```bash  theme={null}
+
 sestatus
 ```
 
@@ -194,6 +204,10 @@ After operating in permissive mode and gathering necessary logs, you can generat
 sudo audit2allow --all -M mymodule
 ```
 
+#### the --all option tells the tool to inspect all logged events
+
+#### -M option tells it to generate a "Module" or policy package ... this is a file that we can load into SELinux to create a security policy that would allow all of the previously logged actions ... and "mymodule" is just a name that was chosen for this security package file
+
 The command output will include a message similar to:
 
 ```text  theme={null}
@@ -208,6 +222,7 @@ To load the custom policy module, execute:
 sudo semodule -i mymodule.pp
 ```
 
+#### the -i option is used to tell the semodule command to install this module package into SELinux
 <Callout icon="lightbulb" color="#1CB2FE">
   If you see a warning such as "libsemanage.add\_user: user sddm not in password file", it is a known issue. You can safely ignore it if you are not using sddm.
 </Callout>
@@ -354,6 +369,27 @@ To restore the default context, use the `restorecon` command. For example, to fi
 sudo chcon --reference=/var/log/dmesg /var/log/auth.log
 ```
 
+## To find valid labels for security policies use command:
+
+#### seinfo -u 
+            users
+
+#### seinfo -r 
+            roles
+
+#### seinfo -t 
+            types
+
+## Look at other labels in the var/log directory:
+
+#### ls -Z /var/log 
+
+## We can tell the chcon command to use another file as a reference and copy all the label parts from the good file to the bad file ... for this we use a dpkg log ... where you can tell the chcon command to use another file as a reference and copy all of the label parts from the good file to the bad file ... so the dmesg file is the good file that should be used as a reference:
+
+#### sudo chcon --reference=/var/log/dmesg /var/log/auth.log
+
+    Here we're using it as a reference and applying it to the auth.log file 
+
 ***
 
 ## Fixing Contexts for Web Content
@@ -380,6 +416,13 @@ sudo semanage fcontext --add --type var_log_t /var/www/10
 # libsemanage.add_user: user sddm not in password file
 sudo restorecon /var/www/10
 ```
+Lookup this example:
+
+#### sudo semanage fcontext --add --type var_log_t /var/www/10
+
+Followed by this command to restore the default label:
+
+#### sudo restorecon /var/www/10
 
 For directories and their contents, remember to wrap the path in quotes if it contains special characters. Refer to the SELinux documentation for additional examples.
 
