@@ -101,6 +101,9 @@ The XML file below defines a virtual machine named "TestMachine" running under Q
 
 In a production setting, a complete VM configuration will include additional parameters such as storage, network interfaces, and the operating system. For demonstration purposes, this basic setup is sufficient.
 
+### >hvm<
+    stands for hardware virtual machine
+
 Define the virtual machine using the following command:
 
 ```bash  theme={null}
@@ -211,6 +214,7 @@ Domain 'TestMachine' destroyed
 
 jeremy@kodekloud:~/machines$
 ```
+### destroy forces a hard poweroff 
 
 <Callout icon="lightbulb" color="#1CB2FE">
   The `destroy` command only powers off the VM abruptly—it does not remove the VM's definition. To completely remove the VM, you must undefine it.
