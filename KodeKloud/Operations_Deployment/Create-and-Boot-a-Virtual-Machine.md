@@ -37,6 +37,8 @@ jeremy@kodekloud:~$
 
 ***
 
+
+
 ## Verifying the Integrity of the Image
 
 To ensure that the downloaded image is authentic and uncorrupted, verify its checksum using the SHA-256 checksum provided on the Ubuntu page. Two files are released: `SHA256SUMS` (which contains checksums for all images) and `SHA256SUMS.gpg` (which is used to verify the checksum file itself). First, download the checksum file:
@@ -373,6 +375,20 @@ ERROR
 ```
 
 refer to the provided options.
+
+## Commands to lookup and figure out where they should go in this document:
+
+#### sudo apt install -y libguestfs-tools
+
+#### sudo virt-customize -a /var/lib/libvirt/images/ubuntu-24.04-minimal-cloudimg-amd64.img --root-password password:password123
+
+#### virsh start ubuntu1
+
+#### sudo apt install libosinfo-bin
+
+#### osinfo-query os
+
+#### virt-install --osinfo detect=on ... (this autodetects the OS version in the image)
 
 ***
 
