@@ -182,12 +182,14 @@ To disable password login for jane, lock her account with:
 
 ```bash  theme={null}
 $ sudo usermod --lock jane
+$ sudo usermod -L jane
 ```
 
 Later, if you need to unlock the account, run:
 
 ```bash  theme={null}
 $ sudo usermod --unlock jane
+$ sudo usermod -U jane
 ```
 
 ### Setting an Account Expiration Date
