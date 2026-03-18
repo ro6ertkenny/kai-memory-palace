@@ -112,6 +112,8 @@ In summary, bridging and bonding offer different network solutions:
 * **Bridging:** Connects two or more separate networks to enable seamless communication among devices as if they were on the same network.
 * **Bonding:** Aggregates multiple network connections into a single logical interface to improve overall performance and reliability.
 
+    In the context of a Bond ... all network interfaces that are addded to it are called Ports
+
 <Frame>
   ![The image compares "Bridge" and "Bond" network configurations, illustrating how a bridge connects two or more networks, while a bond provides two or more connections to a single network.](https://kodekloud.com/kk-media/image/upload/v1752881298/notes-assets/images/Linux-Foundation-Certified-System-Administrator-LFCS-Configure-Bridge-and-Bonding-Devices-Theory/bridge-vs-bond-network-configurations.jpg)
 </Frame>
