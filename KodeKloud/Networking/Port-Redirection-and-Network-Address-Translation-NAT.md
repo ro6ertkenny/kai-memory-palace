@@ -72,10 +72,17 @@ After making these changes, reload the sysctl configuration:
 ```bash  theme={null}
 sudo sysctl --system
 ```
-
+* The --system parameter tells the sysctl command to look for configuration values in all the system default files and directories 
 Verify that the values for IP forwarding are set to 1.
 
-***
+* To check if our change took effect we can run this command:
+
+#### sudo sysctl -a | grep forward
+net.ipv4.ip_forward=1
+net.ipv6.conf.all.forwarding=1
+
+* Make sure both of these values are set to 1
+
 
 ## Configuring Port Redirection with iptables
 
@@ -84,6 +91,14 @@ Linux processes network data using the netfilter framework. Although nftables is
 Consider the following scenario:
 
 Assume the interface `enp1s0` manages traffic from the internal network range 10.0.0.0/24, and `enp6s0` is used for outbound traffic to the Internet. First, configure a rule that forwards incoming TCP connections on port 8080 to an internal address (for example, 192.168.0.5 on port 80):
+
+* Inspect our network addresses with the command:
+
+#### ip a 
+
+* To look for the routes setup use the command:
+
+#### ip r
 
 ```bash  theme={null}
 sudo iptables -t nat -A PREROUTING -i enp1s0 -s 10.0.0.0/24 -p tcp --dport 8080 -j DNAT --to-destination 192.168.0.5:80
