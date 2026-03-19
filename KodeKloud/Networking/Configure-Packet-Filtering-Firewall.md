@@ -36,7 +36,9 @@ To allow SSH (default port 22), use the following command:
 sudo ufw allow 22
 ```
 
-By default, this rule permits both TCP and UDP traffic, but since SSH uses TCP, you can specify it explicitly if needed.
+By default, this rule permits both TCP and UDP traffic, but since SSH uses TCP, you can specify it explicitly if needed
+
+#### sudo ufw allow 22/tcp
 
 Next, enable UFW:
 
@@ -63,6 +65,10 @@ After enabling UFW, you'll notice two rules for port 22 (one for IPv4 and one fo
 ***
 
 ## Restricting SSH Access by IP Address
+
+First checkout active TCP Connections by typing in the following command:
+
+## ss -tn
 
 The default SSH rule allows connections from any IP address on port 22. In a production environment, you may want to restrict access to a known IP address. For example, if your SSH connection originates from IP address 10.0.0.192, restrict access with:
 
