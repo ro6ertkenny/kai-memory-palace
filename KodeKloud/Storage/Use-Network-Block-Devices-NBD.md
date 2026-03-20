@@ -95,6 +95,7 @@ Follow these steps on the server that will export the block device:
   #     group = nbd
   includedir = /etc/nbd-server/conf.d
   allowlist = true
+* this will allow nbd clients to list what exports a server has available ... essentially we can see what block devices it can share with us 
 
   # What follows are export definitions. Your section header must be unique.
   [partition2]
