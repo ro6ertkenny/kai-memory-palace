@@ -8,6 +8,8 @@ In previous lessons, we explored working with local file systems and local block
   ![The image illustrates the Network Filesystem Protocol (NFS) with two computers running Linux, connected by a file-sharing icon, emphasizing that protocols act as a "language."](https://kodekloud.com/kk-media/image/upload/v1752881369/notes-assets/images/Linux-Foundation-Certified-System-Administrator-LFCS-Use-Remote-Filesystems-NFS/nfs-network-filesystem-protocol.jpg)
 </Frame>
 
+** A Protocol (NFS) is a "language" that a client and server use to communicate ... they need to speak the same language so they know how to communicate to each other, negotiate a connection, and transfer data
+
 NFS operates based on a two-step process:
 
 1. Configuring an NFS server to share a file system with remote machines.
@@ -90,12 +92,15 @@ The `-r` flag forces the server to refresh its list of shared directories. To co
 ```bash  theme={null}
 sudo exportfs -v
 ```
+The '-v' stands for verbose ... detailed output and export options
+
 
 <Callout icon="lightbulb" color="#1CB2FE">
   When using wildcards in client specifications, ensure there are no additional spaces between the hostname (or wildcard) and the opening parenthesis. For example:
 
   ```bash  theme={null}
   /etc *.example.com(ro,sync,no_subtree_check)
+    /etc *(ro,sync,no_subtree_check)
   ```
 </Callout>
 
