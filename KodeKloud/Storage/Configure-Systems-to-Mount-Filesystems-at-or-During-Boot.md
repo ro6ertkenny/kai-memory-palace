@@ -87,6 +87,10 @@ For example, to set up your XFS filesystem to mount at `/mybackups`, follow thes
    /dev/vdb2   /mybackups ext4    defaults    0 2
    ```
 
+** if we added fstab and don't intend to reboot the system systemd won't know about our changes ... so with this command we can force it to pick up any changes we made to important configuration files ... including fstab:
+
+#### sudo systemctl daemon-reload
+
 After saving the file, if a reboot is not performed immediately, notify Systemd of your changes so that they are applied at the next boot. On reboot, the filesystem on `/dev/vdb1` will be mounted automatically, and previously created files (for example, `testfile`) will become visible:
 
 ```bash  theme={null}
@@ -126,7 +130,12 @@ Key differences in the fstab fields for swap space include:
 * The third field specifies the type as `swap`.
 * Both the dump and pass fields are set to `0` because swap space is not backed up or checked during boot.
 
-A system reboot will ensure the swap partition is enabled automatically.
+A system reboot will ensure the swap partition is enabled automatically.i
+
+** after reboot type the following command to see the swap partition was automatically mounted at boot time:
+
+#### swapon --show
+ 
 
 ## Using UUIDs for Reliable Mounting
 
