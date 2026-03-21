@@ -127,6 +127,7 @@ If you later add another disk, follow these steps to extend the VG:
    ```bash  theme={null}
    sudo vgextend my_volume /dev/sde
    ```
+* sudo vgs
 
 The output will indicate that "my\_volume" now includes three PVs with a larger combined size. To remove a PV not used by any LV, use:
 
@@ -152,11 +153,14 @@ Logical Volumes act like partitions but are more flexible than traditional ones.
 
 2. Verify your Volume Group status to see that "partition1" is allocated and free space remains.
 
+* sudo vgs
+
 3. Next, create a second logical volume named "partition2" with a size of 6 GB:
 
    ```bash  theme={null}
    sudo lvcreate --size 6G --name partition2 my_volume
    ```
+* sudo lvs
 
 4. To view all logical volumes, use:
 
