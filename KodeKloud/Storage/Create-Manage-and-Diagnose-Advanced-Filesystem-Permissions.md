@@ -25,6 +25,8 @@ In the above output, each file is owned by the user `alex` and the group `staff`
 2. The next three characters (`rw-`) show that users in the `staff` group can also read and write.
 3. The final three characters (`r--`) mean that all other users have read-only access.
 
+
+
 <Callout icon="lightbulb" color="#1CB2FE">
   If you log in as another user (e.g., Jeremy Morgan) who is neither `alex` nor part of the `staff` group, only the last set of permissions (`r--`) applies.
 </Callout>
@@ -186,6 +188,25 @@ To set the immutable attribute:
 sudo chattr +i newfile
 ```
 
+🧠 chattr = change attributes
+chattr = change attributes (special file flags)
+
+It lets you lock down files in ways normal permissions can’t.
+
++i → immutable (MOST IMPORTANT)
+chattr +i file.txt
+
+Means:
+
+You CANNOT:
+- edit the file
+- delete the file
+- rename the file
+- overwrite the file
+
+Even as root (unless you remove it first)
+
+
 You can verify the attribute using the `lsattr` command:
 
 ```bash  theme={null}
@@ -202,6 +223,14 @@ sudo chattr -i newfile
 Other file attributes exist as well (e.g., `c` for compression), although support varies between different file systems such as ext4. For further details, refer to the corresponding manual pages.
 
 ***
+
+* if we find a file that not even the root user can remove or modify, check the attribuites by typing this command:
+
+#### lsattr newfile
+
+#### lsattr 
+
+    lists the whole directory
 
 ## Conclusion
 
