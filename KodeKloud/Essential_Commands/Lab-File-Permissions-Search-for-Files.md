@@ -8,6 +8,8 @@ What command can be used to find files and directoriesmodified in the last 5 min
 
 The find /dev/ -mmin -5 command can be used to find files and directories modified in the last 5 minutes in the /dev directory.
 
+#### find /dev/ -min -5
+
 
 ## Task:
 
