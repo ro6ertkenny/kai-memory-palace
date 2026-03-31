@@ -1,224 +1,327 @@
-# Lab - Files, Directories, Hard and Soft Links
+# Files, Directories, Hard & Soft Links — LFCS Lab (Hidden Answers)
 
-## Task:
+---
 
-What is the top-level directory in Linux?
+## 🧪 Task 1
 
-## Solution:
+Task: What is the top-level directory in Linux?
 
-The root directory is /. This is the top-level directory. There can be no other directories above it.
+<details>
+<summary>Answer</summary>
 
+### Command
+    /
 
-## Task:
+### Explanation
+- `/` → root directory
+- top of the filesystem
+- nothing exists above it
 
-In what form does Linux organise files and directories?
+</details>
 
-## Solution:
+---
 
-Linux organizes files and directories in a filesystem tree.
+## 🧪 Task 2
 
+Task: In what form does Linux organise files and directories?
 
-## Task:
+<details>
+<summary>Answer</summary>
 
-What is the command to print your current working directory?
+### Command
+    Filesystem tree
 
-## Solution:
+### Explanation
+- tree structure → hierarchical
+- everything branches from `/`
 
-#### pwd
+</details>
 
+---
 
-## Task:
+## 🧪 Task 3
 
-What is the command to climb up one directory?
+Task: What is the command to print your current working directory?
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-#### cd .. 
+### Command
+    pwd
 
-is the command to climb up one directory.
+### Explanation
+- pwd → print working directory
+- shows your current location in the filesystem
 
+</details>
 
-## Task:
+---
 
-Absolute paths always start out with the root directory /. Then we specify the sub-directories we want to descend into; /home/bob/Documents/Invoice.pdf is an example of such a path. In this case, first home, then bob, and then Documents. We can see the sub-directory names are separated by a /, and we finally get to the file we want to access, i.e, Invoice.pdf. An absolute path can end with the name of a file or a directory.
+## 🧪 Task 4
 
-As per the example above, If we'd want to delete the Documents directory, how would we specify the path?
+Task: What is the command to climb up one directory?
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-If we'd want to delete the Documents directory, we'd specify the path like: /home/bob/Documents
+### Command
+    cd ..
 
+### Explanation
+- cd → change directory
+- .. → parent directory (one level up)
 
-## Task:
+</details>
 
-Create a directory named lfcs under the /home/bob directory.
+---
 
-## Solution:
+## 🧪 Task 5
 
-Run the below command:
+Task: If we'd want to delete the Documents directory, how would we specify the path?
 
-#### mkdir /home/bob/lfcs
+<details>
+<summary>Answer</summary>
 
+### Command
+    /home/bob/Documents
 
-## Task:
+### Explanation
+- absolute path → starts from `/`
+- follows directory chain down to target
 
-Create a blank file named lfcs.txt under the/home/bob/lfcs directory.
+</details>
 
-Is the "/home/bob/lfcs/lfcs.txt" file created?
+---
 
-## Solution:
+## 🧪 Task 6
 
-Run the below command:
+Task: Create a directory named lfcs under the /home/bob directory.
 
-#### touch  /home/bob/lfcs/lfcs.txt
+<details>
+<summary>Answer</summary>
 
+### Command
+    mkdir /home/bob/lfcs
 
-## Task:
+### Explanation
+- mkdir → make directory
+- full path ensures correct location
 
-Copy the /tmp/Invoice directory (including all its contents) to the /home/bob directory.
+</details>
 
-Is the "/tmp/Invoice" directory copied to the "/home/bob" directory?
+---
 
-## Solution:
+## 🧪 Task 7
 
-Run the below command:
+Task: Create a blank file named lfcs.txt under the /home/bob/lfcs directory.
 
-#### cp -r /tmp/Invoice  /home/bob/
+<details>
+<summary>Answer</summary>
 
+### Command
+    touch /home/bob/lfcs/lfcs.txt
 
-## Task:
+### Explanation
+- touch → create empty file
+- also updates timestamp if file exists
 
-Copy the /home/bob/myfile.txt file to the/home/bob/data/ directory. Make sure to preserve its attributes.
+</details>
 
-Is the file copied with all attributes?
+---
 
-## Solution:
+## 🧪 Task 8
 
-#### cp -a /home/bob/myfile.txt /home/bob/data/
+Task: Copy the /tmp/Invoice directory (including all its contents) to the /home/bob directory.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    cp -r /tmp/Invoice /home/bob/
 
-Copy the /home/bob/lfcs directory (including all its content) into the /home/bob/old-data/ directory.
+### Explanation
+- cp → copy
+- -r → recursive (copy directories + contents)
 
-Is the "/home/bob/lfcs" directory copied into the "/home/bob/old-data/" directory?
+</details>
 
-## Solution:
+---
 
-Execute the below command:
+## 🧪 Task 9
 
-#### cp -r /home/bob/lfcs /home/bob/old-data/
+Task: Copy the /home/bob/myfile.txt file to the /home/bob/data/ directory. Make sure to preserve its attributes.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    cp -a /home/bob/myfile.txt /home/bob/data/
 
-Delete the /home/bob/lfcs/lfcs.txt file.
+### Explanation
+- -a → archive mode
+- preserves permissions, ownership, timestamps
 
-Is the "/home/bob/lfcs/lfcs.txt" file deleted?
+</details>
 
-## Solution:
+---
 
-Execute the below command:
+## 🧪 Task 10
 
-#### rm /home/bob/lfcs/lfcs.txt
+Task: Copy the /home/bob/lfcs directory (including all its content) into the /home/bob/old-data/ directory.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    cp -r /home/bob/lfcs /home/bob/old-data/
 
-Move all contents, excluding the directory itself, from /home/bob/lfcs to /home/bob/new-data/ directory.
+### Explanation
+- -r → recursive copy of directory and contents
 
-Are the contents of the "/home/bob/lfcs" directory moved to the "/home/bob/new-data/" directory?
+</details>
 
-## Solution:
+---
 
-Execute the below command:
+## 🧪 Task 11
 
-#### mv /home/bob/lfcs/* /home/bob/new-data/
+Task: Delete the /home/bob/lfcs/lfcs.txt file.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    rm /home/bob/lfcs/lfcs.txt
 
-Delete directory /home/bob/lfcs .
+### Explanation
+- rm → remove file
+- permanently deletes (no recycle bin)
 
-Is the "/home/bob/lfcs" directory deleted?
+</details>
 
-## Solution:
+---
 
-Run the below command:
+## 🧪 Task 12
 
-#### rm -rf /home/bob/lfcs
+Task: Move all contents, excluding the directory itself, from /home/bob/lfcs to /home/bob/new-data/ directory.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    mv /home/bob/lfcs/* /home/bob/new-data/
 
-Create a soft link to /tmp directory. Create this link in /home/bob directory and call it link_to_tmp.
+### Explanation
+- mv → move files
+- * → all contents inside directory (not the directory itself)
 
-Is the "link_to_tmp" softlink created?
+</details>
 
-## Solution:
+---
 
-Run the below command:
+## 🧪 Task 13
 
-#### ln -s /tmp /home/bob/link_to_tmp
+Task: Delete directory /home/bob/lfcs.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    rm -rf /home/bob/lfcs
 
-Create a hard link to /opt/hlink file. Create this link in /home/bob/ directory and call it hlink.
+### Explanation
+- -r → recursive (delete directory + contents)
+- -f → force (no prompts)
 
-Has the required hard link been created?
+</details>
 
-## Solution:
+---
 
-Execute the below command:
+## 🧪 Task 14
 
-#### ln  /opt/hlink /home/bob/hlink
+Task: Create a soft link to /tmp directory in /home/bob called link_to_tmp.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    ln -s /tmp /home/bob/link_to_tmp
 
-There is a file called /home/bob/new_file; rename this to /home/bob/old_file.
+### Explanation
+- ln → create link
+- -s → symbolic (soft link)
+- points to target path
 
-Is "/home/bob/new_file" renamed to "/home/bob/old_file"?
+</details>
 
-## Solution:
+---
 
-Run the below command:
+## 🧪 Task 15
 
-#### mv /home/bob/new_file /home/bob/old_file
+Task: Create a hard link to /opt/hlink file in /home/bob called hlink.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    ln /opt/hlink /home/bob/hlink
 
-Create a directory named 9 under the /tmp/1/2/3/4/5/6/7/8 directory. Please note that the structure of sub-directories from 1 to 8 does not exist. However, mkdir has a command line option to automatically create all of these sub-directories automatically in one shot, instead of 9 consecutive commands. This option is described in the help output or manual pages as make parent directories as needed. Find out what the correct option is and use it to create the directory in one shot.
+### Explanation
+- ln → create link
+- no -s → hard link
+- same inode as original file
 
-Is the "/tmp/1/2/3/4/5/6/7/8/9" directory created?
+</details>
 
-## Solution:
+---
 
-Run the below command:
+## 🧪 Task 16
 
-#### mkdir -p /tmp/1/2/3/4/5/6/7/8/9
+Task: Rename /home/bob/new_file to /home/bob/old_file.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    mv /home/bob/new_file /home/bob/old_file
 
-ls -l shows you the time when a file has been last modified, but it only shows you the hour and the minute, usually in a form like 17:53. Find another way to make ls display the full/exact last modified time for the files in /home/bob directory.
+### Explanation
+- mv → move/rename
+- same directory → acts as rename
 
-At what exact time was important_file created/modified?
+</details>
 
-## Solution:
+---
 
-Run the below command:
+## 🧪 Task 17
 
-#### ls --full-time
+Task: Create directory /tmp/1/2/3/4/5/6/7/8/9 in one command.
 
+<details>
+<summary>Answer</summary>
 
+### Command
+    mkdir -p /tmp/1/2/3/4/5/6/7/8/9
 
+### Explanation
+- -p → create parent directories as needed
+- builds full path in one command
 
+</details>
 
+---
 
+## 🧪 Task 18
 
+Task: Display the full/exact last modified time for files in /home/bob.
 
+<details>
+<summary>Answer</summary>
 
+### Command
+    ls --full-time /home/bob
 
+### Explanation
+- ls → list files
+- --full-time → show full timestamp (date + seconds)
+
+</details>
