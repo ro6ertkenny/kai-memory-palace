@@ -1,176 +1,253 @@
-# Lab - Manage User Accounts and Groups
+# Manage User Accounts & Groups — LFCS Lab (Hidden Answers)
 
-## Task:
+---
 
-Set the jane user account to expire on March 1, 2030.
+## 🧪 Task 1
 
-Has the expiration date been set for user jane?
+Task: Set the jane user account to expire on March 1, 2030.
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Use the below command:
+### Command
+    sudo usermod -e 2030-03-01 jane
 
-#### sudo usermod -e 2030-03-01 jane
+### Explanation
+- usermod → modify existing user account
+- -e 2030-03-01 → set account expiration date
+- jane → target user
 
+</details>
 
-## Task:
+---
 
-Create a system account called apachedev
+## 🧪 Task 2
 
-Has system account "apachedev" been created?
+Task: Create a system account called apachedev.
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Use the below command:
+### Command
+    sudo useradd --system apachedev
 
-#### sudo useradd --system apachedev
+### Explanation
+- useradd → create user
+- --system → create system account
+- apachedev → username
 
+</details>
 
-## Task:
+---
 
-Jane's account, i.e., jane, is expired. Unexpire the same and make sure it never expires again.
+## 🧪 Task 3
 
-Has Jane user account been unexpired?
+Task: Jane's account is expired. Unexpire it and make sure it never expires again.
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Use the below command:
+### Command
+    sudo usermod -e "" jane
 
-#### sudo usermod -e "" jane
+### Explanation
+- usermod → modify user
+- -e "" → clear expiration date
+- jane → target user
+- result → account no longer has an expiration date
 
+</details>
 
-## Task:
+---
 
-Create a user account called jack with home directory and set its default login shell to be /bin/csh.
+## 🧪 Task 4
 
-Has user Jack been added and is its shell /bin/csh?
+Task: Create a user account called jack with a home directory and set its default login shell to /bin/csh.
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Execute the below command:
+### Command
+    sudo useradd -m -s /bin/csh jack
 
-#### sudo useradd -s /bin/csh -m jack
+### Explanation
+- useradd → create user
+- -m → create home directory
+- -s /bin/csh → set login shell
+- jack → username
 
+</details>
 
-## Task:
+---
 
-Delete the user account called jack and ensure his home directory is removed.
+## 🧪 Task 5
 
-Is user Jack removed?
+Task: Delete the user account called jack and ensure his home directory is removed.
 
-Is user Jack's home directory also removed?
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    sudo userdel -r jack
 
-Execute the below command:
+### Explanation
+- userdel → delete user
+- -r → remove home directory and mail spool
+- jack → target user
 
-#### sudo userdel -r jack
+</details>
 
+---
 
-## Task:
+## 🧪 Task 6
 
-Mark the password for jane as expired to force her to immediately change it the next time she logs in.
+Task: Mark the password for jane as expired so she must change it on next login.
 
-Is password expiration set for user Jane?
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    sudo chage --lastday 0 jane
 
-Execute the below command:
+### Explanation
+- chage → change password aging settings
+- --lastday 0 → force password change on next login
+- jane → target user
 
-#### sudo chage --lastday 0 jane
+</details>
 
+---
 
-## Task:
+## 🧪 Task 7
 
-Add the user jane to the group called developers.
+Task: Add the user jane to the group called developers.
 
-Is user Jane added to the developers group?
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    sudo usermod -aG developers jane
 
-Execute the below command:
+### Explanation
+- usermod → modify user
+- -aG → append supplementary group membership
+- developers → group to add
+- jane → target user
+- `-a` is critical so existing supplementary groups are not removed
 
-#### sudo usermod -a -G developers jane
+</details>
 
+---
 
-## Task:
+## 🧪 Task 8
 
-Create a group named cricket and set its GID to 9875
+Task: Create a group named cricket and set its GID to 9875.
 
-Is cricket group created with GID 9875?
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    sudo groupadd -g 9875 cricket
 
-Execute the below command:
+### Explanation
+- groupadd → create group
+- -g 9875 → set GID
+- cricket → group name
 
-#### sudo groupadd -g 9875 cricket
+</details>
 
+---
 
-## Task:
+## 🧪 Task 9
 
-You already created a group cricket in the previous question. Now, rename this group soccer while preserving the same GID.
+Task: Rename group cricket to soccer while preserving the same GID.
 
-Is the group renamed from cricket to soccer with the same GID?
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    sudo groupmod -n soccer cricket
 
-Execute the below command:
+### Explanation
+- groupmod → modify group
+- -n soccer → new name
+- cricket → current group name
+- GID stays the same unless explicitly changed
 
-#### sudo groupmod -n soccer cricket
+</details>
 
+---
 
-## Task:
+## 🧪 Task 10
 
-Create a user sam with UID 5322. Also, make it a member of the soccer group.
+Task: Create a user sam with UID 5322 and make it a member of the soccer group.
 
-Is user sam created with UID 5322?
+<details>
+<summary>Answer</summary>
 
-Is user sam a member of group soccer?
+### Command
+    sudo useradd -u 5322 -G soccer sam
 
-## Solution:
+### Explanation
+- useradd → create user
+- -u 5322 → set UID
+- -G soccer → add supplementary group membership
+- sam → username
 
-Execute the below command:
+</details>
 
-#### sudo useradd -G soccer sam  --uid 5322
+---
 
+## 🧪 Task 11
 
-## Task:
+Task: Update primary group of user sam and set it to rugby.
 
-Update primary group of user sam and set it to rugby
+<details>
+<summary>Answer</summary>
 
-Has user sam's primary group been set to "rugby"?
+### Command
+    sudo usermod -g rugby sam
 
-## Solution:
+### Explanation
+- usermod → modify user
+- -g rugby → set primary group
+- sam → target user
 
-Execute the below command:
+</details>
 
-#### sudo usermod -g rugby sam
+---
 
+## 🧪 Task 12
 
-## Task:
+Task: Delete the group called appdevs.
 
-Delete the group called appdevs.
+<details>
+<summary>Answer</summary>
 
-Has the group called appdevs been deleted?
+### Command
+    sudo groupdel appdevs
 
+### Explanation
+- groupdel → delete group
+- appdevs → target group
 
-## Solution:
+</details>
 
-Execute the below command:
+---
 
-#### sudo groupdel appdevs
+## 🧪 Task 13
 
+Task: Make sure the user jane gets a warning at least 2 days before the password expires.
 
-## Task:
+<details>
+<summary>Answer</summary>
 
-Make sure the user jane gets a warning at least 2 days before the password expires.
+### Command
+    sudo chage -W 2 jane
 
-Are the required changes made?
+### Explanation
+- chage → manage password aging
+- -W 2 → warn 2 days before password expiration
+- jane → target user
 
-## Solution:
-
-Execute below given command:
-
-#### sudo chage -W 2 jane
-
-
+</details>
