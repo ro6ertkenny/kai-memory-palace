@@ -1,188 +1,145 @@
-# Create Filesystems & Mount at Boot — LFCS Lab (Hidden Answers)
+# Filesystem Features and Mount Options — LFCS Lab (Hidden Answers)
 
 ---
 
-## 🧠 Mental Model
+## 🧪 Task
 
-- /etc/fstab → persistent mounts (boot-time)
-- mount → temporary mount (runtime)
-- umount → detach filesystem
-- mkfs.* → create filesystem
-- labels/UUIDs → preferred over raw device names in production
+Task: We have /dev/vda1 mounted in /.
+What are the mount options used with /dev/vda1?
 
----
+Example: rw or ro, logbufs, logbsize, etc.
+Identify all those options for /dev/vda1 and save them in the /root/moptions file.
 
-## 🧪 Task 1
-
-Task: Which file controls automatic mounting at boot?
+Verify the mount options.
 
 <details>
 <summary>Answer</summary>
 
-### Command
-    /etc/fstab
+## Solution:
+
+Execute the below command:
+
+    findmnt /dev/vda1
+
+Copy the output under OPTIONS and save that in the /root/moptions file:
+
+    vi /root/moptions
+
+Its content should be something like:
+
+    rw,relatime,discard,errors=remount-ro
 
 ### Explanation
-- fstab → filesystem table
-- defines mounts at boot
+
+- findmnt → shows mounted filesystems
+- OPTIONS → displays mount options used
 
 </details>
 
 ---
 
-## 🧪 Task 2
+## 🧪 Task
 
-Task: What is wrong with this command?
+Task: Unmount /dev/vdd1 from the /mnt/directory.
 
-    sudo mkfs.xfs -l "BackupVolume" /dev/vdd1
+Is "/mnt" unmounted?
 
 <details>
 <summary>Answer</summary>
 
+## Solution:
+
+Execute the below command:
+
+    umount /mnt
+
+If the user is not root, you need to use the command with sudo.
+
 ### Explanation
-- correct answer:
-  lowercase `-l` is wrong
-- should be:
-    -L (uppercase) for label
+
+- umount → detaches filesystem from mount point
 
 </details>
 
 ---
 
-## 🧪 Task 3
+## 🧪 Task
 
-Task: Create XFS filesystem with label "DataDisk" on /dev/vdd.
+Task: Mount /dev/vdd1 back into the /mnt/ directory. But this time, use these mount options: ro,noexec,nosuid.
+
+Verify the "/mnt" mount
 
 <details>
 <summary>Answer</summary>
 
-### Command
-    sudo mkfs.xfs -L DataDisk /dev/vdd
+## Solution:
+
+Execute the below command:
+
+    mount -o ro,noexec,nosuid /dev/vdd1 /mnt
+
+If the user is not root, you need to use the command with sudo.
 
 ### Explanation
-- mkfs.xfs → create XFS filesystem
-- -L → set label
+
+- -o → specify mount options
+- ro → read-only
+- noexec → disable execution
+- nosuid → ignore SUID/SGID bits
 
 </details>
 
 ---
 
-## 🧪 Task 4
+## 🧪 Task
 
-Task: Create ext4 filesystem with 2048 inodes on /dev/vde.
+Task: /dev/vdd1 is currently mounted with the rooption, so it's read-only. Remount it with the rw option so it becomes read-write.
+
+Verify the "/mnt" mount
 
 <details>
 <summary>Answer</summary>
 
-### Command
-    sudo mkfs.ext4 -N 2048 /dev/vde
+## Solution:
+
+Execute the below command:
+
+    mount -o remount,rw /dev/vdd1 /mnt
+
+If the user is not root, you need to use the command with sudo.
 
 ### Explanation
-- mkfs.ext4 → create ext4 filesystem
-- -N → number of inodes
+
+- remount → change mount options without unmounting
+- rw → enables write access
 
 </details>
 
 ---
 
-## 🧪 Task 5
+## 🧪 Task
 
-Task: Mount /dev/vdd to /mnt.
+Task: Edit /etc/fstab so that the ext4 filesystem on /dev/vdd1 is automatically mounted into /mnt at boot time.
+But also make sure that this filesystem is mounted as read-only. Otherwise said, use these two mount options: defaults and ro.
 
-<details>
-<summary>Answer</summary>
-
-### Command
-    sudo mount /dev/vdd /mnt
-
-### Explanation
-- mount → attach filesystem
-- temporary (lost on reboot unless in fstab)
-
-</details>
-
----
-
-## 🧪 Task 6
-
-Task: Unmount filesystem from /mnt.
+Verify the required changes.
 
 <details>
 <summary>Answer</summary>
 
-### Command
-    sudo umount /mnt
+## Solution:
+
+Edit /etc/fstab file:
+
+    vi /etc/fstab
+
+Add below given line in it:
+
+    /dev/vdd1 /mnt ext4 defaults,ro 0 2
 
 ### Explanation
-- umount → detach filesystem
 
-</details>
-
----
-
-## 🧪 Task 7
-
-Task: Configure /dev/vde to mount at /test on boot (ext4), and ensure fsck runs.
-
-<details>
-<summary>Answer</summary>
-
-### Command
-    sudo mkdir /test
-
-    sudo vi /etc/fstab
-
-    /dev/vde /test ext4 defaults 0 2
-
-    sudo mount -a
-
-### Explanation
-- mkdir → create mount point
-- fstab entry:
-    device mountpoint fstype options dump fsck
-- 0 → no dump
-- 2 → fsck order (non-root filesystems)
-- mount -a → validate config without reboot
-
-</details>
-
----
-
-## 🧪 Task 8
-
-Task: Configure /dev/vdd as swap at boot.
-
-<details>
-<summary>Answer</summary>
-
-### Command
-    sudo vi /etc/fstab
-
-    /dev/vdd none swap defaults 0 0
-
-    sudo swapon -a
-
-### Explanation
-- swap entry format:
-    device none swap defaults 0 0
-- swapon -a → activate all swap entries
-
-</details>
-
----
-
-## 🧪 Task 9
-
-Task: Change label of /dev/vdd filesystem to SwapFS.
-
-<details>
-<summary>Answer</summary>
-
-### Command
-    sudo xfs_admin -L SwapFS /dev/vdd
-
-### Explanation
-- xfs_admin → modify XFS filesystem metadata
-- -L → set label
+- /etc/fstab → controls mounts at boot
+- defaults,ro → standard options + read-only mode
 
 </details>
