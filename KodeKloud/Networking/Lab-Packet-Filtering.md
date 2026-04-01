@@ -1,192 +1,187 @@
-# Lab - Packet Filtering
+# Packet Filtering (UFW) — LFCS Lab (Hidden Answers)
 
-## Task:
+---
 
-By default, Uncomplicated Firewall (ufw) is disabled. So, do the following before proceeding into the lab.
+## 🧪 Task 1
 
-1. Turn on ufw
-2. All traffic is blocked by default, so we must allow SSH on port 22 so the lab won't be broken.
+Task: Enable UFW and allow SSH (port 22).
 
-Is the UFW firewall tool status active?
+<details>
+<summary>Answer</summary>
 
-Is traffic allowed on port 22? 
+### Command
+    sudo ufw enable
+    sudo ufw allow 22
 
-## Solution:
+### Explanation
+- ufw enable → activate firewall
+- allow 22 → allow SSH traffic
+- critical to avoid locking yourself out
 
-Start ufw with
+</details>
 
-#### sudo ufw enable
+---
 
-All traffic is blocked by default, so we must allow SSH on port 22 so the lab won't be broken.
+## 🧪 Task 2
 
-#### sudo ufw allow 22
+Task: Allow incoming traffic on port 80.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    sudo ufw allow 80
 
-Set up a firewall rule to allow incoming traffic to this machine on port 80.
+### Explanation
+- allow → permit traffic
+- 80 → HTTP port
 
-Have incoming connections to port 80 been allowed?
+</details>
 
-## Solution:
+---
 
-Execute the below command:
+## 🧪 Task 3
 
-#### sudo ufw allow 80
+Task: Allow incoming traffic on port 53 using TCP.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    sudo ufw allow 53/tcp
 
-Set up a firewall rule to allow incoming traffic to this machine on port 53, through the TCP protocol.
+### Explanation
+- 53/tcp → DNS over TCP
+- explicitly specify protocol
 
-Have incoming connections to port 53 been allowed?
+</details>
 
-## Solution:
+---
 
-Execute the below command:
+## 🧪 Task 4
 
-#### sudo ufw allow 53/tcp
+Task: Deny incoming traffic on port 443 using TCP.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    sudo ufw deny 443/tcp
 
-Set up a firewall rule to deny incoming traffic to this machine on port 443, through the TCP protocol.
+### Explanation
+- deny → block traffic
+- 443/tcp → HTTPS port
 
-Is the rule to deny access through 443/tcp added?
+</details>
 
-## Solution:
+---
 
-Execute the below command to finish the task.
+## 🧪 Task 5
 
-#### sudo ufw deny 443/tcp
+Task: Delete the rule denying traffic on port 443/tcp.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    sudo ufw delete deny 443/tcp
 
-Delete a firewall rule denying incoming traffic to this machine on port 443, through the TCP protocol (That is created in previous step).
+### Explanation
+- delete → remove matching rule
+- must match rule exactly
 
-Is the rule deleted?
+</details>
 
-## Solution:
+---
 
-Execute the below command
+## 🧪 Task 6
 
-#### sudo ufw delete deny 443/tcp
+Task: Identify rule number 5.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    sudo ufw status numbered
 
-Rules that we add are numbered. What is the rule with number 5?
+### Explanation
+- shows rules with numbering
+- rule [5] corresponds to:
+    80/tcp (v6) ALLOW IN Anywhere (v6)
 
-## Solution:
+</details>
 
-Execute the below command and check for the rule in number 5.
+---
 
-#### sudo ufw status numbered
+## 🧪 Task 7
 
-Output will be shown below.
+Task: Allow all traffic from IP 207.45.232.181.
 
-     To                         Action      From
-     --                         ------      ----
-[ 1] 22                         ALLOW IN    Anywhere                  
-[ 2] 80/tcp                     ALLOW IN    Anywhere                  
-[ 3] 3306                       ALLOW IN    10.0.0.0/24               
-[ 4] 22 (v6)                    ALLOW IN    Anywhere (v6)             
-[ 5] 80/tcp (v6)                ALLOW IN    Anywhere (v6)
+<details>
+<summary>Answer</summary>
 
+### Command
+    sudo ufw allow from 207.45.232.181
 
-## Task:
+### Explanation
+- allow from → permit all traffic from specific IP
 
-Allow all traffic that is coming from the following IP address 207.45.232.181.
+</details>
 
-Is the rule added to allow access from IP address specified?
+---
 
-## Solution:
+## 🧪 Task 8
 
-Execute the below command to complete this task.
+Task: Allow all traffic from network 10.11.12.0/24.
 
-#### sudo ufw allow from 207.45.232.181
+<details>
+<summary>Answer</summary>
 
+### Command
+    sudo ufw allow from 10.11.12.0/24
 
-## Task:
+### Explanation
+- CIDR notation → defines network range
+- /24 → 256 IP addresses
 
-Allow all traffic coming from any IP in this network range: 10.11.12.0 to 10.11.12.255 (i.e., 10.11.12.0/24). Add the required rule.
+</details>
 
-Has the required firewall rule been added?
+---
 
-## Solution:
+## 🧪 Task 9
 
-Execute the below command:
+Task: Identify the port configured in rule allowing traffic from 192.168.0.4.
 
-#### sudo ufw allow from 10.11.12.0/24 
+<details>
+<summary>Answer</summary>
 
+### Command
+    sudo ufw status numbered
 
-## Task:
+### Explanation
+- find rule with source 192.168.0.4
+- associated port is 22
 
-A rule allow from 192.168.0.4 to any port 22 was added to the firewall, which is the port configured to rule one.
+</details>
 
+---
 
-## Solution:
+## 🧪 Task 10
 
-Execute below command and check the output for rule number 1
+Task: Fix rule order so deny from 10.0.0.19 is evaluated before allow rules.
 
-#### sudo ufw status numbered
+<details>
+<summary>Answer</summary>
 
-Answer is 22
+### Command
+    sudo ufw status numbered
+    sudo ufw delete <rule_number_of_allow>
+    sudo ufw insert 1 deny from 10.0.0.19
 
+### Explanation
+- UFW rules are processed top → bottom
+- first match wins
+- insert 1 → place rule at top (highest priority)
+- ensures deny rule is evaluated before allow
 
-## Task:
-
-There's a firewall rule that denies any traffic coming from the 10.0.0.19 IP address. But this rule is in an incorrect spot (after an allow rule for the 10.0.0.0/24 range). So traffic is never denied because the rule is never matched. Correct this mistake.
-
-Is the rule inserted as number 1 ?
-
-## Solution:
-
-First check for number of rule
-
-#### ~ ➜  sudo ufw status numbered
-Status: active
-
-     To                         Action      From
-     --                         ------      ----
-[ 1] 22/tcp                     ALLOW IN    192.168.0.0/24            
-[ 2] 22                         ALLOW IN    192.168.0.4               
-[ 3] 22                         ALLOW IN    Anywhere                  
-[ 4] 80                         ALLOW IN    Anywhere                  
-[ 5] 53/tcp                     ALLOW IN    Anywhere                  
-[ 6] Anywhere                   ALLOW IN    207.45.232.181            
-[ 7] Anywhere                   ALLOW IN    10.11.12.0/24             
-[ 8] 3306                       ALLOW IN    10.0.0.0/24               
-[ 9] 22 (v6)                    ALLOW IN    Anywhere (v6)             
-[10] 80 (v6)                    ALLOW IN    Anywhere (v6)             
-[11] 53/tcp (v6)                ALLOW IN    Anywhere (v6)             
-
-Delete the rule as per requirement
-
-#### ~ ➜  sudo ufw delete 8
-Deleting:
- allow from 10.0.0.0/24 to any port 3306
-Proceed with operation (y|n)? y
-Rule deleted
-
-Insert rule using the below command
-
-#### ~ ➜ sudo ufw insert 1 deny from 10.0.0.19
-Rule inserted
-
-Check status again
-
-#### ~ ➜ sudo ufw status numbered
-
-
-
-
-
-
-
-
-
-
-
-
+</details>
