@@ -1,148 +1,176 @@
-# Lab - Kernel Runtime Parameters and SELinux/AppArmor
+# Kernel Runtime Parameters & SELinux/AppArmor — LFCS Lab (Hidden Answers)
 
-## Task:
+---
 
-Find the SELinux labels of sshd process running on this system. Save its value in the /home/bob/sshd file.
+## 🧪 Task 1
 
-Verify the SELinux context.
+Task: Find the SELinux label of the sshd process and save it in /home/bob/sshd.
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Execute the below command:
+### Command
+    ps auxZ | grep sshd | awk '{print $1}' | head -n1 > /home/bob/sshd
 
-#### ps auxZ | grep sshd
+### Explanation
+- ps auxZ → show processes with SELinux context
+- grep sshd → filter sshd process
+- awk '{print $1}' → extract SELinux context
+- head -n1 → take first match
+- `>` → save output
 
-Copy the SELinux context from the output and save it in the /home/bob/sshd file.
+</details>
 
-#### vi /home/bob/sshd
+---
 
-For example, if the context is system_u:system_r:initrc_t:s0, then the file contents should be:
+## 🧪 Task 2
 
-#### system_u:system_r:initrc_t:s0
+Task: Enable kernel.modules_disabled runtime parameter.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    sudo sysctl -w kernel.modules_disabled=1
 
-Turn on kernel.modules_disabled kernel runtime parameter, so that loading new kernel modules will be disabled.
+### Explanation
+- sysctl -w → set runtime kernel parameter
+- kernel.modules_disabled=1 → disable loading new modules
 
-Check if the kernel.modules_disabled kernel runtime parameter is turned on.
+</details>
 
-## Solution:
+---
 
-Execute the below command:
+## 🧪 Task 3
 
-#### sysctl -w kernel.modules_disabled=1
+Task: Find SELinux type of /bin/sudo and save it in /home/bob/selabel.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    ls -Z /bin/sudo | awk '{print $1}' | cut -d: -f3 > /home/bob/selabel
 
-Check out the SELinux label for the file stored at /bin/sudo. Ignore the SELinux user and role here.
-What is the SELinux type used on this file? Save its value in /home/bob/selabel file.
+### Explanation
+- ls -Z → show SELinux context
+- awk '{print $1}' → extract full context
+- cut -d: -f3 → extract type field only
+- `>` → save output
+- expected value → sudo_exec_t
 
-Verify the label.
+</details>
 
-## Solution:
+---
 
-Execute the below command:
+## 🧪 Task 4
 
-#### ls -Z /bin/sudo
+Task: Enable kernel parameter net.ipv6.conf.lo.seg6_enabled.
 
-You should see sudo_exec_t in the output. Save it in the /home/bob/selabel file:
+<details>
+<summary>Answer</summary>
 
-#### vi /home/bob/selabel
+### Command
+    sudo sysctl -w net.ipv6.conf.lo.seg6_enabled=1
 
+### Explanation
+- sysctl -w → apply runtime parameter
+- =1 → enable setting
 
-## Task:
+</details>
 
-Use the sysctl command to make sure this kernel runtime parameter is actively enabling its settings:
+---
 
-#### net.ipv6.conf.lo.seg6_enabled
+## 🧪 Task 5
 
-Is kernel runtime parameter enabled?
+Task: Set vm.swappiness to 10 and make it persistent.
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Use the below command:
+### Command
+    sudo sysctl -w vm.swappiness=10
+    echo "vm.swappiness=10" | sudo tee -a /etc/sysctl.conf
+    sudo sysctl -p
 
-#### sysctl -w net.ipv6.conf.lo.seg6_enabled=1
+### Explanation
+- sysctl -w → apply immediately
+- /etc/sysctl.conf → persistent config
+- sysctl -p → reload config
 
+</details>
 
-## Task:
+---
 
-Adjust the value of this kernel runtime parameter, vm.swappiness, to 10.
+## 🧪 Task 6
 
-After you set this to 10, also make the change persistent so that it will be auto-set to this value on the next reboot.
+Task: Change SELinux context of /var/index.html to httpd_sys_content_t.
 
-Is the required value set for vm.swappiness?
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    sudo chcon -t httpd_sys_content_t /var/index.html
 
-Edit the /etc/sysctl.conf file:
+### Explanation
+- chcon → change SELinux context
+- -t → type field
+- httpd_sys_content_t → web server content type
 
-#### vi /etc/sysctl.conf
+</details>
 
-Add the below code in this file and save it:
+---
 
-#### vm.swappiness=10
+## 🧪 Task 7
 
-Apply the changes:
+Task: Temporarily set SELinux to permissive mode.
 
-#### sysctl -p
+<details>
+<summary>Answer</summary>
 
+### Command
+    sudo setenforce 0
 
-## Task:
+### Explanation
+- setenforce → change SELinux mode
+- 0 → permissive (log only, no enforcement)
 
-Change the SELinux context of /var/index.html file to httpd_sys_content_t
+</details>
 
-Is SELinux context updated for the /var/index.html file?
+---
 
-## Solution:
+## 🧪 Task 8
 
-Use the below command:
+Task: Find SELinux roles for staff_u and save them in /home/bob/serole.
 
-#### chcon -t httpd_sys_content_t /var/index.html
+<details>
+<summary>Answer</summary>
 
+### Command
+    semanage user -l | grep staff_u | awk '{print $3}' > /home/bob/serole
 
-## Task:
+### Explanation
+- semanage user -l → list SELinux users
+- grep staff_u → filter user
+- awk '{print $3}' → extract roles field
+- `>` → save output
 
-Temporarily change the SELinux status to Permissive on this system.
+</details>
 
-Check SELinux status.
+---
 
-## Solution:
+## 🧪 Task 9
 
-Execute the below command:
+Task: Restore default SELinux labels for /var/log recursively.
 
-#### sudo setenforce 0
+<details>
+<summary>Answer</summary>
 
+### Command
+    sudo restorecon -R /var/log/
 
-## Task:
+### Explanation
+- restorecon → restore default SELinux context
+- -R → recursive
+- fixes incorrect labels
 
-Identify the SELinux Roles for staff_u SELinux user and save the value(s) in /home/bob/serole file.
-
-Verify the SELinux roles for "staff_u" user.
-
-## Solution:
-
-Execute the below command:
-
-#### semanage user -l
-
-Copy the SELinux Roles value for staff_u user and save it in the /home/bob/serole file:
-
-#### vi /home/bob/serole
-
-
-## Task:
-
-The SELinux labels for the files in /var/log are wrong. Restore the correct (default) labels for every file and subdirectory in the /var/log directory. You only need to fix the SELinux type labels (user and role can be left as they are).
-
-Default labels are restored for /var/log directory?
-
-## Solution:
-
-Run the below command to restore SELinux labels.
-
-#### sudo restorecon -R /var/log/
-
-
+</details>
