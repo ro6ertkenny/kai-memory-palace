@@ -1,187 +1,181 @@
-# Lab - Manage Partitions and Swap Space
+# Manage Partitions & Swap Space — LFCS Lab (Hidden Answers)
 
-## Task:
+---
 
-How do we display block devices such as disks or partitions?
+## 🧠 Mental Model
 
-## Solution:
+- lsblk → visualize block devices (tree view)
+- fdisk / cfdisk → partition editing tools
+- mkswap → format partition as swap
+- swapon / swapoff → enable/disable swap
+- swap = disk used as RAM overflow
 
-Using lsblk command, we can display block devices.
+---
 
+## 🧪 Task 1
 
-## Task:
+Task: How do we display block devices such as disks or partitions?
 
-How do we format a partition as swap space?
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    lsblk
 
-We can format a partition as swap space using the sudo mkswap /dev/vdb3 command where /dev/vdb3 is the partition we want to format.
+### Explanation
+- lsblk → list block devices
+- shows disks, partitions, mountpoints
 
+</details>
 
-## Task:
+---
 
-Identify the name of the virtual disk where / is mounted on this system.
+## 🧪 Task 2
 
-Save the value (only the name without path) in the /root/part file.
+Task: How do we format a partition as swap space?
 
-Does the "/root/part" file have the required data?
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    sudo mkswap /dev/vdb3
 
-Execute the below command to list the partitions on this system:
+### Explanation
+- mkswap → format partition as swap
+- /dev/vdb3 → target partition
 
-#### lsblk
+</details>
 
-For MOUNTPOINT /, look for the partition; for example, if you see an output as below:
+---
 
-NAME                   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
-vda                    252:0    0   10G  0 disk 
-└─vda1                 252:1    0   10G  0 part /
-vdb                    252:16   0    1G  0 disk 
-vdc                    252:32   0    1G  0 disk 
+## 🧪 Task 3
 
-vda1 is the partition in which / is mounted. Copy it and save in a file as asked
+Task: Identify partition where / is mounted and save its name (no path) to /root/part.
 
-#### vi /root/part
+<details>
+<summary>Answer</summary>
 
-The file content should be:
+### Command
+    lsblk | awk '$7=="/" {print $1}' > /root/part
 
-#### vda1
+### Explanation
+- lsblk → list block devices
+- $7=="/" → match mountpoint "/"
+- $1 → partition name
+- `>` → save output
 
+</details>
 
-## Task:
+---
 
-Find out the swapfile used on this system and save its exact path in the /root/swap file.
+## 🧪 Task 4
 
-Does the "/root/swap" file have the required data as needed?
+Task: Find swapfile used and save its path to /root/swap.
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Execute the below command to identify the swapfile:
+### Command
+    swapon --show | awk 'NR>1 {print $1}' > /root/swap
 
-#### swapon --show
+### Explanation
+- swapon --show → list active swap
+- $1 → device/file path
+- `>` → save output
 
-Look for the value under NAME and save it in a file as asked.
+</details>
 
-#### vi /root/swap
+---
 
-For example, if the value is /swapfile.img, then the file content should be:
+## 🧪 Task 5
 
-#### /swapfile.img
+Task: Create three primary partitions on /dev/vdd (10M, 21M, 15M).
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    sudo fdisk /dev/vdd
 
-Create three primary partitions on /dev/vdd.
+### Steps
+- n → new partition
+- p → primary
+- +10M → first partition
+- repeat for:
+    +21M
+    +15M
+- w → write changes
 
-First should have 10MB, second should have 21MB and the third should have 15MB.
+### Verify
+    lsblk
 
-- Verify 10MB partition.
+### Explanation
+- fdisk → interactive partition tool
+- sizes defined with +M
 
-- Verify 21MB partition.
+</details>
 
-- Verify 15MB partition.
+---
 
-## Solution:
+## 🧪 Task 6
 
-Follow the below given steps:
+Task: Format 21MB partition as swap and enable it.
 
-#### fdisk /dev/vdd
+<details>
+<summary>Answer</summary>
 
-If the user is not root, you need to use the command with sudo.
+### Command
+    sudo mkswap /dev/vdd2
+    sudo swapon /dev/vdd2
 
-Now, enter below given responses:
+### Explanation
+- mkswap → prepare swap
+- swapon → activate swap
 
-Command (m for help): n
-Select (default p):  <just-leave-it-default-and-press-enter>
-Partition number (1-4, default 1): <just-leave-it-default-and-press-enter>
-First sector (2048-2097151, default 2048):  <just-leave-it-default-and-press-enter>
-Last sector, +sectors or +size{K,M,G,T,P} (2048-2097151, default 2097151): +10M
-Command (m for help): w
+</details>
 
-You can follow these same steps for all three partitions.
+---
 
-Further, you can verify the created partitions using the below command:
+## 🧪 Task 7
 
-#### lsblk
+Task: Stop using the 21MB partition as swap.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    sudo swapoff /dev/vdd2
 
-Format the 21MB partition as swap. Next, make it active, and tell Linux to start using it as swap memory.
+### Explanation
+- swapoff → disable swap usage
 
-Is "21MB" partition formatted as "swap"?
+</details>
 
-## Solution:
+---
 
-Execute the below commands:
+## 🧪 Task 8
 
-#### mkswap /dev/vdd2
-#### swapon /dev/vdd2
+Task: Resize /dev/vdd3 partition to 21MB.
 
-You can validate with:
+<details>
+<summary>Answer</summary>
 
-#### swapon --show
+### Command
+    sudo cfdisk /dev/vdd
 
-If the user is not root, you need to use the commands with sudo.
+### Steps
+- select /dev/vdd3
+- choose Resize
+- set size → 21M
+- Write → confirm
+- Quit
 
+### Verify
+    lsblk
 
-## Task:
+### Explanation
+- cfdisk → interactive partition editor
+- resize adjusts partition size
+- must write changes to disk
 
-Tell Linux to stop using the 21MB partition as swap.
-
-Has Linux stopped using "21MB" partition as "swap"?
-
-## Solution:
-
-Execute the below command:
-
-#### swapoff /dev/vdd2
-
-You can validate with:
-
-#### swapon --show
-
-If the user is not root, you need to use the command with sudo.
-
-
-## Task:
-
-Resize the /dev/vdd3 partition (which you created earlier) to 21MB.
-
-Has the "/dev/vdd3" partition been resized to "21MB"?
-
-## Solution:
-
-Run the below command:
-
-#### cfdisk /dev/vdd
-
-If the user is not root, you need to use the command with sudo.
-
-You will see some details as below (it can vary from one system to another):
-
-Device             Boot                  Start            End        Sectors         Size        Id Type
->>  Free space                                2048          22527          20480          10M                             
-    /dev/vdd2                                22528          65535          43008          21M        83 Linux
-    /dev/vdd3                                65536         108543          43008          15M        83 Linux
-    Free space                              108544        2097151        1988608         971M
-
-Using arrow keys, select the partition you want to resize. In our case, it's /dev/vdd3. At the bottom, you will see some options as below:
-
-#### [Bootable]  [ Delete ]  [ Resize ]  [  Quit  ]  [  Type  ]  [  Help  ]  [  Write ]  [  Dump  ]
-
-Using arrow keys, select the Resize option and press Enter, adjust the size as needed. For example, in our case, we will set it to 21M and then press Enter again.
-
-#### New size: 21M
-
-Now, using arrow keys, select the Write option and press Enter. It will ask for the confirmation, so enter Yes and press Enter.
-
-#### Are you sure you want to write the partition table to disk? yes
-
-Now, using arrow keys, select the Quit option and press Enter. You are done!!
-
-You can confirm your changes by listing the partitions using the lsblk command.
-
-
-
+</details>
