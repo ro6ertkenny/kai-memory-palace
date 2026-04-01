@@ -4,19 +4,30 @@
 
 Which one of these is also called a mirrored array?
 
-## Solution:
-
+<details><summary>Answer</summary>
 Disks grouped in level 1 RAID is also called a mirrored array.
+</details>
 
+### Explanation:
+- RAID 1 → mirrors data across disks
+- mirrored array → identical data written to multiple disks
+
+---
 
 ## Task:
 
 What command can you use to view a summary status of your RAID arrays?
 
-## Solution:
-
+<details><summary>Answer</summary>
 The /proc/mdstat file contains the summary status of the RAID arrays, so you can use the cat /proc/mdstat command to view a summary status of your RAID arrays.
+</details>
 
+### Explanation:
+- /proc/mdstat → virtual file showing RAID status
+- cat → display file contents
+- shows RAID devices, sync status, and health
+
+---
 
 ## Task:
 
@@ -24,8 +35,7 @@ In your /home/bob directory, you will find a file named archive. List the ACL pe
 
 What permissions are listed for john in this ACL?
 
-## Solution:
-
+<details><summary>Answer</summary>
 You can use the command getfacl archive to get ACL permissions of the file.
 
 # file: archive
@@ -38,7 +48,14 @@ mask::r--
 other::r--
 
 As you can see in the output, John has read only permissions.
+</details>
 
+### Explanation:
+- getfacl → display ACLs
+- user:john:r-- → john has read-only access
+- ACL → extended permissions beyond standard rwx
+
+---
 
 ## Task:
 
@@ -48,8 +65,7 @@ mdadm is already installed in your system which is used for creating, managing, 
 
 Has the required RAID array been created?
 
-## Solution:
-
+<details><summary>Answer</summary>
 Execute the below command:
 
 #### mdadm --create /dev/md0 --level=1 --raid-devices=2 /dev/vdd /dev/vde
@@ -57,7 +73,17 @@ Execute the below command:
 Enter y and press Enter if asked for the confirmation.
 
 Note: You need to use sudo with the command in case of a non-root user.
+</details>
 
+### Explanation:
+- mdadm → manage RAID devices
+- --create → create RAID array
+- /dev/md0 → RAID device name
+- --level=1 → RAID 1 (mirroring)
+- --raid-devices=2 → number of disks
+- /dev/vdd /dev/vde → source disks
+
+---
 
 ## Task:
 
@@ -65,14 +91,21 @@ In your /home/bob directory, you will find a file named specialfile. Add an ACL 
 
 Has the required acl been set for user john?
 
-## Solution:
-
+<details><summary>Answer</summary>
 Execute the below command:
 
 #### setfacl --modify user:john:rw specialfile
 
 Note: You need to use sudo with the command in case of a non-root user.
+</details>
 
+### Explanation:
+- setfacl → modify ACLs
+- --modify → add/update ACL entry
+- user:john:rw → give john read and write
+- specialfile → target file
+
+---
 
 ## Task:
 
@@ -80,14 +113,21 @@ From the file called specialfile, remove the ACL permissions for the user called
 
 Have the required acl permissions been removed for user john?
 
-## Solution:
-
+<details><summary>Answer</summary>
 Execute the below command:
 
 #### setfacl --remove user:john specialfile
 
 Note: You need to use sudo with the command in case of a non-root user.
+</details>
 
+### Explanation:
+- setfacl → manage ACLs
+- --remove → delete ACL entry
+- user:john → target ACL entry
+- specialfile → file being modified
+
+---
 
 ## Task:
 
@@ -95,14 +135,20 @@ To the file called specialfile, add an ACL permission for the group called mail.
 
 Has the required acl been set for group mail?
 
-## Solution:
-
+<details><summary>Answer</summary>
 Execute the below command:
 
 #### setfacl --modify group:mail:rx specialfile
 
 Note: You need to use sudo with the command in case of a non-root user.
+</details>
 
+### Explanation:
+- setfacl → modify ACLs
+- group:mail:rx → read and execute for group
+- specialfile → target file
+
+---
 
 ## Task:
 
@@ -112,17 +158,19 @@ In your /home/bob directory, you will find a directory called collection. Use th
 
 - Were ACL set recursively?
 
-## Solution:
-
+<details><summary>Answer</summary>
 Execute the below command:
 
 #### setfacl --recursive --modify user:john:rwx collection/
 
 Note: You need to use sudo with the command in case of a non-root user.
+</details>
 
-
-
-
+### Explanation:
+- setfacl → modify ACLs
+- --recursive → apply to directory and contents
+- user:john:rwx → full permissions for john
+- collection/ → target directory
 
 
 
