@@ -1,187 +1,243 @@
-# Packet Filtering (UFW) — LFCS Lab (Hidden Answers)
+# Lab - Packet Filtering
 
----
+## Task:
 
-## 🧪 Task 1
+By default, Uncomplicated Firewall (ufw) is disabled. So, do the following before proceeding into the lab.
 
-Task: Enable UFW and allow SSH (port 22).
+1. Turn on ufw
+2. All traffic is blocked by default, so we must allow SSH on port 22 so the lab won't be broken.
 
-<details>
-<summary>Answer</summary>
+Is the UFW firewall tool status active?
 
-### Command
-    sudo ufw enable
-    sudo ufw allow 22
+Is traffic allowed on port 22? 
 
-### Explanation
-- ufw enable → activate firewall
-- allow 22 → allow SSH traffic
-- critical to avoid locking yourself out
+<details><summary>Answer</summary>
+Start ufw with
 
+#### sudo ufw enable
+
+All traffic is blocked by default, so we must allow SSH on port 22 so the lab won't be broken.
+
+#### sudo ufw allow 22
 </details>
 
+### Explanation:
+- ufw → uncomplicated firewall tool
+- enable → turn firewall on
+- allow 22 → permit SSH traffic
+- sudo → run with elevated privileges
+
 ---
 
-## 🧪 Task 2
+## Task:
 
-Task: Allow incoming traffic on port 80.
+Set up a firewall rule to allow incoming traffic to this machine on port 80.
 
-<details>
-<summary>Answer</summary>
+Have incoming connections to port 80 been allowed?
 
-### Command
-    sudo ufw allow 80
+<details><summary>Answer</summary>
+Execute the below command:
 
-### Explanation
-- allow → permit traffic
+#### sudo ufw allow 80
+</details>
+
+### Explanation:
+- ufw allow → permit traffic
 - 80 → HTTP port
-
-</details>
+- sudo → run with elevated privileges
 
 ---
 
-## 🧪 Task 3
+## Task:
 
-Task: Allow incoming traffic on port 53 using TCP.
+Set up a firewall rule to allow incoming traffic to this machine on port 53, through the TCP protocol.
 
-<details>
-<summary>Answer</summary>
+Have incoming connections to port 53 been allowed?
 
-### Command
-    sudo ufw allow 53/tcp
+<details><summary>Answer</summary>
+Execute the below command:
 
-### Explanation
+#### sudo ufw allow 53/tcp
+</details>
+
+### Explanation:
+- ufw allow → permit traffic
 - 53/tcp → DNS over TCP
-- explicitly specify protocol
-
-</details>
+- tcp → protocol specification
+- sudo → run with elevated privileges
 
 ---
 
-## 🧪 Task 4
+## Task:
 
-Task: Deny incoming traffic on port 443 using TCP.
+Set up a firewall rule to deny incoming traffic to this machine on port 443, through the TCP protocol.
 
-<details>
-<summary>Answer</summary>
+Is the rule to deny access through 443/tcp added?
 
-### Command
-    sudo ufw deny 443/tcp
+<details><summary>Answer</summary>
+Execute the below command to finish the task.
 
-### Explanation
-- deny → block traffic
+#### sudo ufw deny 443/tcp
+</details>
+
+### Explanation:
+- ufw deny → block traffic
 - 443/tcp → HTTPS port
-
-</details>
-
----
-
-## 🧪 Task 5
-
-Task: Delete the rule denying traffic on port 443/tcp.
-
-<details>
-<summary>Answer</summary>
-
-### Command
-    sudo ufw delete deny 443/tcp
-
-### Explanation
-- delete → remove matching rule
-- must match rule exactly
-
-</details>
+- tcp → protocol
+- sudo → run with elevated privileges
 
 ---
 
-## 🧪 Task 6
+## Task:
 
-Task: Identify rule number 5.
+Delete a firewall rule denying incoming traffic to this machine on port 443, through the TCP protocol (That is created in previous step).
 
-<details>
-<summary>Answer</summary>
+Is the rule deleted?
 
-### Command
-    sudo ufw status numbered
+<details><summary>Answer</summary>
+Execute the below command
 
-### Explanation
-- shows rules with numbering
-- rule [5] corresponds to:
-    80/tcp (v6) ALLOW IN Anywhere (v6)
-
+#### sudo ufw delete deny 443/tcp
 </details>
+
+### Explanation:
+- ufw delete → remove rule
+- deny 443/tcp → target rule to delete
+- sudo → run with elevated privileges
 
 ---
 
-## 🧪 Task 7
+## Task:
 
-Task: Allow all traffic from IP 207.45.232.181.
+Rules that we add are numbered. What is the rule with number 5?
 
-<details>
-<summary>Answer</summary>
+<details><summary>Answer</summary>
+Execute the below command and check for the rule in number 5.
 
-### Command
-    sudo ufw allow from 207.45.232.181
+#### sudo ufw status numbered
 
-### Explanation
-- allow from → permit all traffic from specific IP
+Output will be shown below.
 
+     To                         Action      From
+     --                         ------      ----
+[ 1] 22                         ALLOW IN    Anywhere                  
+[ 2] 80/tcp                     ALLOW IN    Anywhere                  
+[ 3] 3306                       ALLOW IN    10.0.0.0/24               
+[ 4] 22 (v6)                    ALLOW IN    Anywhere (v6)             
+[ 5] 80/tcp (v6)                ALLOW IN    Anywhere (v6)
 </details>
+
+### Explanation:
+- ufw status numbered → show rules with numbers
+- [5] → rule index
+- allows identification and management of specific rules
 
 ---
 
-## 🧪 Task 8
+## Task:
 
-Task: Allow all traffic from network 10.11.12.0/24.
+Allow all traffic that is coming from the following IP address 207.45.232.181.
 
-<details>
-<summary>Answer</summary>
+Is the rule added to allow access from IP address specified?
 
-### Command
-    sudo ufw allow from 10.11.12.0/24
+<details><summary>Answer</summary>
+Execute the below command to complete this task.
 
-### Explanation
-- CIDR notation → defines network range
-- /24 → 256 IP addresses
-
+#### sudo ufw allow from 207.45.232.181
 </details>
+
+### Explanation:
+- ufw allow from → permit traffic from specific IP
+- 207.45.232.181 → source IP
+- sudo → run with elevated privileges
 
 ---
 
-## 🧪 Task 9
+## Task:
 
-Task: Identify the port configured in rule allowing traffic from 192.168.0.4.
+Allow all traffic coming from any IP in this network range: 10.11.12.0 to 10.11.12.255 (i.e., 10.11.12.0/24). Add the required rule.
 
-<details>
-<summary>Answer</summary>
+Has the required firewall rule been added?
 
-### Command
-    sudo ufw status numbered
+<details><summary>Answer</summary>
+Execute the below command:
 
-### Explanation
-- find rule with source 192.168.0.4
-- associated port is 22
-
+#### sudo ufw allow from 10.11.12.0/24 
 </details>
+
+### Explanation:
+- ufw allow from → permit traffic from network
+- 10.11.12.0/24 → CIDR range
+- sudo → run with elevated privileges
 
 ---
 
-## 🧪 Task 10
+## Task:
 
-Task: Fix rule order so deny from 10.0.0.19 is evaluated before allow rules.
+A rule allow from 192.168.0.4 to any port 22 was added to the firewall, which is the port configured to rule one.
 
-<details>
-<summary>Answer</summary>
+<details><summary>Answer</summary>
+Execute below command and check the output for rule number 1
 
-### Command
-    sudo ufw status numbered
-    sudo ufw delete <rule_number_of_allow>
-    sudo ufw insert 1 deny from 10.0.0.19
+#### sudo ufw status numbered
 
-### Explanation
-- UFW rules are processed top → bottom
-- first match wins
-- insert 1 → place rule at top (highest priority)
-- ensures deny rule is evaluated before allow
-
+Answer is 22
 </details>
+
+### Explanation:
+- ufw status numbered → view rule list with indexes
+- rule 1 → first matching rule
+- port 22 → SSH port
+
+---
+
+## Task:
+
+There's a firewall rule that denies any traffic coming from the 10.0.0.19 IP address. But this rule is in an incorrect spot (after an allow rule for the 10.0.0.0/24 range). So traffic is never denied because the rule is never matched. Correct this mistake.
+
+Is the rule inserted as number 1 ?
+
+<details><summary>Answer</summary>
+First check for number of rule
+
+#### ~ ➜  sudo ufw status numbered
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] 22/tcp                     ALLOW IN    192.168.0.0/24            
+[ 2] 22                         ALLOW IN    192.168.0.4               
+[ 3] 22                         ALLOW IN    Anywhere                  
+[ 4] 80                         ALLOW IN    Anywhere                  
+[ 5] 53/tcp                     ALLOW IN    Anywhere                  
+[ 6] Anywhere                   ALLOW IN    207.45.232.181            
+[ 7] Anywhere                   ALLOW IN    10.11.12.0/24             
+[ 8] 3306                       ALLOW IN    10.0.0.0/24               
+[ 9] 22 (v6)                    ALLOW IN    Anywhere (v6)             
+[10] 80 (v6)                    ALLOW IN    Anywhere (v6)             
+[11] 53/tcp (v6)                ALLOW IN    Anywhere (v6)             
+
+Delete the rule as per requirement
+
+#### ~ ➜  sudo ufw delete 8
+Deleting:
+ allow from 10.0.0.0/24 to any port 3306
+Proceed with operation (y|n)? y
+Rule deleted
+
+Insert rule using the below command
+
+#### ~ ➜ sudo ufw insert 1 deny from 10.0.0.19
+Rule inserted
+
+Check status again
+
+#### ~ ➜ sudo ufw status numbered
+</details>
+
+### Explanation:
+- ufw status numbered → view ordered rules
+- ufw delete 8 → remove incorrect rule
+- ufw insert 1 → insert rule at top priority
+- deny from 10.0.0.19 → block specific IP
+- rule order → first match wins in firewall processing
