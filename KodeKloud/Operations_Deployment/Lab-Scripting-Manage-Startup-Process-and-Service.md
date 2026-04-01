@@ -1,300 +1,384 @@
-# Scripting, Startup Process & Services — LFCS Lab (Hidden Answers)
+# Lab - Scripting, Manage Startup Process and Services
 
----
+## Task:
 
-## 🧪 Task 1
+Schedule this system to power off two hours later from now.
 
-Task: Schedule this system to power off two hours later from now.
+Is this system scheduled to power off two hours from now?
 
-<details>
-<summary>Answer</summary>
+<details><summary>Answer</summary>
+#### sudo shutdown +120
+</details>
 
-### Command
-    sudo shutdown +120
-
-### Explanation
+### Explanation:
 - shutdown → schedule system shutdown
-- +120 → time in minutes (120 = 2 hours)
-
-</details>
+- sudo → run with elevated privileges
+- +120 → time in minutes (120 minutes = 2 hours)
 
 ---
 
-## 🧪 Task 2
+## Task:
 
-Task: Change the system to boot into a graphical desktop by default.
+The system is currently booting to a text-only console.
+Change it to boot to a graphical desktop by default.
 
-<details>
-<summary>Answer</summary>
+Has the system been configured to boot into a graphical desktop by default?
 
-### Command
-    sudo systemctl set-default graphical.target
+<details><summary>Answer</summary>
+#### sudo systemctl set-default graphical.target
+</details>
 
-### Explanation
-- systemctl → manage systemd
+### Explanation:
+- systemctl → manage systemd services and targets
 - set-default → set default boot target
-- graphical.target → GUI mode
-
-</details>
-
----
-
-## 🧪 Task 3
-
-Task: Cancel the scheduled shutdown.
-
-<details>
-<summary>Answer</summary>
-
-### Command
-    sudo shutdown -c
-
-### Explanation
-- -c → cancel scheduled shutdown
-
-</details>
+- graphical.target → graphical desktop environment
+- sudo → run with elevated privileges
 
 ---
 
-## 🧪 Task 4
+## Task:
 
-Task: How do we run script.sh that is located in our current directory?
+Cancel the scheduled shutdown you configured in the beginning.
 
-<details>
-<summary>Answer</summary>
+Has the scheduled shutdown been canceled?
 
-### Command
-    ./script.sh
-
-### Explanation
-- ./ → current directory
-- required because current directory is not in PATH by default
-
+<details><summary>Answer</summary>
+#### sudo shutdown -c
 </details>
+
+### Explanation:
+- shutdown → manage system shutdown
+- -c → cancel a scheduled shutdown
+- sudo → run with elevated privileges
 
 ---
 
-## 🧪 Task 5
+## Task:
 
-Task: What is the correct shebang to add in a script?
+How do we run script.sh that is located in our current directory?
 
-<details>
-<summary>Answer</summary>
+<details><summary>Answer</summary>
+We can run the script like this:
 
-### Command
-    #!/bin/bash
-
-### Explanation
-- #! → shebang (interpreter directive)
-- /bin/bash → specifies Bash shell
-
+#### ./script.sh
 </details>
+
+### Explanation:
+- ./script.sh → execute script in current directory
+- ./ → explicitly reference current directory
+- script.sh → script file being executed
 
 ---
 
-## 🧪 Task 6
+## Task:
 
-Task: Create script.sh under /home/bob that archives dir1 into archive.tar.gz and execute it.
+What is the correct shebang to add in a script?
 
-<details>
-<summary>Answer</summary>
+<details><summary>Answer</summary>
+#!/bin/bash is the correct shebang to add in a script.
+</details>
 
-### Command
-    vi /home/bob/script.sh
+### Explanation:
+- #! → shebang indicator
+- /bin/bash → path to bash interpreter
+- ensures script runs using bash shell
 
-    #!/bin/bash
-    tar -acf archive.tar.gz dir1
+---
 
-    chmod u+x /home/bob/script.sh
-    cd /home/bob
-    ./script.sh
+## Task:
 
-### Explanation
-- tar -a → auto-detect compression (gzip via .gz)
-- -c → create archive
-- -f → output file
+Under bob's home:
+
+Create a script called script.sh. This script should create a tar archive called archive.tar.gz. The script should archive the directory called dir1.
+
+Please make sure you execute the script at least once.
+
+Is script.sh created?
+
+Does the archive have dir1 contents as mentioned in the task?
+
+<details><summary>Answer</summary>
+Create script.sh script:
+
+#### vi script.sh
+
+Add in it the code given below:
+
+#### #!/bin/bash
+#### tar acf archive.tar.gz dir1
+
+Make it executable:
+
+#### chmod u+x script.sh
+
+Finally, execute the script:
+
+#### ./script.sh
+</details>
+
+### Explanation:
+- vi script.sh → create/edit script file
+- #!/bin/bash → define bash interpreter
+- tar → archive tool
+- a → auto-select compression based on extension
+- c → create archive
+- f → specify archive filename
+- archive.tar.gz → output archive
+- dir1 → directory being archived
 - chmod u+x → make script executable
-
-</details>
-
----
-
-## 🧪 Task 7
-
-Task: Find the PID of the sshd.service process and save it in /home/bob/pid.
-
-<details>
-<summary>Answer</summary>
-
-### Command
-    systemctl status sshd.service
-
-### Explanation
-- look for "Main PID" in output
-- manually save it:
-
-    vi /home/bob/pid
-
-- write the PID value (e.g., 134)
-
-</details>
+- ./script.sh → run script
 
 ---
 
-## 🧪 Task 8
+## Task:
 
-Task: Create script2.sh to display if sshd.service is enabled or disabled.
+There is a service unit that automatically starts up the SSH daemon. Use the correct command to find out the PID assigned to the process launched by this service.
 
-<details>
-<summary>Answer</summary>
+Save the PID in /home/bob/pid file.
 
-### Command
-    vi /home/bob/script2.sh
+Is the correct PID saved in the /home/bob/pid file?
 
-    #!/bin/bash
-    systemctl is-enabled sshd.service
+<details><summary>Answer</summary>
+Run the below command:
 
-    chmod u+x /home/bob/script2.sh
-    /home/bob/script2.sh
+#### systemctl status sshd.service
 
-### Explanation
-- systemctl is-enabled → checks if service starts at boot
-- outputs enabled/disabled
+Then look for Main PID and save that value in the /home/bob/pid file:
 
+#### vi /home/bob/pid
+
+For example:
+
+#### 134
 </details>
+
+### Explanation:
+- systemctl status → view service status
+- sshd.service → SSH daemon service
+- Main PID → process ID of running service
+- vi /home/bob/pid → save PID into file manually
 
 ---
 
-## 🧪 Task 9
+## Task:
 
-Task: Create /home/bob/perm.sh to set /home/bob/dir8 permissions to owner execute only.
+Under bob's home:
+Create script2.sh script that displays if the sshd.service unit is enabled or disabled.
 
-<details>
-<summary>Answer</summary>
+Remember to make this script executable and try to execute it at least once to verify your answer.
 
-### Command
-    vi /home/bob/perm.sh
+Check the script.
 
-    #!/bin/bash
-    chmod 0100 /home/bob/dir8
+<details><summary>Answer</summary>
+Create script2.sh script:
 
-    chmod u+x /home/bob/perm.sh
-    /home/bob/perm.sh
+#### vi /home/bob/script2.sh
 
-### Explanation
-- 0100 → owner execute only
-- no permissions for group or others
+Add in it the code given below
 
+#### #!/bin/bash
+#### systemctl is-enabled sshd.service
+
+Make it executable:
+
+#### chmod u+x /home/bob/script2.sh
+
+Finally, execute the script:
+
+#### ./script2.sh
 </details>
+
+### Explanation:
+- vi → create/edit script
+- #!/bin/bash → bash interpreter
+- systemctl is-enabled → check if service is enabled
+- sshd.service → target service
+- chmod u+x → make script executable
+- ./script2.sh → execute script
 
 ---
 
-## 🧪 Task 10
+## Task:
 
-Task: Fix script10.sh so it runs correctly.
+Create a script /home/bob/perm.sh. This script should set permissions on the /home/bob/dir8 directory so that the user owner only has x (execute) permissions; the group owner and others must not have any permissions at all.
 
-<details>
-<summary>Answer</summary>
+Remember to make this script executable and try to execute it at least once to verify your answer.
 
-### Command
-    chmod 700 /home/bob/script10.sh
+Does /home/bob/perm.sh exist?
 
-    vi /home/bob/script10.sh
+Test and execute the script.
 
-    #!/bin/bash
-    cat test.txt
+<details><summary>Answer</summary>
+Create perm.sh script:
 
-### Explanation
-- chmod 700 → make script executable by owner
-- cat test.txt → correct command inside script
+#### vi /home/bob/perm.sh
 
+Add in it the code given below:
+
+#### #!/bin/bash
+#### chmod 0100 /home/bob/dir8
+
+Make it executable:
+
+#### chmod u+x /home/bob/perm.sh
+
+Finally, execute the script:
+
+#### ./perm.sh
 </details>
+
+### Explanation:
+- vi → create/edit script
+- #!/bin/bash → bash interpreter
+- chmod → change file permissions
+- 0100 → user execute only, no permissions for group/others
+- /home/bob/dir8 → target directory
+- chmod u+x → make script executable
+- ./perm.sh → execute script
 
 ---
 
-## 🧪 Task 11
+## Task:
 
-Task: Copy the output of sshd.service status to /home/bob/service.txt.
+We already have a script named script10.sh under /home/bob/. Make sure this script runs without any errors to display the appropriate output.
 
-<details>
-<summary>Answer</summary>
+Is the script correct?
 
-### Command
-    sudo systemctl status sshd.service > /home/bob/service.txt
+<details><summary>Answer</summary>
+Update script permissions to make it executable
 
-### Explanation
-- systemctl status → show service status
-- `>` → redirect output to file
+#### chmod 700 /home/bob/script10.sh
 
+Fix some issues in the /home/bob/script10.sh script and, finally, it should look like this.
+
+#### #!/bin/bash
+#### cat test.txt
 </details>
+
+### Explanation:
+- chmod 700 → give full permissions to owner only
+- script10.sh → script file
+- #!/bin/bash → bash interpreter
+- cat → display file contents
+- test.txt → file being read
 
 ---
 
-## 🧪 Task 12
+## Task:
 
-Task: Mask the apache2 service.
+Copy the output of the sshd.service status to /home/bob/service.txt.
 
-<details>
-<summary>Answer</summary>
+Is the sshd.service status copied to /home/bob/service.txt?
 
-### Command
-    sudo systemctl mask apache2.service
+<details><summary>Answer</summary>
+Execute the below commands:
 
-### Explanation
-- mask → prevents service from being started (even manually)
-
+#### cd /home/bob
+#### sudo systemctl status sshd.service > service.txt
 </details>
+
+### Explanation:
+- cd /home/bob → change directory
+- systemctl status → get service status
+- sshd.service → target service
+- > → redirect output to file
+- service.txt → destination file
 
 ---
 
-## 🧪 Task 13
+## Task:
 
-Task: Unmask the apache2 service.
+apache2 is already installed; mask its service.
 
-<details>
-<summary>Answer</summary>
+Is 'apache2.service' masked ?
 
-### Command
-    sudo systemctl unmask apache2.service
+<details><summary>Answer</summary>
+Execute the below command:
 
-### Explanation
-- unmask → restore ability to start service
-
+#### sudo systemctl mask apache2.service
 </details>
+
+### Explanation:
+- systemctl → manage systemd services
+- mask → disable service completely (cannot be started)
+- apache2.service → target service
+- sudo → run with elevated privileges
 
 ---
 
-## 🧪 Task 14
+## Task:
 
-Task: Fix kkloud.service with the following requirements:
-- Restart always
-- Add stop command
-- Start after sshd.service
+Now, unmask the apache2 service.
 
-<details>
-<summary>Answer</summary>
+Is 'apache2.service' unmasked ?
 
-### Command
-    vi /etc/systemd/system/kkloud.service
+<details><summary>Answer</summary>
+Execute the below command:
 
-### Correct File
-    [Unit]
-    Description=KodeKloud Service
-    After=sshd.service
-
-    [Service]
-    ExecStart=/usr/local/bin/kkloud
-    ExecStop=/usr/local/bin/kkloud --savedata
-    KillMode=process
-    Restart=always
-    Type=simple
-
-    [Install]
-    WantedBy=multi-user.target
-
-### Explanation
-- Restart=always → restart regardless of exit reason
-- ExecStop → defines shutdown command
-- After=sshd.service → dependency ordering
-
+#### sudo systemctl unmask apache2.service
 </details>
+
+### Explanation:
+- systemctl → manage services
+- unmask → re-enable ability to start service
+- apache2.service → target service
+- sudo → run with elevated privileges
+
+---
+
+## Task:
+
+Take a look at the Systemd service called kkloud.service. Find where this file is located, and edit it to correct three mistakes.
+
+Currently, the process managed by this service is only restarted when it fails. Set it to always restart, regardless of the reason why it stopped.
+
+Also, this service file does not include instructions about what command to run when it wants to stop this process. Add another line to instruct that the correct command to stop this process is kkloud --savedata. path to command is /usr/local/bin/kkloud
+
+Finally, this service should start after the sshd.service. Locate the correct line you need to fix and edit it accordingly.
+
+Is the restart policy set to always?
+
+Is the stop command added to the service file?
+
+Is the kkloud.service configured to start after sshd.service ?
+
+<details><summary>Answer</summary>
+Locate the file in the /etc/systemd/system folder with name kkloud.service,
+
+1. Change the restart on failure to always
+
+#### Restart=on-failure --> Restart=always
+
+2. Add the command to run when we want to stop the service in the service section.
+
+#### ExecStop=/usr/local/bin/kkloud --savedata
+
+3. Edit the required line under the Unit section.
+
+#### After=sshd.service
+
+Overall, the file should be like this after making changes.
+
+#### [Unit]
+Description=KodeKloud Service
+After=sshd.service
+
+#### [Service]
+ExecStart=/usr/local/bin/kkloud
+ExecStop=/usr/local/bin/kkloud --savedata
+KillMode=process
+Restart=always
+Type=simple
+
+#### [Install]
+WantedBy=multi-user.target
+</details>
+
+### Explanation:
+- /etc/systemd/system → location of custom service files
+- Restart=always → restart service regardless of exit condition
+- ExecStop → command used to stop the service
+- /usr/local/bin/kkloud → executable path
+- --savedata → argument passed during stop
+- After=sshd.service → define startup order dependency
+- systemd unit sections → [Unit], [Service], [Install] define service behavior
