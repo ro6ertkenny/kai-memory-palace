@@ -1,196 +1,235 @@
-# Lab - Manage System-Wide Environment Profiles and Template User Environments
+# System-Wide Environment Profiles & Template User Environments — LFCS Lab (Hidden Answers)
 
-## Task:
+---
 
-How can we print the value of an environment variable?
+## 🧪 Task 1
 
-## Solution:
+Task: How can we print the value of an environment variable?
 
-We can print the value of an environment variable using echo $MYVAR command.
+<details>
+<summary>Answer</summary>
 
+### Command
+    echo $MYVAR
 
-## Task:
+### Explanation
+- echo → print to terminal
+- $MYVAR → variable reference
 
-Which of the following environment variables holds the value of user's home directory?
+</details>
 
-## Solution:
+---
 
-$HOME environment variable holds the value of user's home directory.
+## 🧪 Task 2
 
+Task: Which environment variable holds the user's home directory?
 
-## Task:
+<details>
+<summary>Answer</summary>
 
-Which of the following files can be used to set the globally available environment variables in a Linux-based system?
+### Command
+    $HOME
 
-## Solution:
+### Explanation
+- $HOME → path to current user’s home directory
 
-The /etc/environment file can be used to set the globally available environment variables in a Linux-based system.
+</details>
 
+---
 
-## Task:
+## 🧪 Task 3
 
-Print our current user's (bob) environment and save the output in the /home/bob/env file.
+Task: Which file sets globally available environment variables?
 
-You can use the redirection to save your command's output in a file: [your-command] > /home/bob/env
+<details>
+<summary>Answer</summary>
 
-Check bob's env.
+### Command
+    /etc/environment
 
-## Solution:
+### Explanation
+- /etc/environment → system-wide environment variables
+- applies to all users
 
-Execute the below command:
+</details>
 
-#### env > /home/bob/env
+---
 
+## 🧪 Task 4
 
-## Task:
+Task: Print current user's environment and save to /home/bob/env.
 
-Add an environment variable for user bob.
+<details>
+<summary>Answer</summary>
 
-The variable name should be MYVAR and its value should be TRUE
+### Command
+    env > /home/bob/env
 
-Is the required environment variable set for user bob?
+### Explanation
+- env → print environment variables
+- `>` → save output to file
 
-## Solution:
+</details>
 
-Edit .bashrc file:
+---
 
-#### vi ~/.bashrc
+## 🧪 Task 5
 
-add the variable at the end of the file:
+Task: Add environment variable MYVAR=TRUE for user bob.
 
-#### export MYVAR=TRUE
+<details>
+<summary>Answer</summary>
 
-save the file and run:
+### Command
+    vi ~/.bashrc
 
-#### source ~/.bashrc
+    export MYVAR=TRUE
 
+    source ~/.bashrc
 
-## Task:
+### Explanation
+- .bashrc → user-specific shell config
+- export → make variable available to child processes
+- source → reload config
 
-Identify the value of GLOBALENV environment variable and save it in the /home/bob/globalenv file.
+</details>
 
-You can use the redirection to save your command's output in a file: [your-command] > /home/bob/globalenv
+---
 
-Is GLOBALENV environment variable value saved in the /home/bob/globalenv file?
+## 🧪 Task 6
 
-## Solution:
+Task: Save value of GLOBALENV variable to /home/bob/globalenv.
 
-Execute the below command:
+<details>
+<summary>Answer</summary>
 
-#### echo $GLOBALENV > /home/bob/globalenv
+### Command
+    echo $GLOBALENV > /home/bob/globalenv
 
+### Explanation
+- echo → print variable
+- `>` → redirect output to file
 
-## Task:
+</details>
 
-Whenever we add a new user to the system, some files are copied from a template directory to the user's home directory.
+---
 
-Manually copy those files into the /home/bob/default_data directory.
+## 🧪 Task 7
 
-Is required data copied?
+Task: Copy default user template files into /home/bob/default_data.
 
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    sudo cp /etc/skel/.bash* /home/bob/default_data/
 
-Execute the below command:
+### Explanation
+- /etc/skel → template directory for new users
+- cp → copy files
+- .bash* → hidden bash config files
 
-#### sudo cp /etc/skel/.bash* /home/bob/default_data/
+</details>
 
+---
 
-## Task:
+## 🧪 Task 8
 
-Modify the system-wide environment file and make sure that the variable GLOBALOPTION is set to this value: ON. Otherwise, after you modify that file, any user that logs in and types…
+Task: Set GLOBALOPTION=ON system-wide.
 
-#### echo $GLOBALOPTION
+<details>
+<summary>Answer</summary>
 
-should get this result:
+### Command
+    sudo vi /etc/environment
 
-#### ON
+    GLOBALOPTION=ON
 
-Is the required variable updated/added?
+### Explanation
+- /etc/environment → global variables
+- applies to all users on login
+- no export needed in this file
 
-## Solution:
+</details>
 
-Edit the /etc/environment file:
+---
 
-#### sudo vi /etc/environment
+## 🧪 Task 9
 
-Save the below line at the end of the file:
+Task: Display "Welcome to our server!" for all users on login.
 
-#### GLOBALOPTION=ON
+<details>
+<summary>Answer</summary>
 
-Then execute the following command on the terminal for the changes to take effect:
+### Command
+    sudo vi /etc/profile.d/welcome.sh
 
-#### source /etc/environment
+    echo "Welcome to our server!"
 
+### Explanation
+- /etc/profile.d/ → scripts run at login
+- .sh file → executed for all users
 
-## Task:
+</details>
 
-Make sure that this command gets executed for any user that logs in to the system:
+---
 
-#### echo Welcome to our server!
+## 🧪 Task 10
 
-Are the required changes made?
+Task: Ensure new users get a README file in their home directory.
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Create a file with .sh extension at location /etc/profile.d/, for example:
+### Command
+    sudo touch /etc/skel/README
 
-#### sudo vi /etc/profile.d/welcome.sh
+### Explanation
+- /etc/skel → template copied to new users
+- README → automatically included
 
-And save in it the line given below:
+</details>
 
-#### echo "Welcome to our server!"
+---
 
+## 🧪 Task 11
 
-## Task:
+Task: Set LFCS variable for all users.
 
-Make sure that every time a new user account is added to the system, a file called README is copied to the new user's home directory.
+<details>
+<summary>Answer</summary>
 
-Are the required changes made?
+### Command
+    sudo vi /etc/environment
 
-## Solution:
+    LFCS="Welcome to the KodeKloud LFCS Labs!"
 
-Whenever we create a new user in Linux, the files in the /etc/skel directory get copied into the user's home. So, we can create a README in the /etc/skel directory so that it gets copied to the newly created user's home.
-Execute the below command to do so:
+### Explanation
+- /etc/environment → system-wide variable
+- quotes required for spaces in value
 
-#### sudo touch /etc/skel/README
+</details>
 
+---
 
-## Task:
+## 🧪 Task 12
 
-Set a variable named LFCS with value Welcome to the KodeKloud LFCS Labs! for every user that logs into this system.
+Task: Add $HOME/.config/bin to PATH for user bob.
 
-Note: You may need to login again to make the changes take effect, so run sudo su - <current-user-name>.
+<details>
+<summary>Answer</summary>
 
-Has LFCS variable been set?
+### Command
+    vi /home/bob/.bashrc
 
-## Solution:
+    export PATH="$HOME/.config/bin:$PATH"
 
-Edit the /etc/environment file:
+    source /home/bob/.bashrc
 
-#### sudo vi /etc/environment
+### Explanation
+- PATH → executable search path
+- prepend custom directory
+- export → make available to shell
+- source → apply changes immediately
 
-Add the below line at the end of the file:
-
-#### LFCS=Welcome to the KodeKloud LFCS Labs!
-
-
-## Task:
-
-Add the value of $PATH variable for user bob to include $HOME/.config/bin location in the path.
-
-Has PATH been updated for user bob?
-
-## Solution:
-
-Edit the .bashrc file:
-
-#### vi /home/bob/.bashrc
-
-Add the PATH variable value so that it looks similar to this and save it:
-
-#### PATH="$HOME/.config/bin:$PATH"
-
-Source .bashrc:
-
-#### source ~/.bashrc
+</details>
