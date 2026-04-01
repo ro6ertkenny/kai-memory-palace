@@ -1,177 +1,249 @@
-# Lab - Schedule Tasks
+# Schedule Tasks — LFCS Lab (Hidden Answers)
 
-## Task:
+---
 
-As per the cron given below:
+## 🧪 Task 1
+
+Task: As per the cron below:
 
 0 3 15 * * /usr/bin/touch test_passed
 
-When will /usr/bin/touch test_passed command run?
+When will this run?
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-On the 15th of each month, at 3 AM
+### Command
+    0 3 15 * *
 
+### Explanation
+- minute = 0
+- hour = 3
+- day = 15
+- month = *
+- day of week = *
 
-## Task:
+→ runs at 03:00 on the 15th of every month
 
-We're logged in as the user called alex. How do we see the crontab for theroot user?
+</details>
 
-## Solution:
+---
 
-Using the sudo crontab -l command, we can see the crontab for the root user.
+## 🧪 Task 2
 
+Task: As user alex, how do we see the crontab for root?
 
-## Task:
+<details>
+<summary>Answer</summary>
 
-Which file can we analyze to check if anacron jobs have run successfully?
+### Command
+    sudo crontab -l
 
-## Solution:
+### Explanation
+- crontab -l → list cron jobs
+- sudo → access root's crontab
 
-The /var/log/cron file contains the information about anacron jobs run.
+</details>
 
+---
 
-## Task:
+## 🧪 Task 3
 
-How can we force anacron to rerun all jobs, regardless of when they were last executed?
+Task: Which file contains logs for anacron jobs?
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-We can force anacron to rerun all jobs, regardless of when they were last executed using sudo anacron -n -f command.
+### Command
+    /var/log/cron
 
+### Explanation
+- /var/log/cron → contains cron and anacron job logs (distro-dependent)
 
-## Task:
+</details>
 
-What is the command to see the jobs that are scheduled to run in at utility?
+---
 
-Using the correct command, identify the currently scheduled jobs under user bob and save the command output in the /home/bob/at_jobs.txt file.
+## 🧪 Task 4
 
-Verify the "/home/bob/at_jobs.txt" file.
+Task: Force anacron to rerun all jobs.
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Execute the below command:
+### Command
+    sudo anacron -n -f
 
-#### atq > /home/bob/at_jobs.txt
+### Explanation
+- -n → run jobs now
+- -f → force execution regardless of timestamps
 
+</details>
 
-## Task:
+---
 
-Remove all at jobs that exist for the user bob.
+## 🧪 Task 5
 
-Have all at jobs been removed?
+Task: Show all at jobs for user bob and save output to /home/bob/at_jobs.txt.
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Identify the jobid using atq command:
+### Command
+    atq > /home/bob/at_jobs.txt
 
-Remove the job using jobid; for example, if jobid is 3, then execute the below command:
+### Explanation
+- atq → list scheduled at jobs
+- `>` → redirect output to file
 
-#### atrm 3
+</details>
 
+---
 
-## Task:
+## 🧪 Task 6
 
-Add this command to the crontab of root:
+Task: Remove all at jobs for user bob.
 
-#### /usr/bin/touch test_passed
+<details>
+<summary>Answer</summary>
 
-Make it run every day at 21:30
+### Command
+    atq | awk '{print $1}' | xargs atrm
 
-Is the required cron added?
+### Explanation
+- atq → list jobs
+- awk '{print $1}' → extract job IDs
+- xargs atrm → remove each job
 
-## Solution:
+</details>
 
-Execute the sudo crontab -e command and add the code given below.
+---
 
-#### 30 21 * * * /usr/bin/touch test_passed
+## 🧪 Task 7
 
+Task: Add cron job for root to run /usr/bin/touch test_passed daily at 21:30.
 
-## Task:
+<details>
+<summary>Answer</summary>
 
-Add an anacron job with the following specifications:
+### Command
+    sudo crontab -e
 
-A. It should run once every 10 days.
+    30 21 * * * /usr/bin/touch test_passed
 
-B. It should have 5 minutes of delay.
+### Explanation
+- 30 → minute
+- 21 → hour (9:30 PM)
+- * * * → every day
 
-C. The job id should be db_cleanup.
+</details>
 
-D. The command to run is /usr/bin/touch /root/anacron_created_this.`
+---
 
-Is the required anacron added?
+## 🧪 Task 8
 
-## Solution:
+Task: Add an anacron job:
 
-Save the line given below in the /etc/anacrontab file.
+- every 10 days
+- 5 minute delay
+- job id = db_cleanup
+- command = /usr/bin/touch /root/anacron_created_this
 
-#### sudo vim /etc/anacrontab
+<details>
+<summary>Answer</summary>
 
-and add below line to file.
+### Command
+    sudo vi /etc/anacrontab
 
-#### 10 5 db_cleanup /usr/bin/touch /root/anacron_created_this
+    10 5 db_cleanup /usr/bin/touch /root/anacron_created_this
 
+### Explanation
+- 10 → run every 10 days
+- 5 → delay in minutes
+- db_cleanup → job identifier
+- command → executed task
 
-## Task:
+</details>
 
-Using the root user, schedule the below command to run at 15:30 August 20 2054 by using at utility:
+---
 
-#### /usr/bin/touch atscheduler
+## 🧪 Task 9
 
-Has the required command been scheduled to run?
+Task: Schedule /usr/bin/touch atscheduler to run at 15:30 August 20 2054 using at.
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Switch to the root user using the sudo -i command. Then execute the command
-at 15:30 August 20 2054.
+### Command
+    sudo -i
+    at 15:30 Aug 20 2054
 
-Add the /usr/bin/touch atscheduler line and then save it by pressing CTRL+D.
+    /usr/bin/touch atscheduler
+    Ctrl+D
 
+### Explanation
+- at → schedule one-time job
+- Ctrl+D → save and exit input
 
-## Task:
+</details>
 
-Using crontab utility, add a cron for user root to run the below command:
+---
 
-#### /usr/bin/touch monthly
+## 🧪 Task 10
 
-Make it run at 12:00AM on the 1st of every month.
+Task: Add cron for root to run /usr/bin/touch monthly at 12:00AM on the 1st of every month.
 
-Is the required cron added?
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    sudo crontab -e
 
-Execute the command sudo crontab -e and add the code given below.
+    0 0 1 * * /usr/bin/touch monthly
 
-#### 0 0 1 * * /usr/bin/touch monthly
+### Explanation
+- 0 0 → midnight
+- 1 → first day of month
 
+</details>
 
-## Task:
+---
 
-Using crontab utility, add a cron for user root to run the below command:
+## 🧪 Task 11
 
-#### /usr/bin/touch weekly
+Task: Add cron for root to run /usr/bin/touch weekly at 11:00AM every Sunday.
 
-Make it run at 11:00AM on every Sunday.
+<details>
+<summary>Answer</summary>
 
-Is the required cron added?
+### Command
+    sudo crontab -e
 
-## Solution:
+    0 11 * * 0 /usr/bin/touch weekly
 
-Execute the command sudo crontab -e and add the code given below.
+### Explanation
+- 0 → Sunday (also can be 7)
+- 11 → 11 AM
 
-#### 0 11 * * 0 /usr/bin/touch weekly
+</details>
 
+---
 
-## Task:
+## 🧪 Task 12
 
-Add a cron for the user bob to execute the sudo /usr/bin/systemctl restart nginx command on Sundays every week at 6am and 11pm.
+Task: Add cron for user bob to run "sudo /usr/bin/systemctl restart nginx" at 6am and 11pm every Sunday.
 
-Has the required cron been added?
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    crontab -e
 
-Execute the crontab -e command and add the code given below.
+    0 6,23 * * 0 sudo /usr/bin/systemctl restart nginx
 
-#### 0 6,23 * * 0 sudo /usr/bin/systemctl restart nginx
+### Explanation
+- 6,23 → 6 AM and 11 PM
+- * * 0 → every Sunday
+- sudo → requires proper sudo permissions in cron environment
 
-
+</details>
