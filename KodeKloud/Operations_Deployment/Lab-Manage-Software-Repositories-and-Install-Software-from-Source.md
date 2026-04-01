@@ -1,140 +1,152 @@
-# Lab: Manage Software, Repositories & Install Software from Source
+# Manage Software, Repositories & Install from Source — LFCS Lab (Hidden Answers)
 
-## Task:
+---
 
-What is the difference between "apt update" and "apt upgrade"?
+## 🧪 Task 1
 
-## Solution:
+Task: What is the difference between "apt update" and "apt upgrade"?
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    apt update
+    apt upgrade
 
-Install the Apache web server.
+### Explanation
+- apt update → refresh package index (what versions are available)
+- apt upgrade → install newer versions of already installed packages
+- update = "what’s available"
+- upgrade = "install updates"
 
-To find the package you need, you can search for this text: apache http server. In your search command, you can wrap this search string between " " double quotes to get fewer results and find the package easier.
+</details>
 
-Is apache webserver installed?
+---
 
-## Solution:
+## 🧪 Task 2
 
-#### sudo apt search "apache http server"
+Task: Install the Apache web server.
 
-Install the Apache web server
+<details>
+<summary>Answer</summary>
 
-#### sudo apt update 
-#### sudo apt install apache2
+### Command
+    sudo apt search "apache http server"
+    sudo apt update
+    sudo apt install apache2
 
+### Explanation
+- apt search → find package name
+- apt update → refresh repo metadata
+- apt install apache2 → install Apache web server
 
-## Task:
+</details>
 
-Find out the name of the package that "/bin/ls" belongs to and save it in package.txt under /home/bob.
+---
 
-Is the name of the package that /bin/ls belongs to stored in /home/bob/package.txt?
+## 🧪 Task 3
 
-## Solution:
+Task: Find which package /bin/ls belongs to and save it in /home/bob/package.txt.
 
-We can find the package by
+<details>
+<summary>Answer</summary>
 
-#### dpkg --search /bin/ls
+### Command
+    dpkg -S /bin/ls > /home/bob/package.txt
 
-and save the output to below file
+### Explanation
+- dpkg -S → search which package owns a file
+- /bin/ls → file to search
+- `>` → save output to file
 
-#### vi /home/bob/package.txt
+</details>
 
+---
 
-## Task:
+## 🧪 Task 4
 
-List the files that belong to the coreutils package. Filter out the entries that were installed in the /bin directory. You will see one file in this /bin directory with a name that begins with the letter "u". Identify the complete path of this file in the /bin directory and save it in name.txt file under /home/bob?
+Task: Find files from coreutils in /bin, identify the one starting with "u", and save full path in /home/bob/name.txt.
 
-Is the package name saved to the /home/bob/name.txt file?
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    dpkg -L coreutils | grep ^/bin
 
-We can list the files that belong to the coreutils package by running the below command.
+### Explanation
+- dpkg -L → list files from package
+- coreutils → package name
+- grep ^/bin → filter only /bin entries
+- expected match → /bin/uname
 
-dpkg --listfiles coreutils | grep ^/bin
-Identify the package name that begins with the letter u (/bin/uname) and save the answer to
+Save result:
 
-#### vi /home/bob/name.txt
+    echo /bin/uname > /home/bob/name.txt
 
+</details>
 
-## Task:
+---
 
-Uninstall the package ziptool and its dependency package(s) from the system.
+## 🧪 Task 5
 
-Are ziptool and its dependencies removed?
+Task: Uninstall ziptool and its dependencies.
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Execute the below command and observe the output
+### Command
+    sudo apt-get remove --auto-remove -y ziptool
 
-#### sudo apt-get remove --auto-remove -y ziptool
+### Explanation
+- remove → uninstall package
+- --auto-remove → remove unused dependencies
+- -y → auto-confirm
 
-Observe the highlighted section
-#### The following packages will be REMOVED:
-####  libzip4 ziptool
+</details>
 
+---
 
-## Task:
+## 🧪 Task 6
 
-In rare cases, we may need to get packages that were available on an older Ubuntu distribution.
+Task: Add Ubuntu 20.04 (focal) repository and update APT.
 
-Configure the package manager with this extra repository:
+<details>
+<summary>Answer</summary>
 
-#### deb http://us.archive.ubuntu.com/ubuntu/ focal main
+### Command
+    sudo vi /etc/apt/sources.list
 
-This will make packages from Ubuntu 20.04 (codenamed Focal Fossa) available on this system.
+    deb http://us.archive.ubuntu.com/ubuntu/ focal main
 
-Don't forget to also update APT's local cache
+    sudo apt update
 
-Is the information on the remote repository focal available now?
+### Explanation
+- sources.list → repo configuration file
+- deb → repository entry
+- apt update → refresh package list with new repo
 
-## Solution:
+</details>
 
-Add this repository information to the /etc/apt/sources.list file.
+---
 
-#### bob@ubuntu-host /etc/apt🔒 ➜  sudo vim sources.list
+## 🧪 Task 7
 
-And add the repo
+Task: Build and install tmux from source in /home/bob/tmux.
 
-#### deb http://us.archive.ubuntu.com/ubuntu/ focal main
+<details>
+<summary>Answer</summary>
 
-Run the below command
+### Command
+    cd /home/bob/tmux
+    ./autogen.sh
+    ./configure
+    make
+    sudo make install
 
-#### sudo apt update 
+### Explanation
+- autogen.sh → generate build system files
+- configure → prepare build environment
+- make → compile source code
+- make install → install compiled binaries into system
 
-
-## Task:
-
-In the tmux directory, you will find the source code for the tmux application. All compilation tools and libraries were already installed for you.
-
-1. Build the application (compile source code).
-2. Install it on the system.
-
-Is tmux application installed?
-
-## Solution:
-
-Navigate to the /home/bob/tmux directory and follow the below steps to install an application from the binary.
-
-#### cd tmux
-
-Run autogen.sh to generate the necessary build files
-
-#### sudo ./autogen.sh
-
-Configure the build
-
-#### sudo ./configure
-
-Compile the source code
-
-#### sudo make
-
-Install the application
-
-#### sudo make install
-
-Now access it by running command
-
-#### tmux
+</details>
