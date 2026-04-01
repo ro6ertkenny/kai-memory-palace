@@ -4,10 +4,15 @@
 
 From the listed options, select the path for default NFS configuration file
 
-## Solution:
-
+<details><summary>Answer</summary>
 /etc/exports is the default NFS configuration file.
+</details>
 
+### Explanation:
+- /etc/exports → main NFS server configuration file
+- defines which directories are shared and with whom
+
+---
 
 ## Task:
 
@@ -17,8 +22,7 @@ Note: Make sure you reexport the configuration file using exportfs -r.
 
 Is "/home" shared in read-only mode for clients in the "10.0.0.0/24" CIDR range?
 
-## Solution:
-
+<details><summary>Answer</summary>
 - Open the NFS server configuration file: vi /etc/exports
 - Add the following line: /home 10.0.0.0/24(ro)
 - Save the file and exit the text editor.
@@ -30,14 +34,21 @@ Is "/home" shared in read-only mode for clients in the "10.0.0.0/24" CIDR range?
 Now, the "/home" directory is shared in read-only mode for clients in the specified CIDR range.
 
 Note: You need to use sudo with the commands if the user is not root.
+</details>
 
+### Explanation:
+- /etc/exports → define NFS shares
+- (ro) → read-only access
+- exportfs -r → reload export configuration
+- systemctl restart nfs-server → apply changes
+
+---
 
 ## Task:
 
 Inspect the configuration file for the newly established NFS share on the /homedirectory. Identify the IP address specified for which access to /home is configured.
 
-## Solution:
-
+<details><summary>Answer</summary>
 To identify the IP address configured for the /home NFS share, inspect the NFS server configuration file. Use the following command to view the relevant information.
 
 grep "/home" /etc/exports
@@ -46,7 +57,15 @@ grep "/home" /etc/exports
 /home 127.0.0.1(ro)
 
 As you can see, 127.0.0.1 is the IP for which /home is shared.
+</details>
 
+### Explanation:
+- grep → search file for pattern
+- "/home" → filter relevant entries
+- /etc/exports → NFS config file
+- shows allowed IPs and permissions
+
+---
 
 ## Task:
 
@@ -58,23 +77,34 @@ For this step, manually mount the NFS share with the following properties:
 
 Is 127.0.0.1:/home mounted on /mnt ?
 
-## Solution:
-
+<details><summary>Answer</summary>
 Execute the following command to manually mount the NFS share:
 
 #### mount 127.0.0.1:/home /mnt
 
 Note: You need to use sudo with the command if the user is not root.
+</details>
 
+### Explanation:
+- mount → attach filesystem
+- 127.0.0.1:/home → NFS server and share
+- /mnt → local mount point
+
+---
 
 ## Task:
 
 Which file from the below options needs to be modified in order to automatically mount an NFS share at system startup?
 
-## Solution:
-
+<details><summary>Answer</summary>
 To automatically mount an NFS share at system startup, you need to modify the /etc/fstab file on the client machine.
+</details>
 
+### Explanation:
+- /etc/fstab → defines mounts at boot
+- used for local and remote (NFS) mounts
+
+---
 
 ## Task:
 
@@ -87,8 +117,7 @@ In the previous step, we have manually mounted NFS share. For this step, configu
 
 Is entry added to /fstab file to automatically share /home from 127.0.0.1?
 
-## Solution:
-
+<details><summary>Answer</summary>
 To automatically mount the NFS share at system startup, add an entry to the "/etc/fstab" file. Edit the file with a text editor su
 ch as nano or vim:
 
@@ -101,16 +130,30 @@ Add the following line to the end of the file:
 #### 127.0.0.1:/home /mnt nfs defaults 0 0
 
 Save the file and exit the text editor.
+</details>
 
+### Explanation:
+- 127.0.0.1:/home → NFS server and share
+- /mnt → local mount point
+- nfs → filesystem type
+- defaults → standard mount options
+- /etc/fstab → persistent mount configuration
+
+---
 
 ## Task:
 
 Can a single entry in "/etc/exports" be used to share the same file directory with two different IPs by specifying them?
 
-## Solution:
-
+<details><summary>Answer</summary>
 Yes, you can add a single entry in "/etc/exports" to share the same file directory with two different IPs by specifying them in the entry separated by a space
+</details>
 
+### Explanation:
+- /etc/exports → supports multiple clients per entry
+- space-separated IPs → multiple access rules in one line
+
+---
 
 ## Task:
 
@@ -126,8 +169,7 @@ Note: Make sure you reexport the configuration file using exportfs -r.
 
 - Is exportfs -v showing the updated nfs shares?
 
-## Solution:
-
+<details><summary>Answer</summary>
 To achieve the specified NFS share configurations, add the following entry to the "/etc/exports" file on the NFS server:
 
 #### /home 192.0.0.0/24(ro) 127.0.0.10(rw,no_root_squash)
@@ -138,8 +180,13 @@ To achieve the specified NFS share configurations, add the following entry to th
 #### exportfs -r
 
 Note: You need to use sudo with the command if the user is not root.
+</details>
 
-
+### Explanation:
+- /etc/exports → define NFS shares
+- 192.0.0.0/24(ro) → read-only network access
+- 127.0.0.10(rw,no_root_squash) → full access with root privileges preserved
+- exportfs -r → reload NFS exports
 
 
 
