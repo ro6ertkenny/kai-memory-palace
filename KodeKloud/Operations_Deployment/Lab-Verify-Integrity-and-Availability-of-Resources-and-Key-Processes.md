@@ -1,105 +1,123 @@
-# Lab - Verify Integrity and Availability of Resources and Key Processes
+# Verify Integrity & Availability of Resources — LFCS Lab (Hidden Answers)
 
-## Task:
+---
 
-Identify what % space of / partition is in use on our system. Save the value in the /home/bob/used file.
+## 🧪 Task 1
 
-For example, if the used space is 10%, then the file content should be 10%.
+Task: Identify what % space of / partition is in use and save it in /home/bob/used.
 
-Verify the /home/bob/used file.
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    df / | awk 'NR==2 {print $5}' > /home/bob/used
 
-Execute the below command and copy the used space value:
+### Explanation
+- df / → disk usage for root partition
+- awk 'NR==2 {print $5}' → second line, 5th column (used %)
+- `>` → save output to file
 
-#### df /
+</details>
 
-Save the value in the /home/bob/used file:
+---
 
-#### vi /home/bob/used
+## 🧪 Task 2
 
+Task: Find disk usage of /bin and save it in /home/bob/bin.
 
-## Task:
+<details>
+<summary>Answer</summary>
 
-Figure out how much storage space the /bin/ directory is using and save the value in the /home/bob/bin file.
+### Command
+    du -sh /bin | awk '{print $1}' > /home/bob/bin
 
-Verify the /home/bob/bin file.
+### Explanation
+- du → disk usage
+- -s → summary
+- -h → human readable
+- awk '{print $1}' → extract size only
+- `>` → save output
 
-## Solution:
+</details>
 
-Execute the below command and copy the required value:
+---
 
-#### du -sh /bin/
+## 🧪 Task 3
 
-Save the value in the /home/bob/bin file:
+Task: Find total system memory (in MB) and save it in /home/bob/memory.
 
-#### vi /home/bob/bin
+<details>
+<summary>Answer</summary>
 
+### Command
+    free --mega | awk '/Mem:/ {print $2}' > /home/bob/memory
 
-## Task:
+### Explanation
+- free --mega → memory in MB
+- /Mem:/ → match memory line
+- {print $2} → total memory column
+- `>` → save result
 
-Use the correct command to check out the memory on this system (in megabytes). In /home/bob/memory file, save the total amount of RAM that this system has.
+</details>
 
-For example, if you see 512 in the command's output, the file contents should be 512
+---
 
-Verify the /home/bob/memory file.
+## 🧪 Task 4
 
-## Solution:
+Task: Find system uptime and save only the time value in /home/bob/up.
 
-Execute the below command and copy the required value:
+<details>
+<summary>Answer</summary>
 
-#### free --mega
+### Command
+    uptime | awk -F'(up |,)' '{print $2}' | sed 's/ //g' > /home/bob/up
 
-Save the value in the /home/bob/memory file:
+### Explanation
+- uptime → system uptime info
+- awk -F'(up |,)' → split around "up" and comma
+- {print $2} → extract uptime value
+- sed 's/ //g' → remove spaces
+- `>` → save output
 
-#### vi /home/bob/memory
+</details>
 
+---
 
-## Task:
+## 🧪 Task 5
 
-Use the correct command to check out how long this system has been up. In the /home/bob/up file, save the time value in hours, minutes, or days (whichever is applicable).
+Task: Find CPU cores per socket and save value in /home/bob/cpu.
 
-For example, if you see 1:07 in the command's output, the file content should be 1.
-Similarly, if you see something like 51 min in the command's output, the file content should be 51min (without any space).
+<details>
+<summary>Answer</summary>
 
-Verify the /home/bob/up file.
+### Command
+    lscpu | awk -F: '/Core\\(s\\) per socket/ {gsub(/ /,"",$2); print $2}' > /home/bob/cpu
 
-## Solution:
+### Explanation
+- lscpu → CPU info
+- match "Core(s) per socket"
+- remove spaces with gsub
+- print value only
+- `>` → save result
 
-Execute the below command and copy the required value:
+</details>
 
-#### uptime
+---
 
-Save the value in the /home/bob/up file:
+## 🧪 Task 6
 
-#### vi /home/bob/up
+Task: Check XFS filesystem on /dev/vdd for errors and save output to /home/bob/fscheck.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    sudo xfs_repair -n /dev/vdd > /home/bob/fscheck 2>&1
 
-Use the correct command to identify the CPU core(s) per socket on this system. Save its value in the /home/bob/cpu file.
+### Explanation
+- xfs_repair → check/repair XFS filesystem
+- -n → no modify (check only)
+- `>` → redirect standard output
+- `2>&1` → include error output
 
-Verify the /home/bob/cpu file.
-
-## Solution:
-
-Execute the below command and copy the required value:
-
-#### lscpu
-
-Save the value in the /home/bob/cpu file:
-
-#### vi /home/bob/cpu
-
-
-## Task:
-
-On /dev/vdd, we have an XFS filesystem.Use the correct command to check this filesystem for errors and save the output in /home/bob/fscheck file.
-
-Has the required file system been checked for errors?
-
-## Solution:
-
-Execute the below command:
-
-#### sudo xfs_repair -n /dev/vdd > /home/bob/fscheck 2>&1
+</details>
