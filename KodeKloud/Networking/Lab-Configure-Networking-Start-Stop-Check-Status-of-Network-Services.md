@@ -1,307 +1,293 @@
-# Lab - Configure Networking, Start/Stop/Check Status of Network Services
+# Configure Networking & Network Services — LFCS Lab (Hidden Answers)
 
-## Task:
+---
 
-Where do we configure static hostname resolution?
+## 🧪 Task 1
 
-## Solution:
+Task: Where do we configure static hostname resolution?
 
-We can configure static hostname resolution in /etc/hosts file.
+<details>
+<summary>Answer</summary>
 
+### Command
+    /etc/hosts
 
-## Task:
+### Explanation
+- /etc/hosts → local hostname-to-IP mapping
+- used before DNS lookup
 
-How do we see what processes on our system are listening for incoming network connections, on the TCP and UDP protocols?
+</details>
 
-## Solution:
+---
 
-Using sudo ss -tunlp command we can see what processes on our system are listening for incoming network connections, on the TCP and UDP protocols.
+## 🧪 Task 2
 
+Task: How do we see processes listening on TCP and UDP ports?
 
-## Task:
+<details>
+<summary>Answer</summary>
 
-Identify the IP address of the eth0 interface on our current system.
+### Command
+    sudo ss -tunlp
 
-Create a file called /home/bob/ip and save the ip address value (with subnet) in it.
+### Explanation
+- ss → socket statistics
+- -t → TCP
+- -u → UDP
+- -n → numeric (no DNS resolution)
+- -l → listening sockets
+- -p → show process info
 
-Is the IP address saved in the /home/bob/ip file?
+</details>
 
-## Solution:
+---
 
-Execute the below command:
+## 🧪 Task 3
 
-#### ip a
+Task: Identify IP address of eth0 and save it in /home/bob/ip.
 
-Look for the IP address of eth0 interface and copy it:
+<details>
+<summary>Answer</summary>
 
-Now, create the required file and save the IP value in it:
+### Command
+    ip -o -f inet addr show eth0 | awk '{print $4}' > /home/bob/ip
 
-#### vi /home/bob/ip
+### Explanation
+- ip addr → show interface info
+- -o → one-line output
+- -f inet → IPv4 only
+- awk '{print $4}' → extract IP/CIDR
+- `>` → save output
 
-For example, if the IP address is 172.16.1.0/24, then add it in the file:
+</details>
 
-#### 172.16.1.0/24
+---
 
-Finally, save the file.
+## 🧪 Task 4
 
+Task: Identify default gateway and save only IP in /home/bob/gateway.txt.
 
-## Task:
+<details>
+<summary>Answer</summary>
 
-Identify the default gateway on this system and store the output (only the IP address) in the /home/bob/gateway.txt file
+### Command
+    ip route | awk '/default/ {print $3}' > /home/bob/gateway.txt
 
-Has the default gateway value been stored in the /home/bob/gateway.txt file?
+### Explanation
+- ip route → routing table
+- default → default gateway line
+- $3 → gateway IP
+- `>` → save output
 
-## Solution:
+</details>
 
-Execute the below command:
+---
 
-#### ip route show
+## 🧪 Task 5
 
-Look for the line that contains default via string and copy the IP address you see after default via in this line:
-Now, create the required file and save the IP address value in it:
+Task: Find PID of process listening on port 22 and save it in /home/bob/pid.
 
-#### vi /home/bob/gateway.txt
+<details>
+<summary>Answer</summary>
 
-For example, if the IP address value is 172.17.0.1, then add it in the file:
+### Command
+    sudo ss -tlnp | awk -F'pid=' '/:22/ {split($2,a,","); print a[1]}' > /home/bob/pid
 
-#### 172.17.0.1
+### Explanation
+- ss -tlnp → listening TCP ports with PID
+- :22 → filter SSH port
+- extract pid value
+- `>` → save output
 
-Finally, save the file.
+</details>
 
+---
 
-## Task:
+## 🧪 Task 6
 
-Find out what process is listening for incoming connections on port 22 and identify its PID.
+Task: Find PID of process listening on port 53 and save it in /home/bob/process_pid.
 
-Create a file called /home/bob/pid and save the PID value in it.
+<details>
+<summary>Answer</summary>
 
-PID is saved in the /home/bob/pid file?
+### Command
+    sudo ss -ulnp | awk -F'pid=' '/:53/ {split($2,a,","); print a[1]}' > /home/bob/process_pid
 
-## Solution:
+### Explanation
+- -u → UDP (DNS uses UDP)
+- -l → listening
+- extract PID
+- `>` → save output
 
-Execute the below command:
+</details>
 
-#### sudo ss -tlnp | grep :22
+---
 
-Look for the pid= and copy it:
+## 🧪 Task 7
 
-Now, create the required file and save the PID value in it:
+Task: Find process name listening on port 8080 and save it in /home/bob/process.
 
-#### vi /home/bob/pid
+<details>
+<summary>Answer</summary>
 
-For example, if the PID value is 1123, then add it in the file:
+### Command
+    sudo ss -tlnp | awk -F'"' '/:8080/ {print $2}' > /home/bob/process
 
-#### 1123
+### Explanation
+- ss → preferred over netstat
+- extract process name from quotes
+- `>` → save output
 
-Finally, save the file.
+</details>
 
+---
 
-## Task:
+## 🧪 Task 8
 
-Now, find out what process is listening for incoming connections on port 53 and identify its PID.
+Task: Configure static resolution for example.com → 8.8.8.8.
 
-Create a file called /home/bob/process_pid and save the PID value in it.
+<details>
+<summary>Answer</summary>
 
-Is PID saved in the /home/bob/process_pid file?
+### Command
+    sudo vi /etc/hosts
 
-## Solution:
+    8.8.8.8 example.com
 
-Execute the below command. Since it is a UDP port, you need to use the u option as well with the ss command:
+### Explanation
+- /etc/hosts → static hostname mapping
+- overrides DNS
 
-#### sudo ss -tlnpu | grep :53
+</details>
 
-Look for the pid= and copy it:
-Now, create the required file and save the PID value in it:
+---
 
-#### vi /home/bob/process_pid
+## 🧪 Task 9
 
-For example, if the PID value is 1123, then add it in the file:
+Task: Add temporary IP 192.168.9.3/24 to eth1.
 
-#### 1123
+<details>
+<summary>Answer</summary>
 
-Finally, save the file.
+### Command
+    sudo ip addr add 192.168.9.3/24 dev eth1
 
+### Explanation
+- ip addr add → assign IP
+- dev eth1 → target interface
+- temporary → lost on reboot
 
-## Task:
+</details>
 
-So, now, let's try to identify the process name based on the port it's listening on. Find out the process name that is listening for incoming connections on port 8080.
+---
 
-Create a file called /home/bob/process and save the name of the process in it, for example sshd.
+## 🧪 Task 10
 
-Is the process name saved in the /home/bob/process file?
+Task: Create Netplan config for enp6s0 with IP 10.0.10.5/24.
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Let's try to use netstat. Execute the below command:
+### Command
+    sudo vi /etc/netplan/99-custom.yaml
 
-#### sudo netstat -natp | grep :8080
+    network:
+      version: 2
+      ethernets:
+        enp6s0:
+          dhcp4: false
+          dhcp6: false
+          addresses:
+            - 10.0.10.5/24
 
-Look for the string in the last of the line, for example:
+    sudo chmod 600 /etc/netplan/99-custom.yaml
+    sudo netplan apply
 
-#### tcp        0      0 0.0.0.0:8080            0.0.0.0:*               LISTEN      993/ttyd
+### Explanation
+- netplan → network configuration system
+- chmod 600 → required permissions
+- netplan apply → apply changes
 
-Here, ttyd is the process name. Now, create the required file and save the process name in it:
+</details>
 
-#### vi /home/bob/process
+---
 
-In this case, the value should be ttyd:
+## 🧪 Task 11
 
-#### ttyd
+Task: Change enp6s0 IP to 192.168.10.10/24.
 
-Finally, save the file.
+<details>
+<summary>Answer</summary>
 
+### Command
+    sudo vi /etc/netplan/99-custom.yaml
 
-## Task:
+    (update address to 192.168.10.10/24)
 
-Configure static resolution so that example.com hostname resolves to IP address 8.8.8.8.
+    sudo netplan apply
 
-Does example.com resolve to IP address 8.8.8.8?
+### Explanation
+- modify config file
+- apply changes with netplan
 
-## Solution:
+</details>
 
-Edit the /etc/hosts file:
+---
 
-#### sudo vi /etc/hosts
+## 🧪 Task 12
 
-Add the below line in it:
+Task: Save routing table to /home/bob/route.txt.
 
-#### 8.8.8.8         example.com
+<details>
+<summary>Answer</summary>
 
-Save and exit.
+### Command
+    ip route > /home/bob/route.txt
 
+### Explanation
+- ip route → show routing table
+- `>` → save output
 
-## Task:
+</details>
 
-Use the ip command to add a temporary extra IP to the eth1 interface. You should add the CIDR notation of the IP: 192.168.9.3/24.
+---
 
-Is extra IP added?
+## 🧪 Task 13
 
-## Solution:
+Task: List incoming open ports and save to /home/bob/incoming.txt.
 
-You can use the below command to set the new IP address.
+<details>
+<summary>Answer</summary>
 
-#### sudo ip a add 192.168.9.3/24 dev eth1
+### Command
+    sudo ss -tuln > /home/bob/incoming.txt
 
+### Explanation
+- ss → modern replacement for netstat
+- -tuln → TCP + UDP + listening + numeric
+- `>` → save output
 
-## Task:
+</details>
 
-Create the following Netplan config in the file named 99-custom.yaml under the /etc/netplan directory.
+---
 
-network:
-  version: 2
-  ethernets:
-    enp6s0:
-      dhcp4: false
-      dhcp6: false
-      addresses:
-        - 10.0.10.5/24
+## 🧪 Task 14
 
-Is enp6s0 interface configured with the required IP address?
+Task: Add global DNS resolver 8.8.8.8.
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Navigate to the /etc/netplan directory and follow the below steps.
+### Command
+    sudo vi /etc/systemd/resolved.conf
 
-Create a file with name and copy the content provided.
+    DNS=8.8.8.8
 
-#### sudo vim /etc/netplan/99-custom.yaml
+    sudo systemctl restart systemd-resolved
 
-Paste the following content in the file.
+### Explanation
+- resolved.conf → system-wide DNS config
+- DNS= → set resolver
+- restart service → apply changes
 
-network:
-  version: 2
-  ethernets:
-    enp6s0:
-      dhcp4: false
-      dhcp6: false
-      addresses:
-        - 10.0.10.5/24
-
-Change permissions using the below command.
-
-#### sudo chmod 600 /etc/netplan/99-custom.yaml
-
-After configuring, now apply the changes by following the command.
-
-#### sudo netplan generate
-#### sudo networkctl reload
-#### sudo networkctl reconfigure enp6s0
-
-
-## Task:
-
-The interface named enp6s0 is configured with a permanent IP 10.0.10.5/24. Change this configuration so that the permanent IP is 192.168.10.10/24 instead of 10.0.10.5/24.
-
-Don't forget to apply these new settings to the interface
-
-Is the configuration updated and applied as follows?
-
-## Solution:
-
-Update the file /etc/netplan/99-custom.yaml created in the previous step using the vim command shown below.
-
-network:
-  version: 2
-  ethernets:
-    enp6s0:
-      dhcp4: false
-      dhcp6: false
-      addresses:
-        - 192.168.10.10/24
-
-You can apply the configuration by two commands as follows.
-
-#### sudo netplan generate
-#### sudo networkctl reload
-#### sudo networkctl reconfigure enp6s0
-
-Check the changes using the below command.
-
-#### ip a | grep enp6s0
-
-
-## Task:
-
-Check the network route of this system and store the output in the /home/bob/route.txt file.
-
-Is the required output stored in the /home/bob/route.txt file?
-
-## Solution:
-
-Execute any one of the following commands:
-
-#### sudo ip route show > /home/bob/route.txt
-
-or
-
-#### sudo ip r > /home/bob/route.txt
-
-
-## Task:
-
-Get the list of all incoming open ports on this system and store the output in the /home/bob/incoming.txt file.
-
-Is the required output stored in the /home/bob/incoming.txt?
-
-## Solution:
-
-Execute the below commands:
-
-#### sudo netstat -tulpn | grep LISTEN > /home/bob/incoming.txt
-
-
-## Task:
-
-Add a global DNS resolver (one that applies to all network interfaces). Set it to the following IP: 8.8.8.8.
-
-Has a new DNS resolver been added?
-
-## Solution:
-
-Edit the /etc/systemd/resolved.conf file.
-
-#### sudo vim /etc/systemd/resolved.conf
-
-Uncomment the below line in it and update to 8.8.8.8: 8.8.8.8:
-
-#### #DNS --> DNS=8.8.8.8
+</details>
