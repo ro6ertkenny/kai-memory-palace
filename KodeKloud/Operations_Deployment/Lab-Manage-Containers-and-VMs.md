@@ -1,276 +1,287 @@
-# Lab - Manage Containers and VMs
+# Manage Containers & VMs — LFCS Lab (Hidden Answers)
 
-## Task:
+---
 
-What does this command do?
+## 🧪 Task 1
 
-#### virsh destroy TestMachine
+Task: What does this command do?
 
-A. It deletes the virtual machine called TestMachine.
+    virsh destroy TestMachine
 
-B. It forces a power off for the virtual machine called TestMachine.
+<details>
+<summary>Answer</summary>
 
-C. It destroys all data stored in the virtual machine called TestMachine.
+### Command
+    virsh destroy TestMachine
 
-D. It deletes both the virtual machine called TestMachine and the data stored on it.
+### Explanation
+- virsh destroy → force power off (like pulling the plug)
+- does NOT delete VM or disk
+- correct answer → forces shutdown of VM
 
-## Solution:
+</details>
 
-It forces a power off for the virtual machine called TestMachine.
+---
 
+## 🧪 Task 2
 
-## Task:
+Task: Set VM1 to automatically start at boot.
 
-Which of the following commands would you use to set the virtual machine called VM1 to automatically start up at boot?
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    virsh autostart VM1
 
-You can use virsh autostart VM1 command to set the virtual machine called VM1 to automatically start up at boot.
+### Explanation
+- autostart → enable VM to start on host boot
 
+</details>
 
-## Task:
+---
 
-Which of the following commands is used to list all docker containers (including stopped containers) present on a system?
+## 🧪 Task 3
 
-## Solution:
+Task: List all Docker containers (including stopped ones).
 
-Pull docker.io/library/nginx image on this system.
+<details>
+<summary>Answer</summary>
 
-Is the required docker image pulled?
+### Command
+    docker ps -a
 
+### Explanation
+- docker ps → running containers
+- -a → include stopped containers
 
-## Task:
+</details>
 
-Create and run a new Docker container based on the docker.io/library/nginx image. Three command line options should be used:
+---
 
-A. The option to detach from this container's input/output (so you're not stuck inside the container once you run your command)
+## 🧪 Task 4
 
-B. The option to map port 1234 on the host to port 80 on the container
+Task: Run nginx container with:
+- detached mode
+- port 1234 → 80
+- name = website
 
-C. The option to name this new container as website
+<details>
+<summary>Answer</summary>
 
-Is the container called website created and running?
+### Command
+    docker run -d -p 1234:80 --name website docker.io/library/nginx
 
-Is the correct PORT mapped?
+### Explanation
+- -d → detached (background)
+- -p 1234:80 → host:container port mapping
+- --name → container name
 
-## Solution:
+</details>
 
-Execute the below command to run the docker container:
+---
 
-#### docker run -d -p 1234:80 --name website docker.io/library/nginx
+## 🧪 Task 5
 
+Task: Remove docker.io/library/nginx image.
 
-## Task:
+<details>
+<summary>Answer</summary>
 
-Remove the docker.io/library/nginx docker image.
+### Command
+    docker ps -a
+    docker stop <container_id>
+    docker rm <container_id>
+    docker rmi docker.io/library/nginx
 
-Has the image been removed?
+### Explanation
+- must stop/remove containers using image first
+- docker rmi → remove image
 
-## Solution:
+</details>
 
-First, check if that image is being used by any running container. If so, then first stop that container and remove it.
+---
 
-#### docker images
-#### docker ps -a
-#### docker stop $CONTAINER_ID
-#### docker rm $CONTAINER_ID
+## 🧪 Task 6
 
-Now, remove the image.
+Task: Remove all Docker containers.
 
-#### docker rmi $IMAGE_ID
+<details>
+<summary>Answer</summary>
 
-Or you can force remove the image:
+### Command
+    docker rm -f $(docker ps -aq)
 
-#### docker rmi $IMAGE_ID -f
+### Explanation
+- docker ps -aq → all container IDs
+- rm -f → force remove (running + stopped)
 
+</details>
 
-## Task:
+---
 
-Remove all docker containers (including running, stopped containers) from this system.
+## 🧪 Task 7
 
-Have all docker containers been removed?
+Task: Run Apache container:
+- image = httpd
+- port 9080 → 80
+- restart always
+- name = webinstance1
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Using below mentioned command, check all docker containers present on the system:
+### Command
+    docker run -d -p 9080:80 --restart always --name webinstance1 httpd
 
-#### docker ps -a
+### Explanation
+- --restart always → restart on failure or reboot
+- -p → port mapping
+- -d → background
 
-Delete the running containers if any:
+</details>
 
-#### docker stop <container-id>
-#### docker rm <container-id>
+---
 
-Delete the stopped/exited containers if any:
+## 🧪 Task 8
 
-#### docker rm <container-id>
+Task: List all VMs and save name to /home/bob/vm.
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Command
+    virsh list --all | awk 'NR>2 && $2!="" {print $2}' > /home/bob/vm
 
-Use the image called httpd to create and run an Apache web server. Bind port 9080 on the host to port 80 of the container. Set the restart policy so that this container always restarts if it stops unexpectedly or the system reboots. Name the container webinstance1.
+### Explanation
+- virsh list --all → list all VMs
+- awk → extract VM name column
+- `>` → save output
 
-Is webinstance1 container up and running?
+</details>
 
-Are ports configured correctly?
+---
 
-Is the restart policy configured as mentioned?
+## 🧪 Task 9
 
-## Solution:
+Task: Start VM1.
 
-Run the below command to complete the task.
+<details>
+<summary>Answer</summary>
 
-#### docker run --detach --publish 9080:80 --restart always --name webinstance1 httpd
+### Command
+    virsh start VM1
 
-Check for containers using the below command.
+### Explanation
+- start → boot VM
 
-#### docker ps
+</details>
 
+---
 
-## Task:
+## 🧪 Task 10
 
-We have virsh utility installed that lets us interact with virtual machines and qemu-kvm installed that lets us create and run them.
+Task: Remove VM1 completely.
 
-Check if any virtual machine is present on this system (stopped or running). If yes, then save its name in the /home/bob/vm file.
+<details>
+<summary>Answer</summary>
 
-Is the /home/bob/vm file updated as needed?
+### Command
+    virsh destroy VM1
+    virsh undefine VM1
 
-## Solution:
+### Explanation
+- destroy → power off
+- undefine → remove VM definition
 
-Execute the below command to list out the VMs:
+</details>
 
-#### virsh list --all
+---
 
-Look for the value(s) under Name and save it in /home/bob/vm file:
+## 🧪 Task 11
 
-#### vi /home/bob/vm
+Task: Create VM from /opt/testmachine2.xml and start it.
 
-So, if the VM name is VM1, then the file content should be:
+<details>
+<summary>Answer</summary>
 
-#### VM1
+### Command
+    virsh define /opt/testmachine2.xml
+    virsh list --all
+    virsh start <VM_NAME>
 
+### Explanation
+- define → register VM from XML
+- start → run VM
 
-## Task:
+</details>
 
-In the previous question, you might have noticed that VM1 is in shut off state; start this VM.
+---
 
-Has VM1 been started?
+## 🧪 Task 12
 
-## Solution:
+Task: Set VM2 to autostart at boot.
 
-Execute the below command:
+<details>
+<summary>Answer</summary>
 
-#### virsh start VM1
+### Command
+    virsh autostart VM2
 
+### Explanation
+- autostart → enable boot-time start
 
-## Task:
+</details>
 
-Now, completely remove the VM1 virtual machine.
+---
 
-Has VM1 been deleted?
+## 🧪 Task 13
 
-## Solution:
+Task: Set VM2 memory to 80M and apply changes.
 
-Execute the below commands:
+<details>
+<summary>Answer</summary>
 
-#### virsh destroy VM1
-#### virsh undefine VM1
+### Command
+    virsh setmaxmem VM2 80M --config
+    virsh setmem VM2 80M --config
+    virsh destroy VM2
+    virsh start VM2
 
+### Explanation
+- setmaxmem → max memory
+- setmem → current memory
+- --config → persistent
+- restart required for changes
 
-## Task:
+</details>
 
-We have a configuration file /opt/testmachine2.xml on this system.
+---
 
-Create a virtual machine using this configuration file, and make sure to start it.
+## 🧪 Task 14
 
-Is the virtual machine created from the "/opt/testmachine2.xml" configuration and is it running?
+Task: Create VM kk-ubuntu using provided cloud image.
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Execute the below commands:
+### Command
+    virt-install \
+        --name kk-ubuntu \
+        --memory 1024 \
+        --vcpus 1 \
+        --disk path=/var/lib/libvirt/images/ubuntu-22.04-minimal-cloudimg-amd64.img \
+        --import \
+        --os-variant ubuntu22.04 \
+        --graphics none \
+        --network network=default
 
-#### virsh define /opt/testmachine2.xml
+### Explanation
+- virt-install → create VM
+- --memory → RAM in MB
+- --vcpus → CPU count
+- --disk → disk image path
+- --import → use existing image
+- --graphics none → no GUI
+- --network → attach to default network
 
-Now, list out the virtual machines:
-
-#### virsh list --all
-
-Identify the name of the VM from the above command and start it. Let's say, if VM name is VM2:
-
-#### virsh start VM2
-
-
-## Task:
-
-Right now, when we start up or reboot this system, the virtual machines on it have to be manually started.
-But we want VM2 virtual machine to start up automatically at boot.
-
-Is VM2 virtual machine set to autostart at boot?
-
-## Solution:
-
-Execute the below command:
-
-#### virsh autostart VM2
-
-
-## Task:
-
-Change the memory size for VM2; set its value to 80M.
-
-Make sure the changes are in effect; you can verify the same using sudo virsh dominfo VM2 command.
-
-Has the memory size for VM2 been set to 80M?
-
-## Solution:
-
-Execute the below command to change the maximum memory size:
-
-#### virsh setmaxmem VM2 80M --config
-
-Execute the below command to change the memory size as needed:
-
-#### virsh setmem VM2 80M --config
-
-Shutdown the VM:
-
-#### virsh shutdown VM2
-
-Or
-force a power off in our case since we have no operating system in there:
-
-#### virsh destroy VM2
-
-Start the VM again:
-
-#### virsh start VM2
-
-
-## Task:
-
-There is a cloud image available in /var/lib/libvrt/images/ folder use that image to spin up the virtual machine with the following details
-
-Name - kk-ubuntu
-Memory - 1024 
-vcpus - 1 
-disk path - /var/lib/libvirt/images/ubuntu-22.04-minimal-cloudimg-amd64.img
-os-variant - ubuntu22.04 
-graphics -  none 
-network - default
-
-Note: It will take some time for the process to be completed.
-
-Is virtual machine kk-ubuntu is in running state?
-
-## Solution:
-
-virt-install \
-    --name kk-ubuntu \
-    --memory 1024 \
-    --vcpus 1 \
-    --disk path=/var/lib/libvirt/images/ubuntu-22.04-minimal-cloudimg-amd64.img\
-    --import \
-    --os-variant ubuntu22.04 \
-    --graphics none \
-    --network network=default
-
+</details>
