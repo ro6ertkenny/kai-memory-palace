@@ -1,34 +1,41 @@
-# Git & SSL Certificates — LFCS Lab (Hidden Answers)
+# Lab - Git & SSL Certifications
 
----
+## Task:
 
-## 🧪 Task 1
-
-Task: Generate a 4096-bit RSA private key and a Certificate Signing Request with a single command. The private key should be encrypted with the following password: "kkloud".
+Generate a 4096-bit RSA private key and a Certificate Signing Request with a single command. The private key should be encrypted with the following password: "kkloud".
 
 Save the key in a file called priv.key. Save the CSR in a file called cert.csr. There are no requirements for the certificate details like country name, organisation name, and so on. You can pick anything, or press Enter to pick the default values when prompted.
 
-<details>
-<summary>Answer</summary>
+Private key is created?
 
-### Command
-    openssl req -newkey rsa:4096 -keyout priv.key -out cert.csr
+Certificate signing request is created?
 
-### Explanation
-- openssl req → create or process certificate requests
-- -newkey rsa:4096 → generate a new 4096-bit RSA key
-- -keyout priv.key → save private key to priv.key
-- -out cert.csr → save CSR to cert.csr
-- the command will prompt for the PEM pass phrase
-- enter `kkloud` when prompted to encrypt the private key
+<details><summary>Answer</summary>
+Use the below command to generate a key and certificate signing request.
 
+### openssl req -newkey rsa:4096 -keyout priv.key -out cert.csr
+
+and enter password when it prompts like below
+
+Enter PEM pass phrase:kkloud
+Verifying - Enter PEM pass phrase:kkloud
+
+Leave rest of the options default
 </details>
+
+### Explanation:
+- openssl → tool for SSL/TLS and cryptography operations
+- req → generate certificate requests
+- -newkey rsa:4096 → create a new 4096-bit RSA private key
+- -keyout priv.key → save private key to file
+- -out cert.csr → save certificate signing request to file
+- passphrase → encrypts the private key with provided password
 
 ---
 
-## 🧪 Task 2
+## Task:
 
-Task: Generate a self-signed certificate.
+Generate a self-signed certificate
 
 - Use no encryption for the private key.
 - Save the key in a file called priv.key.
@@ -37,193 +44,226 @@ Task: Generate a self-signed certificate.
 
 Set the Common Name to kodekloud.com. The rest of the certificate details you can set to whatever you want.
 
-<details>
-<summary>Answer</summary>
+Common name is set as kodekloud.com ?
 
-### Command
-    openssl req -x509 -nodes -days 365 -keyout priv.key -out kodekloud.crt
+<details><summary>Answer</summary>
+You can use the below command to generate a key and self-signed certificate.
 
-### Explanation
-- openssl req → certificate request / certificate creation mode
-- -x509 → create a self-signed certificate instead of a CSR
-- -nodes → no DES encryption on private key, meaning no passphrase
-- -days 365 → certificate valid for 365 days
-- -keyout priv.key → save private key
-- -out kodekloud.crt → save certificate
-- set the Common Name to `kodekloud.com` when prompted
-
+openssl req -x509 -noenc -days 365 -keyout priv.key -out kodekloud.crt
+Enter kodekloud.com for common name
 </details>
+
+### Explanation:
+- openssl → cryptography tool
+- req → certificate request utility
+- -x509 → generate a self-signed certificate
+- -noenc → do not encrypt the private key
+- -days 365 → certificate validity period
+- -keyout priv.key → output private key file
+- -out kodekloud.crt → output certificate file
+- Common Name → identifies the domain (kodekloud.com)
 
 ---
 
-## 🧪 Task 3
+## Task:
 
-Task: In your /home/bob/ directory you will find a file called my.crt. What is the Common Name set in this certificate?
+In your /home/bob/ directory you will find a file called my.crt. What is the Common Name set in this certificate?
 
-<details>
-<summary>Answer</summary>
+<details><summary>Answer</summary>
+Identify the CN by below command
 
-### Command
-    openssl x509 -in /home/bob/my.crt -text -noout
+#### openssl x509 -in my.crt -text
 
-### Explanation
-- openssl x509 → inspect X.509 certificates
-- -in /home/bob/my.crt → certificate file to read
-- -text → show human-readable certificate details
-- -noout → do not print the encoded certificate
-- look for the Subject field and identify the `CN`
-- expected answer from the lab: `labs.kodekloud.com`
+in the output of the command Identify the common name.
 
+CN = labs.kodekloud.com
 </details>
+
+### Explanation:
+- openssl → cryptography tool
+- x509 → work with certificates
+- -in my.crt → input certificate file
+- -text → display certificate details in readable format
+- CN → Common Name field in certificate
 
 ---
 
-## 🧪 Task 4
+## Task:
 
-Task: We've created a local Git repository for you.
+We've created a local Git repository for you.
 
 - Please switch to the directory called /root/kode to access it.
 - You can stage all the files with the .cpp extension to prepare them for a future commit. The other files should NOT be staged.
 - Next, create a commit with the following message: Added C++ files.
 
-<details>
-<summary>Answer</summary>
+File3 with .txt extension is untracked?
 
-### Command
-    cd /root/kode
-    git add *.cpp
-    git commit -m "Added C++ files"
+Commit message is set correctly?
 
-### Explanation
-- cd /root/kode → enter the repository
-- git add *.cpp → stage only files ending in `.cpp`
-- git commit -m "Added C++ files" → create commit with exact message
-- `.txt` files remain unstaged and untracked if not added
+<details><summary>Answer</summary>
+Navigate to directory kode
 
+### cd kode
+Stage the files with .cpp extension.
+
+### git add *.cpp
+Commit the files with the commit message Added C++ files
+
+### git commit -m "Added C++ files"
 </details>
+
+### Explanation:
+- cd kode → change into repository directory
+- git add *.cpp → stage only .cpp files
+- *.cpp → wildcard matching all .cpp files
+- git commit → create a commit
+- -m "Added C++ files" → commit message
 
 ---
 
-## 🧪 Task 5
+## Task:
 
-Task: Switch to the Git repository that can be found in the kode directory. Create a new branch called testing.
+Switch to the Git repository that can be found in the kode directory. Create a new branch called testing.
 
-<details>
-<summary>Answer</summary>
+NOTE: If you encounter an error while using a Git command, please exit the current directory and then re-enter it.
 
-### Command
-    cd kode
-    git branch testing
+Git branch with the name testing is created?
 
-### Explanation
-- git branch testing → create a new branch named `testing`
-- this creates the branch but does not switch to it
+<details><summary>Answer</summary>
+Navigate to kode directory.
+Use the below command to create a branch with the name testing.
 
+### git branch testing
 </details>
+
+### Explanation:
+- git branch testing → create a new branch named testing
+- branch → represents a separate line of development
 
 ---
 
-## 🧪 Task 6
+## Task:
 
-Task: In the local Git repository that can be found in the kode directory do the following:
+In the local Git repository that can be found in the kode directory do the following:
 
 - Delete the branch called "testing".
 - The error you will encounter is expected.
 
-Figure out what is preventing you from performing the task, solve the issue, and then delete the "testing" branch.
+Figure out what is preventing you from performing the task, solve the issue, and then delete the "testing" branch?
 
-<details>
-<summary>Answer</summary>
+Branch with name testing is deleted?
 
-### Command
-    cd kode
-    git checkout master
-    git branch --delete testing
+<details><summary>Answer</summary>
+Navigate to kode directory.
 
-### Explanation
-- a branch cannot be deleted while it is the currently checked out branch
-- git checkout master → switch off the `testing` branch
-- git branch --delete testing → delete the branch safely
+### cd kode
+Check out to master branch first because active branches can't be deleted.
 
+### git checkout master
+Delete the testing branch now
+
+### git branch --delete testing
 </details>
+
+### Explanation:
+- cd kode → change into repository directory
+- git checkout master → switch to master branch
+- active branch → cannot be deleted while checked out
+- git branch --delete testing → delete branch named testing
 
 ---
 
-## 🧪 Task 7
+## Task:
 
-Task: Go into the local Git repository found in the kode directory and find the file that modified in latest commit.
+Go into the local Git repository found in the kode directory and find the file that modified in latest commit.
 
-<details>
-<summary>Answer</summary>
+<details><summary>Answer</summary>
+Check for the file modified in the latest commit.
 
-### Command
-    cd kode
-    git log --raw -1
+### git log --raw
 
-### Explanation
-- git log → show commit history
-- --raw → show file-level change details
-- -1 → only show the latest commit
-- inspect the modified file listed in the output
-- expected lab answer: `file2.cpp`
+You will find output similar to below one.
 
+### commit 6a64b289a71e970f94bcb6b0bd07424a05a98b83 (HEAD -> master)
+Author: Bob <bob@kodekloud.com>
+Date:   Fri Feb 16 09:11:41 2024 +0000
+
+    Added text
+
+:100644 100644 e69de29 a11f211 M        file2.cpp
+
+We can find the file file2.cpp is modified.
 </details>
+
+### Explanation:
+- git log → view commit history
+- --raw → show file-level changes in commits
+- M → indicates file was modified
+- file2.cpp → file changed in latest commit
 
 ---
 
-## 🧪 Task 8
+## Task:
 
-Task: Go into the local Git repository that you can find in the kode directory. Merge the documentation branch into the master branch.
+Go into the local Git repository that you can find in the kode directory. Merge the documentation branch into the master branch.
 
-<details>
-<summary>Answer</summary>
+NOTE: If you encounter an error while using a Git command, please exit the current directory and then re-enter it.
 
-### Command
-    cd kode
-    git checkout master
-    git merge documentation
+documentation branch merged to the master branch ?
 
-### Explanation
-- git checkout master → switch to target branch
-- git merge documentation → merge `documentation` into `master`
+<details><summary>Answer</summary>
+Navigate to kode directory.
 
+### cd kode
+
+To merge the documentation branch to the master branch we need to checkout in the master branch first.
+
+### git checkout master
+
+Now merge the documentation branch to the master branch.
+
+### git merge documentation
 </details>
+
+### Explanation:
+- cd kode → change into repository directory
+- git checkout master → switch to master branch
+- git merge documentation → merge documentation branch into master
+- merge → combine changes from another branch
 
 ---
 
-## 🧪 Task 9
+## Task:
 
-Task: What command would you use to push the master branch from your local repository to a remote repository nicknamed origin?
+What command would you use to push the master branch from your local repository to a remote repository nicknamed origin?
 
-<details>
-<summary>Answer</summary>
-
-### Command
-    git push origin master
-
-### Explanation
-- git push → send local commits to remote
-- origin → remote nickname
-- master → branch to push
-
+<details><summary>Answer</summary>
+### git push origin master 
+is the command we use to push changes to master branch of remote repository.
 </details>
+
+### Explanation:
+- git push → send commits to remote repository
+- origin → remote repository name
+- master → branch being pushed
 
 ---
 
-## 🧪 Task 10
+## Task:
 
-Task: Clone the remote repository from https://github.com/kodekloudhub/git-for-beginners-course.git in your /home/bob/ directory. A subdirectory for the local repository will be automatically created.
+Clone the remote repository from https://github.com/kodekloudhub/git-for-beginners-course.git in your /home/bob/ directory. A subdirectory for the local repository will be automatically created.
 
-<details>
-<summary>Answer</summary>
+Repository cloned ?
 
-### Command
-    cd /home/bob
-    git clone https://github.com/kodekloudhub/git-for-beginners-course.git
+<details><summary>Answer</summary>
+Navigate to /home/bob directory by cd /home/bob
+Clone the repo by below command
 
-### Explanation
-- cd /home/bob → go to target parent directory
-- git clone → download remote repository
-- Git automatically creates the local repo directory based on the repository name
-
+### git clone https://github.com/kodekloudhub/git-for-beginners-course.git
 </details>
+
+### Explanation:
+- cd /home/bob → change to target directory
+- git clone → copy remote repository locally
+- URL → location of remote repository
+- result → new directory created with repository contents
