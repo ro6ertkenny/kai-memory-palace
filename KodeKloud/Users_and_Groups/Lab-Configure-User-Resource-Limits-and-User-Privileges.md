@@ -1,198 +1,234 @@
-# Lab - Configure User Resource Limits and User Privileges
+# Configure User Resource Limits & User Privileges — LFCS Lab (Hidden Answers)
 
-## Task:
+---
 
-Which of the following keywords can we use to limit the number of processes a user can run?
+## 🧪 Task 1
 
-## Solution:
+Task: Which keyword can we use to limit the number of processes a user can run?
 
-nproc will be used to limit the number of processes a user can run.
+<details>
+<summary>Answer</summary>
 
+### Command
+    nproc
 
-## Task:
+### Explanation
+- nproc → limit number of processes
+- used in `/etc/security/limits.conf`
 
-Modify the security limits file and make sure that the user called trinity can run no more than 30 processes in her session.
-This should be both a hard limit and a soft limit, written in a single line.
+</details>
 
-Have required limits been set?
+---
 
-## Solution:
+## 🧪 Task 2
 
-Edit the /etc/security/limits.conf file:
+Task: Modify the security limits file so user trinity can run no more than 30 processes in her session. This should be both a hard and soft limit, written in a single line.
 
-#### sudo vi /etc/security/limits.conf
+<details>
+<summary>Answer</summary>
 
-Add the below line at the end of the file:
+### Command
+    sudo vi /etc/security/limits.conf
 
-#### trinity - nproc 30
+    trinity - nproc 30
 
-Save and exit.
+### Explanation
+- trinity → target user
+- - → apply both soft and hard limits
+- nproc → process count limit
+- 30 → maximum allowed processes
 
+</details>
 
-## Task:
+---
 
-Identify all the security limits currently applied in our user's session and save them in the /home/bob/limits file.
+## 🧪 Task 3
 
-You can use the redirection to save your command's output in a file: [your-command] > /home/bob/limits
+Task: Identify all security limits currently applied in our user's session and save them in /home/bob/limits.
 
-Verify the saved data.
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    ulimit -a > /home/bob/limits
 
-Execute the below command:
+### Explanation
+- ulimit -a → show all current shell/session limits
+- `>` → redirect output to file
 
-#### ulimit -a > /home/bob/limits
+</details>
 
+---
 
-## Task:
+## 🧪 Task 4
 
-Modify the sudoers file in such a way to allow the user called trinity to run any sudo command without needing to provide her password.
+Task: Modify sudoers so user trinity can run any sudo command without entering her password.
 
-Are required changes added for the user trinity?
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    sudo visudo
 
-Edit the /etc/sudoers file:
+    trinity ALL=(ALL) NOPASSWD: ALL
 
-#### sudo visudo /etc/sudoers
+### Explanation
+- visudo → safely edit sudoers file
+- trinity → target user
+- ALL=(ALL) → may run as any user
+- NOPASSWD: ALL → no password required for any command
 
-Add the below line at the end of the file:
+</details>
 
-#### trinity    ALL=(ALL)   NOPASSWD: ALL
+---
 
-Save and exit.
+## 🧪 Task 5
 
+Task: Remove the previous sudoers entry for trinity and add a new one that allows trinity to run only /usr/bin/mount with sudo.
 
-## Task:
+<details>
+<summary>Answer</summary>
 
-Modify the sudoers file again. Remove your previous entry for the user called trinity if it still exists.
-Now add a new entry that allows trinity to only run the /usr/bin/mount command with sudo.
+### Command
+    sudo visudo
 
-Are required changes added for the user trinity?
+    trinity ALL=(ALL) /usr/bin/mount
 
-## Solution:
+### Explanation
+- remove old trinity entry first
+- new rule allows only `/usr/bin/mount`
+- no other sudo commands are allowed by this rule
 
-Edit the /etc/sudoers file:
+</details>
 
-#### sudo visudo /etc/sudoers
+---
 
-Remove the previous entry for trinity user and add the below line at the end of the /etc/sudoers file:
+## 🧪 Task 6
 
-#### trinity ALL=(ALL) /usr/bin/mount
+Task: Set a hard file size limit of 4 MiB for user stephen.
 
-Save and exit.
+<details>
+<summary>Answer</summary>
 
+### Command
+    sudo vi /etc/security/limits.conf
 
-## Task:
+    stephen hard fsize 4096
 
-Make changes in security limits file for user stephen so that he can create maximum filesize upto 4 MiB. This should be a hard limit.
+### Explanation
+- stephen → target user
+- hard → hard limit
+- fsize → maximum file size
+- 4096 → size in KiB, which equals 4 MiB
 
-Are required changes added for the user stephen?
+</details>
 
-## Solution:
+---
 
-Edit the /etc/security/limits.conf file:
+## 🧪 Task 7
 
-#### sudo vi /etc/security/limits.conf
+Task: Set a soft limit of 20 processes for everyone in the salesteam group.
 
-Add the below line at the end of the file:
+<details>
+<summary>Answer</summary>
 
-#### stephen hard fsize 4096
+### Command
+    sudo vi /etc/security/limits.conf
 
-Save and exit.
+    @salesteam soft nproc 20
 
+### Explanation
+- @salesteam → group entry
+- soft → soft limit
+- nproc → number of processes
+- 20 → maximum soft limit
 
-## Task:
+</details>
 
-Set a soft limit of 20 processes for everyone in the salesteam group.
+---
 
-Is the required soft limit set to the salesteam group ?
+## 🧪 Task 8
 
-## Solution:
+Task: Define a policy for all users in the salesteam group to run any sudo command.
 
-Edit the /etc/security/limits.conf file:
+<details>
+<summary>Answer</summary>
 
-#### sudo vi /etc/security/limits.conf
+### Command
+    sudo visudo
 
-Add the following line at the end of the file:
+    %salesteam ALL=(ALL) ALL
 
-#### @salesteam     soft    nproc     20
+### Explanation
+- %salesteam → group in sudoers
+- ALL=(ALL) → may run as any user
+- ALL → may run any command
+- password is still required unless NOPASSWD is added
 
-Save and exit.
+</details>
 
+---
 
-## Task:
+## 🧪 Task 9
 
-Define a policy for all the users in the salesteam group to run any sudo command.
+Task: Define a policy so user trinity can run sudo commands as user sam.
 
-Is the required policy defined for salesteam group to run all sudo commands?
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    sudo visudo
 
-Edit the /etc/sudoers file:
+    trinity ALL=(sam) ALL
 
-#### sudo visudo /etc/sudoers
+### Explanation
+- trinity → target user
+- ALL=(sam) → may run commands as user `sam`
+- ALL → any command, but only as `sam`
 
-Add the below line at the end of the file:
+</details>
 
-#### %salesteam     ALL=(ALL)     ALL
+---
 
-Save and exit.
+## 🧪 Task 10
 
+Task: We applied a hard limit of 10 processes for all users under developers group, but the limit isn't working. Fix the issue.
 
-## Task:
+<details>
+<summary>Answer</summary>
 
-Define a policy so that user trinity can run sudo commands as the user sam.
+### Command
+    sudo vi /etc/security/limits.conf
 
-Have required changes been added?
+    @developers hard nproc 10
 
-## Solution:
+### Explanation
+- `@developers` → group entry
+- hard → hard limit
+- nproc → process count limit
+- 10 → maximum allowed
+- the fix is using `@` so the entry applies to the group instead of a username
 
-Edit the /etc/sudoers file:
+</details>
 
-#### sudo visudo /etc/sudoers
+---
 
-Add the below line at the end of the file:
+## 🧪 Task 11
 
-#### trinity   ALL=(sam)   ALL
+Task: Remove the previous sudoers entry for trinity and add a new one that allows trinity to run all commands with sudo, but only after entering the password.
 
-Save and exit.
+<details>
+<summary>Answer</summary>
 
+### Command
+    sudo visudo
 
-## Task:
+    trinity ALL=(ALL) ALL
 
-We applied a hard limit of 10 processes for all the users under developers group, but somehow the limit isn't working. Look into the issue and fix the same.
+### Explanation
+- remove old trinity entry first
+- ALL=(ALL) → may run as any user
+- ALL → may run any command
+- no `NOPASSWD` means password is required
 
-Has the limits issue for "developers" group been fixed?
-
-## Solution:
-
-Edit the /etc/security/limits.conf file:
-
-#### sudo vi /etc/security/limits.conf
-
-Look for the developers group entry and make sure it looks like this:
-
-#### @developers     hard    nproc  10
-
-
-## Task:
-
-Modify the sudoers file again. Remove your previous entry for the user called trinity if it still exists.
-Now add a new entry that allows trinity to run all commands with sudo, but only after entering the password.
-
-Have required changes been made for user trinity?
-
-## Solution:
-
-Edit the /etc/sudoers file:
-
-#### sudo visudo /etc/sudoers
-
-Add the below line in the /etc/sudoers file:
-
-#### trinity ALL=(ALL) ALL
-
-Save and exit.
-
-
+</details>
