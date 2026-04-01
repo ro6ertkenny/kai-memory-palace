@@ -1,159 +1,188 @@
-# Lab - Create Filesystems and Mount Them at Boot
+# Create Filesystems & Mount at Boot — LFCS Lab (Hidden Answers)
 
-## Task:
+---
 
-What file do we need to edit to tell the Linux OS which filesystems it should automatically mount when it boots up?
+## 🧠 Mental Model
 
-## Solution:
+- /etc/fstab → persistent mounts (boot-time)
+- mount → temporary mount (runtime)
+- umount → detach filesystem
+- mkfs.* → create filesystem
+- labels/UUIDs → preferred over raw device names in production
 
-We will need to edit /etc/fstab file to tell the Linux OS which filesystems it should automatically mount when it boots up.
+---
 
+## 🧪 Task 1
 
-## Task:
+Task: Which file controls automatic mounting at boot?
 
-We want to create an xfs filesystem on /dev/vdd1 with the label BackupVolume. What is wrong with this command?
+<details>
+<summary>Answer</summary>
 
-#### sudo mkfs.xfs -l "BackupVolume" /dev/vdd1
+### Command
+    /etc/fstab
 
-A. The volume name is too long. 10 characters is the maximum limit and we used 12.
+### Explanation
+- fstab → filesystem table
+- defines mounts at boot
 
-B. The lowercase -l option is wrong. It should be -L, with an uppercase L.
+</details>
 
-C. The -l option should go at the end. The command should be: sudo mkfs.xfs /dev/vdd1 -l "BackupVolume".
+---
 
-D. The command mkfs.xfs is wrong. It should be mkfs-xfs.
+## 🧪 Task 2
 
-## Solution:
+Task: What is wrong with this command?
 
-The lowercase -l option is wrong. It should be -L, with an uppercase L
+    sudo mkfs.xfs -l "BackupVolume" /dev/vdd1
 
+<details>
+<summary>Answer</summary>
 
-## Task:
+### Explanation
+- correct answer:
+  lowercase `-l` is wrong
+- should be:
+    -L (uppercase) for label
 
-Create an xfs filesystem with the label "DataDisk" on /dev/vdd.
+</details>
 
-Is the required label set for the filesystem?
+---
 
-## Solution:
+## 🧪 Task 3
 
-Execute the below command:
+Task: Create XFS filesystem with label "DataDisk" on /dev/vdd.
 
-#### mkfs.xfs -L "DataDisk" /dev/vdd
+<details>
+<summary>Answer</summary>
 
-If the user is not root, you need to use the command with sudo.
+### Command
+    sudo mkfs.xfs -L DataDisk /dev/vdd
 
+### Explanation
+- mkfs.xfs → create XFS filesystem
+- -L → set label
 
-## Task:
+</details>
 
-Create an ext4 filesystem with 2048 inodes on /dev/vde.
+---
 
-Is the required filesystem created?
+## 🧪 Task 4
 
-## Solution:
+Task: Create ext4 filesystem with 2048 inodes on /dev/vde.
 
-Execute the below command:
+<details>
+<summary>Answer</summary>
 
-#### mkfs.ext4 -N 2048 /dev/vde
+### Command
+    sudo mkfs.ext4 -N 2048 /dev/vde
 
-If the user is not root, you need to use the command with sudo.
+### Explanation
+- mkfs.ext4 → create ext4 filesystem
+- -N → number of inodes
 
+</details>
 
-## Task:
+---
 
-Mount /dev/vdd in the /mnt/ directory.
+## 🧪 Task 5
 
-Is the partition mounted?
+Task: Mount /dev/vdd to /mnt.
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Execute the below command:
+### Command
+    sudo mount /dev/vdd /mnt
 
-#### mount /dev/vdd /mnt
+### Explanation
+- mount → attach filesystem
+- temporary (lost on reboot unless in fstab)
 
-If the user is not root, you need to use the command with sudo.
+</details>
 
+---
 
-## Task:
+## 🧪 Task 6
 
-Unmount the filesystem mounted in the /mnt/ directory.
+Task: Unmount filesystem from /mnt.
 
-Is filesystem unmounted?
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    sudo umount /mnt
 
-Execute the below command:
+### Explanation
+- umount → detach filesystem
 
-#### umount /mnt
+</details>
 
-If the user is not root, you need to use the command with sudo.
+---
 
+## 🧪 Task 7
 
-## Task:
+Task: Configure /dev/vde to mount at /test on boot (ext4), and ensure fsck runs.
 
-Configure the system to automatically mount /dev/vde when it boots up. This partition has an ext4 filesystem on it. It should mount the filesystem to the /test directory. This directory does not exist. Make sure you create it first.
+<details>
+<summary>Answer</summary>
 
-Also, make sure this filesystem is checked on boot.
+### Command
+    sudo mkdir /test
 
-For now, you do not need to reboot the system after making the required changes.
+    sudo vi /etc/fstab
 
-- Is the "/test" directory created?
+    /dev/vde /test ext4 defaults 0 2
 
-- Is '/dev/vde' automatically mounted when system boots up?
+    sudo mount -a
 
-## Solution:
+### Explanation
+- mkdir → create mount point
+- fstab entry:
+    device mountpoint fstype options dump fsck
+- 0 → no dump
+- 2 → fsck order (non-root filesystems)
+- mount -a → validate config without reboot
 
-First, create a directory using the following command:
+</details>
 
-#### mkdir /test
+---
 
-Edit the /etc/fstab file:
+## 🧪 Task 8
 
-#### vi /etc/fstab
+Task: Configure /dev/vdd as swap at boot.
 
-If the user is not root, you need to use the command with sudo.
+<details>
+<summary>Answer</summary>
 
-Add this line in it:
+### Command
+    sudo vi /etc/fstab
 
-#### /dev/vde /test ext4 defaults 0 2
+    /dev/vdd none swap defaults 0 0
 
-Save and exit.
+    sudo swapon -a
 
+### Explanation
+- swap entry format:
+    device none swap defaults 0 0
+- swapon -a → activate all swap entries
 
-## Task:
+</details>
 
-Configure the system to automatically use /dev/vdd as swap when it boots up.
+---
 
-For now, you do not need to reboot the system after making the required changes as this might affect the next task.
+## 🧪 Task 9
 
-- Is required configuration done ?
+Task: Change label of /dev/vdd filesystem to SwapFS.
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Edit /etc/fstab file:
+### Command
+    sudo xfs_admin -L SwapFS /dev/vdd
 
-#### vi /etc/fstab
+### Explanation
+- xfs_admin → modify XFS filesystem metadata
+- -L → set label
 
-If the user is not root, you need to use the command with sudo.
-
-Add this line in it:
-
-#### /dev/vdd none swap defaults 0 0
-
-Save and exit.
-
-
-## Task:
-
-Change the label for /dev/vdd filesystem to SwapFS
-
-- Required label set for the filesystem?
-
-## Solution:
-
-Execute below given command:
-
-#### xfs_admin -L "SwapFS" /dev/vdd
-
-If the user is not root, you need to use the command with sudo.
-
-
+</details>
