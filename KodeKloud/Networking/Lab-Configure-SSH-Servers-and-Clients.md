@@ -1,254 +1,237 @@
-# Configure SSH Servers & Clients — LFCS Lab (Hidden Answers)
+one more for Networking:
 
----
+# Lab - Configure-SSH-Servers-and-Clients
 
-## 🧠 Mental Model
+## Task:
 
-- /etc/ssh/sshd_config → SSH server configuration
-- /etc/ssh/ssh_config → SSH client configuration (system-wide)
-- Server = what YOU control
-- Client = how YOU connect
+In what file can we edit the settings of our SSH server?
 
----
+## Solution:
 
-## 🧪 Task 1
+We can edit the settings of our SSH server in /etc/ssh/sshd_config file.
 
-Task: Where can we edit SSH server settings?
 
-<details>
-<summary>Answer</summary>
+## Task:
 
-### Command
-    /etc/ssh/sshd_config
+In a squid proxy server, what does this line do?
 
-### Explanation
-- sshd_config → SSH daemon (server) config file
+#### http_access allow localnetwork
 
-</details>
+A. It makes it accept connections from the computers in our local network.
 
----
+B. It lets computers in the local network use the http protocol, but not the https protocol.
 
-## 🧪 Task 2
+C. It makes it accept incoming connections from whatever was defined in the ACL named "localnetwork"
 
-Task: What does this squid rule do?
+D. It lets computers use the proxy server to access devices in the "localnetwork" ACL.
 
-    http_access allow localnetwork
+## Solution:
 
-<details>
-<summary>Answer</summary>
+It makes it accept incoming connections from whatever was defined in the ACL named localnetwork.
 
-### Explanation
-- allows access based on ACL definition
-- correct answer:
-  accepts incoming connections from whatever is defined in ACL "localnetwork"
 
-</details>
+## Task:
 
----
+Edit the configuration of the SSH server and disable password logins.
 
-## 🧪 Task 3
+Please make sure to restart the sshd service after making the required changes.
 
-Task: Disable SSH password logins and restart service.
+Is SSH password login disabled?
 
-<details>
-<summary>Answer</summary>
+## Solution:
 
-### Command
-    sudo vi /etc/ssh/sshd_config
+Edit the /etc/ssh/sshd_config file:
 
-    PasswordAuthentication no
+#### sudo vi /etc/ssh/sshd_config
 
-    sudo systemctl restart sshd
+Uncomment the below line or add it if doesn't exist:
 
-### Explanation
-- PasswordAuthentication no → disable password auth
-- restart required to apply changes
+#### PasswordAuthentication no
 
-</details>
+Save your changes and restart the sshd service:
 
----
+#### sudo systemctl restart sshd
 
-## 🧪 Task 4
 
-Task: Enable X11 forwarding in SSH client config.
+## Task:
 
-<details>
-<summary>Answer</summary>
+Edit the system-wide configuration of the SSH client and turn on X11 forwarding.
 
-### Command
-    sudo vi /etc/ssh/ssh_config
+Has X11 forwarding been turned on?
 
-    ForwardX11 yes
+## Solution:
 
-### Explanation
-- ssh_config → client config
-- ForwardX11 → enable GUI forwarding over SSH
+Edit the /etc/ssh/ssh_config file:
 
-</details>
+#### sudo vi /etc/ssh/ssh_config
 
----
+Uncomment the below line or add it if doesn't exist:
 
-## 🧪 Task 5
+#### ForwardX11 yes
 
-Task: Install and start squid proxy server.
 
-<details>
-<summary>Answer</summary>
+## Task:
 
-### Command
-    sudo apt install squid -y
-    sudo systemctl start squid
+Install squid proxy server on this system and start its service.
 
-### Explanation
-- install squid package
-- start squid service
+Is squid proxy server installed?
 
-</details>
+Is squid service started?
 
----
+## Solution:
 
-## 🧪 Task 6
+Execute the below command to install the required package:
 
-Task: Deny access to ACL localnet in squid.
+#### sudo apt install squid -y
 
-<details>
-<summary>Answer</summary>
+Start squid service
 
-### Command
-    sudo vi /etc/squid/squid.conf
+#### sudo systemctl start squid
 
-    http_access deny localnet
 
-### Explanation
-- change allow → deny
-- blocks access for localnet ACL
+## Task:
 
-</details>
+Edit the config file of the Squid proxy daemon. Modify it to deny access to the IP addresses defined in the ACL called localnet.
 
----
+Is squid proxy configured to deny access to localnet?
 
-## 🧪 Task 7
+## Solution:
 
-Task: Add ACL vpn (203.0.110.5) and allow access.
+Edit the /etc/squid/squid.conf file:
 
-<details>
-<summary>Answer</summary>
+#### sudo vi /etc/squid/squid.conf
 
-### Command
-    sudo vi /etc/squid/squid.conf
+And change the line http_access allow localnet to http_access deny localnet.
 
-    acl vpn src 203.0.110.5
-    http_access allow vpn
 
-### Explanation
-- acl → define access list
-- src → source IP
-- allow rule must be above deny rules
+## Task:
 
-</details>
+Edit the configuration of the Squid proxy daemon. Add a src type acl and name it vpn. The IP you should use in this acl is 203.0.110.5. Now add a new rule that tells the proxy server to allow access to the acl named vpn.
 
----
+Is the new acl named vpn added?
 
-## 🧪 Task 8
+Is the new rule added?
 
-Task: Configure SSH server to use IPv4 only.
+## Solution:
 
-<details>
-<summary>Answer</summary>
+Edit the /etc/squid/squid.conf file:
 
-### Command
-    sudo vi /etc/ssh/sshd_config
+#### sudo vi /etc/squid/squid.conf
 
-    AddressFamily inet
+and Save the below changes in it:
+Add this line
 
-### Explanation
-- inet → IPv4 only
-- disables IPv6 usage
+#### acl vpn src 203.0.110.5
 
-</details>
+Add the below line in the same file before the http_access deny all line:
 
----
+#### http_access allow vpn
 
-## 🧪 Task 9
 
-Task: Allow squid access to external ACL.
+## Task:
 
-<details>
-<summary>Answer</summary>
+Edit the configuration of the SSH server and configure it to use only IPv4 IP address family.
 
-### Command
-    sudo vi /etc/squid/squid.conf
+Is SSHD server configured to use 'IPv4' IP address family?
 
-    http_access allow external
+## Solution:
 
-### Explanation
-- allows traffic defined in ACL "external"
-- placement matters (before deny rules)
+Edit the /etc/ssh/sshd_config file:
 
-</details>
+#### sudo vi /etc/ssh/sshd_config
 
----
+Uncomment the below line in it:
 
-## 🧪 Task 10
+#### #AddressFamily any
 
-Task: Block facebook.com using squid.
+and change it to (add it if doesn't exist):
 
-<details>
-<summary>Answer</summary>
+#### AddressFamily inet
 
-### Command
-    sudo vi /etc/squid/squid.conf
 
-    acl facebook dstdomain .facebook.com
-    http_access deny facebook
+## Task:
 
-### Explanation
-- dstdomain → match destination domain
-- .facebook.com → includes subdomains
-- deny rule blocks access
+Edit the configuration of the Squid proxy daemon. Now, add a new rule that allows http access to external.
 
-</details>
+Is squid server configured to allow http access to external?
 
----
+## Solution:
 
-## 🧪 Task 11
+Edit the /etc/squid/squid.conf file:
 
-Task: Enable SSH password login and disable root login.
+#### sudo vi /etc/squid/squid.conf
 
-<details>
-<summary>Answer</summary>
+Add the below line in this file after the http_access allow localhost line:
 
-### Command
-    sudo vi /etc/ssh/sshd_config
+#### http_access allow external
 
-    PasswordAuthentication yes
-    PermitRootLogin no
 
-    sudo systemctl restart sshd
+## Task:
 
-### Explanation
-- enable password login
-- disable root login for security
-- restart required
+Edit the configuration of the Squid proxy daemon, and add an acl and http access rule to block facebook.com.
 
-</details>
+Has the required acl been added?
 
----
+Has facebook.com been blocked?
 
-## 🧪 Task 12
+## Solution:
 
-Task: Set max authentication attempts to 4.
+Edit the /etc/squid/squid.conf file:
 
-<details>
-<summary>Answer</summary>
+#### sudo vi /etc/squid/squid.conf
 
-### Command
-    sudo vi /etc/ssh/sshd_config
+Add the acl provided below:
 
-    MaxAuthTries 4
+#### acl facebook dstdomain .facebook.com
 
-### Explanation
-- limits login attempts per connection
-- helps prevent brute-force attacks
+And add the below line after the http_access allow localhost line:
 
-</details>
+#### http_access deny facebook
+
+
+## Task:
+
+Edit the configuration of the SSH server and re-enable password logins, but disable the SSH login for user root.
+
+Is SSH password login enabled?
+
+Is SSH login disabled for user root?
+
+## Solution:
+
+Edit /etc/ssh/sshd_config file:
+
+#### sudo vi /etc/ssh/sshd_config
+
+Change the below line:
+
+#### PasswordAuthentication no
+
+to
+
+#### PasswordAuthentication yes
+
+Uncomment the below line or add it if doesn't exist:
+
+#### PermitRootLogin no
+
+Save your changes and restart the sshd service:
+
+#### sudo systemctl restart sshd
+
+
+## Task:
+
+In the configuration file of the SSH server, change the maximum number of authentication attempts permitted per connection to 4.
+
+Is the maximum number of authentication attempts permitted per connection changed to "4"?
+
+## Solution:
+
+Edit the /etc/ssh/sshd_config file:
+
+#### sudo vi /etc/ssh/sshd_config
+
+Uncomment the below line or add it if doesn't exist:
+
+#### MaxAuthTries 4
