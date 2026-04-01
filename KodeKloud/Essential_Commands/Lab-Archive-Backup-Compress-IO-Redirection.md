@@ -1,156 +1,303 @@
-# Lab - Archive, Back Up, Compress, IO, Redirection
+# Archive, Back Up, Compress, IO & Redirection — LFCS Lab (Hidden Answers)
 
-Task:
-Create a tar archive logs.tar (under bob's home) of the/var/log/ directory
+---
 
-Solution:
-sudo tar -cvf logs.tar /var/log
+## 🧪 Task 1
 
--c: Create a new archive.
--v: Verbose — show files being added (nice for confirmation).
--f: Specify the filename of the archive.
+Task: Create a tar archive logs.tar (under bob's home) of the /var/log/ directory.
 
-So, tar -cvf logs.tar /var/log means: "Create (-c) a verbose (-v) archive with filename (-f) logs.tar of the /var/log directory."
+<details>
+<summary>Answer</summary>
 
+### Command
+    cd /home/bob
+    sudo tar -cvf logs.tar /var/log
 
-Task:
-Create a compressed tar archive logs.tar.gz (under bob's home) of the /var/log/ directory
+### Explanation
+- tar → archive tool
+- -c → create archive
+- -v → verbose output
+- -f logs.tar → archive filename
+- /var/log → source directory to archive
 
-Solution:
-sudo tar czfP logs.tar.gz /var/log/
+</details>
 
-In the context of the tar command, the capital P flag stands for "absolute path". When used, it tells tar to preserve the full absolute path of files and directories during archiving, rather than making them relative or stripping the leading slash.
+---
 
-This is useful if you want to extract the archive exactly where the files originally resided, maintaining the full directory structure.
+## 🧪 Task 2
 
+Task: Create a compressed tar archive logs.tar.gz (under bob's home) of the /var/log/ directory.
 
-Task:
-List the content of the /home/bob/logs.tar archive and save the output in the /home/bob/tar_data.txt file.
+<details>
+<summary>Answer</summary>
 
-Solution:
-tar tfP /home/bob/logs.tar > /home/bob/tar_data.txt
+### Command
+    cd /home/bob
+    sudo tar -czf logs.tar.gz /var/log/
 
+### Explanation
+- -c → create archive
+- -z → gzip compression
+- -f logs.tar.gz → archive filename
+- /var/log/ → source directory
+- The extra `-P` is not required for this task.
 
-Task:
-Extract the contents of /home/bob/archive.tar.gz to the /tmp directory
+</details>
 
-Solution:
-tar --extract --file /home/bob/archive.tar.gz --directory /tmp/
-or
-tar xf /home/bob/archive.tar.gz -C /tmp
+---
 
-The uppercase -C flag in tar doesn't mean "copy." Instead, it stands for "change to directory" before performing the operation. Think of it as telling tar to switch to a specific directory and then do its thing there—like a quick change of location before acting.
+## 🧪 Task 3
 
-For example:
+Task: List the content of the /home/bob/logs.tar archive and save the output in the /home/bob/tar_data.txt file.
 
-tar -czf archive.tar.gz -C /path/to/directory .
+<details>
+<summary>Answer</summary>
 
-This creates an archive of the contents in /path/to/directory without including the full path
+### Command
+    tar -tf /home/bob/logs.tar > /home/bob/tar_data.txt
 
+### Explanation
+- -t → list archive contents
+- -f /home/bob/logs.tar → archive to read
+- `>` → redirect output to file
+- The extra `-P` is not required for listing.
 
-Task:
-Execute the /home/bob/script.sh script and save all normal output (except errors/warnings) in the /home/bob/output_stdout.txt file
+</details>
 
-Solution:
-sudo ./script.sh > /home/bob/output_stdout.txt
+---
 
-The ./ before script.sh indicates that the script is located in the current directory. It's a way to tell the shell, "Run this script from the current directory," especially when the current directory isn't in the system's PATH.
+## 🧪 Task 4
 
-In your case, ./script.sh means you're executing the script.sh file in the directory you're currently in, rather than searching for it in the directories listed in PATH.
+Task: Extract the contents of /home/bob/archive.tar.gz to the /tmp directory.
 
+<details>
+<summary>Answer</summary>
 
-Task:
-Execute the /home/bob/script.sh script and save all command output (both errors/warnings and normal output) in the /home/bob/output.txt file
+### Command
+    tar -xf /home/bob/archive.tar.gz -C /tmp
 
-Solution:
-sudo ./script.sh > /home/bob/output.txt 2>&1
+### Explanation
+- -x → extract
+- -f /home/bob/archive.tar.gz → archive to extract
+- -C /tmp → change to /tmp before extracting
+- Many `tar` versions auto-detect compression here, so `-z` is often not required.
 
+</details>
 
-Task:
-Execute the /home/bob/script.sh script and save all errors only in the /home/bob/output_errors.txt file
+---
 
-Solution:
-sudo ./script.sh 2> /home/bob/output_errors.txt
+## 🧪 Task 5
 
+Task: Execute the /home/bob/script.sh script and save all normal output (except errors/warnings) in the /home/bob/output_stdout.txt file.
 
-Task:
-Create a bzip archive under bob's home named file.txt.bz2 out of /home/bob/file.txt, but preserve the original file. At the end of the exercise, you should have both.
+<details>
+<summary>Answer</summary>
 
-Does the original file exist?
-Is bzip2 created?
+### Command
+    /home/bob/script.sh > /home/bob/output_stdout.txt
 
-bzip2 is created?
+### Explanation
+- /home/bob/script.sh → run the script by full path
+- `>` → redirect standard output only
+- standard error is not redirected, so errors/warnings still go to the terminal
 
-Solution:
-bzip2 --keep /home/bob/file.txt
+</details>
 
+---
 
-Task:
-Extract the contents of /home/bob/archive.tar.gz to the /opt directory
+## 🧪 Task 6
 
-Solution:
-sudo tar --extract --file /home/bob/archive.tar.gz --directory /opt/
-or
-sudo tar xf /home/bob/archive.tar.gz -C /opt
+Task: Execute the /home/bob/script.sh script and save all command output (both errors/warnings and normal output) in the /home/bob/output.txt file.
 
+<details>
+<summary>Answer</summary>
 
-Task:
-Use the cat command, and redirection, to add (append) the contents of /home/bob/file.txt to /home/bob/destination.txt.
+### Command
+    /home/bob/script.sh > /home/bob/output.txt 2>&1
 
-Solution:
-cat /home/bob/file.txt >> /home/bob/destination.txt
+### Explanation
+- `>` → redirect standard output to file
+- `2>&1` → redirect standard error to wherever standard output is going
+- result → both stdout and stderr go into the same file
 
+</details>
 
-Task:
-Create a file.tar archive of the /home/bob/file directory under the /home/bob location.
+---
 
-Is the archive created?
+## 🧪 Task 7
 
-Check contents.
+Task: Execute the /home/bob/script.sh script and save all errors only in the /home/bob/output_errors.txt file.
 
-Solution:
-cd  /home/bob
-tar --create --file file.tar  file
+<details>
+<summary>Answer</summary>
 
+### Command
+    /home/bob/script.sh 2> /home/bob/output_errors.txt
 
-Task:
-Create the gzip archive of the games.txt file , which is present under the /home/bob directory.
+### Explanation
+- `2>` → redirect standard error only
+- standard output still goes to the terminal
+- output_errors.txt will contain only errors/warnings
 
-Is the gzip of "games.txt" file created?
+</details>
 
-Solution:
+---
 
-cd /home/bob
-gzip games.txt
+## 🧪 Task 8
 
+Task: Create a bzip archive under bob's home named file.txt.bz2 out of /home/bob/file.txt, but preserve the original file.
 
-Task:
-We have a /home/bob/lfcs.txt.xz file; uncompress it under /home/bob/.
+<details>
+<summary>Answer</summary>
 
-Is the file uncompressed?
+### Command
+    bzip2 --keep /home/bob/file.txt
 
-Solution:
-cd /home/bob
-unxz lfcs.txt.xz
+### Explanation
+- bzip2 → compress file with bzip2
+- --keep → keep original file
+- result → /home/bob/file.txt remains and /home/bob/file.txt.bz2 is created
 
+</details>
 
-Task:
-Sort the contents of the /home/bob/values.conf file alphabetically and eliminate any common values. Save the sorted output in the /home/bob/values.sort file.
+---
 
-Verify the sorted output.
+## 🧪 Task 9
 
-Solution:
-sort -du /home/bob/values.conf > /home/bob/values.sort
+Task: Extract the contents of /home/bob/archive.tar.gz to the /opt directory.
 
+<details>
+<summary>Answer</summary>
 
-Task:
-Sort again the contents of the /home/bob/values.conf file alphabetically. Eliminate any common values and ignore case
+### Command
+    sudo tar -xf /home/bob/archive.tar.gz -C /opt
 
-Finally, save the sorted output in the/home/bob/values.sorted file
+### Explanation
+- -x → extract
+- -f → archive file
+- -C /opt → extract into /opt
 
-Verify the sorted output
+</details>
 
-Solution:
-sort -duf /home/bob/values.conf > /home/bob/values.sorted
+---
 
+## 🧪 Task 10
 
+Task: Use the cat command, and redirection, to add (append) the contents of /home/bob/file.txt to /home/bob/destination.txt.
+
+<details>
+<summary>Answer</summary>
+
+### Command
+    cat /home/bob/file.txt >> /home/bob/destination.txt
+
+### Explanation
+- cat → print file contents
+- `>>` → append output to file
+- destination.txt keeps existing content and gets the new content added at the end
+
+</details>
+
+---
+
+## 🧪 Task 11
+
+Task: Create a file.tar archive of the /home/bob/file directory under the /home/bob location.
+
+<details>
+<summary>Answer</summary>
+
+### Command
+    cd /home/bob
+    tar --create --file file.tar file
+
+### Explanation
+- --create → create archive
+- --file file.tar → archive name
+- file → source directory inside /home/bob
+- running from /home/bob makes the archive path and source clean
+
+</details>
+
+---
+
+## 🧪 Task 12
+
+Task: Create the gzip archive of the games.txt file, which is present under the /home/bob directory.
+
+<details>
+<summary>Answer</summary>
+
+### Command
+    cd /home/bob
+    gzip games.txt
+
+### Explanation
+- gzip → compress file with gzip
+- creates games.txt.gz
+- original games.txt is removed by default
+
+</details>
+
+---
+
+## 🧪 Task 13
+
+Task: We have a /home/bob/lfcs.txt.xz file; uncompress it under /home/bob/.
+
+<details>
+<summary>Answer</summary>
+
+### Command
+    cd /home/bob
+    unxz lfcs.txt.xz
+
+### Explanation
+- unxz → decompress xz file
+- creates lfcs.txt
+- removes lfcs.txt.xz by default
+
+</details>
+
+---
+
+## 🧪 Task 14
+
+Task: Sort the contents of the /home/bob/values.conf file alphabetically and eliminate any common values. Save the sorted output in the /home/bob/values.sort file.
+
+<details>
+<summary>Answer</summary>
+
+### Command
+    sort -u /home/bob/values.conf > /home/bob/values.sort
+
+### Explanation
+- sort → sort lines alphabetically
+- -u → unique only, remove duplicate lines
+- `>` → save result to file
+- `-d` is not required for this task.
+
+</details>
+
+---
+
+## 🧪 Task 15
+
+Task: Sort again the contents of the /home/bob/values.conf file alphabetically. Eliminate any common values and ignore case.
+
+Finally, save the sorted output in the /home/bob/values.sorted file.
+
+<details>
+<summary>Answer</summary>
+
+### Command
+    sort -uf /home/bob/values.conf > /home/bob/values.sorted
+
+### Explanation
+- sort → sort lines
+- -u → unique only
+- -f → ignore case by folding lowercase to uppercase for comparisons
+- `>` → save result to file
+- `-d` is not required for this task.
+
+</details>
