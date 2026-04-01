@@ -1,180 +1,217 @@
-# Create Filesystems and Mount Them at Boot — LFCS Lab (Hidden Answers)
+# Lab - Create Filesystems and Mount Them at Boot
 
----
+## Task:
 
-## 🧪 Task
+What file do we need to edit to tell the Linux OS which filesystems it should automatically mount when it boots up?
 
-Task: What file do we need to edit to tell the Linux OS which filesystems it should automatically mount when it boots up?
-
-<details>
-<summary>Answer</summary>
-
-## Solution:
-
-We will need to edit /etc/fstab file.
-
-### Explanation
-
-- /etc/fstab → defines mounts at boot
-
+<details><summary>Answer</summary>
+We will need to edit /etc/fstab file to tell the Linux OS which filesystems it should automatically mount when it boots up.
 </details>
 
+### Explanation:
+- /etc/fstab → filesystem table
+- defines which filesystems mount at boot
+- contains device, mount point, type, and options
+
 ---
 
-## 🧪 Task
+## Task:
 
-Task: What is wrong with mkfs.xfs command?
+We want to create an xfs filesystem on /dev/vdd1 with the label BackupVolume. What is wrong with this command?
 
-<details>
-<summary>Answer</summary>
+#### sudo mkfs.xfs -l "BackupVolume" /dev/vdd1
 
-## Solution:
+A. The volume name is too long. 10 characters is the maximum limit and we used 12.
 
-The lowercase -l option is wrong. It should be -L.
+B. The lowercase -l option is wrong. It should be -L, with an uppercase L.
 
-### Explanation
+C. The -l option should go at the end. The command should be: sudo mkfs.xfs /dev/vdd1 -l "BackupVolume".
 
-- -L → sets filesystem label
-- -l → incorrect flag
+D. The command mkfs.xfs is wrong. It should be mkfs-xfs.
 
+<details><summary>Answer</summary>
+The lowercase -l option is wrong. It should be -L, with an uppercase L
 </details>
 
----
-
-## 🧪 Task
-
-Task: Create XFS filesystem labeled DataDisk.
-
-<details>
-<summary>Answer</summary>
-
-## Solution:
-
-    mkfs.xfs -L "DataDisk" /dev/vdd
-
-### Explanation
-
+### Explanation:
 - mkfs.xfs → create XFS filesystem
-- -L → assign label
-
-</details>
-
----
-
-## 🧪 Task
-
-Task: Create ext4 filesystem with 2048 inodes.
-
-<details>
-<summary>Answer</summary>
-
-## Solution:
-
-    mkfs.ext4 -N 2048 /dev/vde
-
-### Explanation
-
-- -N → sets inode count
-
-</details>
+- -L → set filesystem label
+- -l → incorrect option for label
 
 ---
 
-## 🧪 Task
+## Task:
 
-Task: Mount /dev/vdd to /mnt.
+Create an xfs filesystem with the label "DataDisk" on /dev/vdd.
 
-<details>
-<summary>Answer</summary>
+Is the required label set for the filesystem?
 
-## Solution:
+<details><summary>Answer</summary>
+Execute the below command:
 
-    mount /dev/vdd /mnt
+#### mkfs.xfs -L "DataDisk" /dev/vdd
 
-### Explanation
-
-- mount → attaches filesystem
-
+If the user is not root, you need to use the command with sudo.
 </details>
+
+### Explanation:
+- mkfs.xfs → create XFS filesystem
+- -L "DataDisk" → assign label
+- /dev/vdd → target device
 
 ---
 
-## 🧪 Task
+## Task:
 
-Task: Unmount filesystem.
+Create an ext4 filesystem with 2048 inodes on /dev/vde.
 
-<details>
-<summary>Answer</summary>
+Is the required filesystem created?
 
-## Solution:
+<details><summary>Answer</summary>
+Execute the below command:
 
-    umount /mnt
+#### mkfs.ext4 -N 2048 /dev/vde
 
-### Explanation
-
-- umount → detaches filesystem
-
+If the user is not root, you need to use the command with sudo.
 </details>
+
+### Explanation:
+- mkfs.ext4 → create ext4 filesystem
+- -N 2048 → specify number of inodes
+- /dev/vde → target device
 
 ---
 
-## 🧪 Task
+## Task:
 
-Task: Configure /dev/vde mount at boot.
+Mount /dev/vdd in the /mnt/ directory.
 
-<details>
-<summary>Answer</summary>
+Is the partition mounted?
 
-## Solution:
+<details><summary>Answer</summary>
+Execute the below command:
 
-    mkdir /test
-    vi /etc/fstab
+#### mount /dev/vdd /mnt
 
-    /dev/vde /test ext4 defaults 0 2
-
-### Explanation
-
-- defaults → standard mount options
-- 2 → fsck order
-
+If the user is not root, you need to use the command with sudo.
 </details>
+
+### Explanation:
+- mount → attach filesystem
+- /dev/vdd → source device
+- /mnt → mount point directory
 
 ---
 
-## 🧪 Task
+## Task:
 
-Task: Configure swap at boot.
+Unmount the filesystem mounted in the /mnt/ directory.
 
-<details>
-<summary>Answer</summary>
+Is filesystem unmounted?
 
-## Solution:
+<details><summary>Answer</summary>
+Execute the below command:
 
-    vi /etc/fstab
+#### umount /mnt
 
-    /dev/vdd none swap defaults 0 0
-
-### Explanation
-
-- swap entries use "none" as mount point
-
+If the user is not root, you need to use the command with sudo.
 </details>
+
+### Explanation:
+- umount → detach filesystem
+- /mnt → mount point being unmounted
 
 ---
 
-## 🧪 Task
+## Task:
 
-Task: Change label to SwapFS.
+Configure the system to automatically mount /dev/vde when it boots up. This partition has an ext4 filesystem on it. It should mount the filesystem to the /test directory. This directory does not exist. Make sure you create it first.
 
-<details>
-<summary>Answer</summary>
+Also, make sure this filesystem is checked on boot.
 
-## Solution:
+For now, you do not need to reboot the system after making the required changes.
 
-    xfs_admin -L "SwapFS" /dev/vdd
+- Is the "/test" directory created?
 
-### Explanation
+- Is '/dev/vde' automatically mounted when system boots up?
 
-- xfs_admin → modifies XFS metadata
+<details><summary>Answer</summary>
+First, create a directory using the following command:
 
+#### mkdir /test
+
+Edit the /etc/fstab file:
+
+#### vi /etc/fstab
+
+If the user is not root, you need to use the command with sudo.
+
+Add this line in it:
+
+#### /dev/vde /test ext4 defaults 0 2
+
+Save and exit.
 </details>
+
+### Explanation:
+- mkdir /test → create mount point
+- /etc/fstab → define auto-mount configuration
+- /dev/vde → device
+- /test → mount point
+- ext4 → filesystem type
+- defaults → default mount options
+- 0 → dump setting
+- 2 → filesystem check order at boot
+
+---
+
+## Task:
+
+Configure the system to automatically use /dev/vdd as swap when it boots up.
+
+For now, you do not need to reboot the system after making the required changes as this might affect the next task.
+
+- Is required configuration done ?
+
+<details><summary>Answer</summary>
+Edit /etc/fstab file:
+
+#### vi /etc/fstab
+
+If the user is not root, you need to use the command with sudo.
+
+Add this line in it:
+
+#### /dev/vdd none swap defaults 0 0
+
+Save and exit.
+</details>
+
+### Explanation:
+- /etc/fstab → filesystem configuration file
+- /dev/vdd → swap device
+- none → no mount point
+- swap → filesystem type
+- defaults → default options
+- 0 0 → skip dump and fsck
+
+---
+
+## Task:
+
+Change the label for /dev/vdd filesystem to SwapFS
+
+- Required label set for the filesystem?
+
+<details><summary>Answer</summary>
+Execute below given command:
+
+#### xfs_admin -L "SwapFS" /dev/vdd
+
+If the user is not root, you need to use the command with sudo.
+</details>
+
+### Explanation:
+- xfs_admin → manage XFS filesystem parameters
+- -L "SwapFS" → set new label
+- /dev/vdd → target filesystem
