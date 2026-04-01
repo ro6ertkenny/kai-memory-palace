@@ -8,7 +8,10 @@ cut -d ';' -f 2 testfile
 </details>
 
 ### Explanation:
-cut extracts fields from text. -d ';' sets the delimiter to semicolon, and -f 2 selects the second field from each line.
+- cut → extract fields from text
+- -d ';' → set delimiter to semicolon
+- -f 2 → select the second field
+- testfile → input file being processed
 
 ---
 
@@ -20,7 +23,13 @@ sed -i 's/enabled/disabled/g' /home/bob/values.conf
 </details>
 
 ### Explanation:
-sed performs text substitution. -i edits the file in place, s replaces text, and g applies the change globally on each line.
+- sed → stream editor for text transformation
+- -i → edit file in place
+- s → substitute command
+- enabled → text to match
+- disabled → replacement text
+- g → replace all occurrences on each line
+- /home/bob/values.conf → target file
 
 ---
 
@@ -32,7 +41,14 @@ sed -i 's/disabled/enabled/gi' /home/bob/values.conf
 </details>
 
 ### Explanation:
-The i flag makes the match case-insensitive, so all variations of "disabled" are replaced with "enabled".
+- sed → stream editor
+- -i → edit file in place
+- s → substitute command
+- disabled → pattern to match
+- enabled → replacement text
+- g → replace all matches on each line
+- i → case-insensitive matching
+- /home/bob/values.conf → target file
 
 ---
 
@@ -44,7 +60,14 @@ sed -i '500,2000s/enabled/disabled/g' values.conf
 </details>
 
 ### Explanation:
-500,2000 limits the operation to lines 500 through 2000, applying the substitution only within that range.
+- sed → stream editor
+- -i → edit file in place
+- 500,2000 → line range to apply changes
+- s → substitute command
+- enabled → pattern to match
+- disabled → replacement text
+- g → replace all matches on each line
+- values.conf → target file
 
 ---
 
@@ -56,7 +79,14 @@ sed -i 's~#%$2jh//238720//31223~$2//23872031223~g' /home/bob/data.txt
 </details>
 
 ### Explanation:
-~ is used as a delimiter instead of / to avoid escaping slashes in the pattern. The substitution replaces the exact string globally.
+- sed → stream editor
+- -i → edit file in place
+- s → substitute command
+- ~ → delimiter used instead of / to avoid escaping slashes
+- #%$2jh//238720//31223 → pattern to match
+- $2//23872031223 → replacement text
+- g → replace all matches on each line
+- /home/bob/data.txt → target file
 
 ---
 
@@ -68,7 +98,11 @@ To perform the action, you will need to cut and paste a line of text. The specif
 </details>
 
 ### Explanation:
-dd deletes (cuts) the current line in vim, and p pastes it below the current cursor position.
+- :1049 → jump to line 1049 in vim
+- dd → delete (cut) the current line
+- navigate to line 5 → move cursor to target location
+- p → paste below the current line
+- vim → editor used to manipulate file content
 
 ---
 
@@ -80,7 +114,11 @@ The steps can vary from editor to editor, but let's use vi editor: Open file wit
 </details>
 
 ### Explanation:
-In vim, prefixing dd with a number (1000dd) deletes that many lines starting from the current line.
+- vi → open file in editor
+- 1000dd → delete 1000 lines starting from current line
+- dd → delete a line
+- number prefix → repeat the command that many times
+- save → write changes to disk
 
 ---
 
@@ -92,7 +130,10 @@ Execute the below command: ## diff file1 file2 Copy the line you got in the outp
 </details>
 
 ### Explanation:
-diff compares two files and shows differences. You manually identify the unique line and save it into file3.
+- diff → compare two files line by line
+- file1 file2 → files being compared
+- output → shows differences between files
+- vi file3 → open/create file3 to store the unique line
 
 ---
 
@@ -104,7 +145,11 @@ In the /home/bob/textfile file, there's a number that has 5 digits. Save the num
 </details>
 
 ### Explanation:
-egrep searches using regex. [0-9]{5} matches exactly five digits, and > redirects the output to a file.
+- egrep → search using extended regular expressions
+- [0-9]{5} → match exactly five digits
+- textfile → input file being searched
+- > → redirect output to file
+- /home/bob/number → destination file
 
 ---
 
@@ -116,7 +161,12 @@ How many numbers in /home/bob/textfile begin with the number 2. Save the count i
 </details>
 
 ### Explanation:
-^2 matches lines starting with 2, and -c counts how many matching lines exist.
+- grep → search text
+- -c → count matching lines
+- ^2 → match lines starting with 2
+- textfile → input file
+- > → redirect output to file
+- /home/bob/count → destination file
 
 ---
 
@@ -128,7 +178,13 @@ How many lines in the /home/bob/testfile file begin with string Section, regardl
 </details>
 
 ### Explanation:
--i makes the match case-insensitive, and -c counts the number of matching lines.
+- grep → search text
+- -i → case-insensitive matching
+- -c → count matching lines
+- ^SECTION → match lines starting with "SECTION"
+- testfile → input file
+- > → redirect output to file
+- /home/bob/count_lines → destination file
 
 ---
 
@@ -140,7 +196,12 @@ Find all lines in the/home/bob/testfile file that contain string man; it must be
 </details>
 
 ### Explanation:
--w ensures only whole word matches are returned, avoiding partial matches like "manpath".
+- grep → search text
+- -w → match whole words only
+- man → target word
+- testfile → input file
+- > → redirect output to file
+- /home/bob/man_filtered → destination file
 
 ---
 
@@ -152,4 +213,8 @@ Save the last 500 lines of the /home/bob/textfile file in the /home/bob/last fil
 </details>
 
 ### Explanation:
-tail -500 outputs the last 500 lines of a file, and > redirects them into another file.
+- tail → output last part of a file
+- -500 → show last 500 lines
+- /home/bob/textfile → input file
+- > → redirect output to file
+- /home/bob/last → destination file
