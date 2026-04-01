@@ -1,32 +1,34 @@
-# Lab - Git & SSL Certifications
+# Git & SSL Certificates — LFCS Lab (Hidden Answers)
 
-## Task:
+---
 
-Generate a 4096-bit RSA private key and a Certificate Signing Request with a single command. The private key should be encrypted with the following password: "kkloud".
+## 🧪 Task 1
+
+Task: Generate a 4096-bit RSA private key and a Certificate Signing Request with a single command. The private key should be encrypted with the following password: "kkloud".
 
 Save the key in a file called priv.key. Save the CSR in a file called cert.csr. There are no requirements for the certificate details like country name, organisation name, and so on. You can pick anything, or press Enter to pick the default values when prompted.
 
-Private key is created?
+<details>
+<summary>Answer</summary>
 
-Certificate signing request is created?
+### Command
+    openssl req -newkey rsa:4096 -keyout priv.key -out cert.csr
 
-## Solution:
+### Explanation
+- openssl req → create or process certificate requests
+- -newkey rsa:4096 → generate a new 4096-bit RSA key
+- -keyout priv.key → save private key to priv.key
+- -out cert.csr → save CSR to cert.csr
+- the command will prompt for the PEM pass phrase
+- enter `kkloud` when prompted to encrypt the private key
 
-Use the below command to generate a key and certificate signing request.
+</details>
 
-### openssl req -newkey rsa:4096 -keyout priv.key -out cert.csr
+---
 
-and enter password when it prompts like below
+## 🧪 Task 2
 
-Enter PEM pass phrase:kkloud
-Verifying - Enter PEM pass phrase:kkloud
-
-Leave rest of the options default
-
-
-## Task:
-
-Generate a self-signed certificate
+Task: Generate a self-signed certificate.
 
 - Use no encryption for the private key.
 - Save the key in a file called priv.key.
@@ -35,160 +37,193 @@ Generate a self-signed certificate
 
 Set the Common Name to kodekloud.com. The rest of the certificate details you can set to whatever you want.
 
-Common name is set as kodekloud.com ?
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    openssl req -x509 -nodes -days 365 -keyout priv.key -out kodekloud.crt
 
-You can use the below command to generate a key and self-signed certificate.
+### Explanation
+- openssl req → certificate request / certificate creation mode
+- -x509 → create a self-signed certificate instead of a CSR
+- -nodes → no DES encryption on private key, meaning no passphrase
+- -days 365 → certificate valid for 365 days
+- -keyout priv.key → save private key
+- -out kodekloud.crt → save certificate
+- set the Common Name to `kodekloud.com` when prompted
 
-openssl req -x509 -noenc -days 365 -keyout priv.key -out kodekloud.crt
-Enter kodekloud.com for common name
+</details>
 
+---
 
-## Task:
+## 🧪 Task 3
 
-In your /home/bob/ directory you will find a file called my.crt. What is the Common Name set in this certificate?
+Task: In your /home/bob/ directory you will find a file called my.crt. What is the Common Name set in this certificate?
 
-## Solution:
+<details>
+<summary>Answer</summary>
 
-Identify the CN by below command
+### Command
+    openssl x509 -in /home/bob/my.crt -text -noout
 
-#### openssl x509 -in my.crt -text
+### Explanation
+- openssl x509 → inspect X.509 certificates
+- -in /home/bob/my.crt → certificate file to read
+- -text → show human-readable certificate details
+- -noout → do not print the encoded certificate
+- look for the Subject field and identify the `CN`
+- expected answer from the lab: `labs.kodekloud.com`
 
-in the output of the command Identify the common name.
+</details>
 
-CN = labs.kodekloud.com
+---
 
+## 🧪 Task 4
 
-## Task:
-
-
-We've created a local Git repository for you.
+Task: We've created a local Git repository for you.
 
 - Please switch to the directory called /root/kode to access it.
 - You can stage all the files with the .cpp extension to prepare them for a future commit. The other files should NOT be staged.
 - Next, create a commit with the following message: Added C++ files.
 
-File3 with .txt extension is untracked?
+<details>
+<summary>Answer</summary>
 
-Commit message is set correctly?
+### Command
+    cd /root/kode
+    git add *.cpp
+    git commit -m "Added C++ files"
 
-## Solution:
-Navigate to directory kode
+### Explanation
+- cd /root/kode → enter the repository
+- git add *.cpp → stage only files ending in `.cpp`
+- git commit -m "Added C++ files" → create commit with exact message
+- `.txt` files remain unstaged and untracked if not added
 
-### cd kode
-Stage the files with .cpp extension.
+</details>
 
-### git add *.cpp
-Commit the files with the commit message Added C++ files
+---
 
-### git commit -m "Added C++ files"
+## 🧪 Task 5
 
+Task: Switch to the Git repository that can be found in the kode directory. Create a new branch called testing.
 
-## Task:
+<details>
+<summary>Answer</summary>
 
-Switch to the Git repository that can be found in the kode directory. Create a new branch called testing.
+### Command
+    cd kode
+    git branch testing
 
-NOTE: If you encounter an error while using a Git command, please exit the current directory and then re-enter it.
+### Explanation
+- git branch testing → create a new branch named `testing`
+- this creates the branch but does not switch to it
 
-Git branch with the name testing is created?
+</details>
 
-## Solution:
-Navigate to kode directory.
-Use the below command to create a branch with the name testing.
+---
 
-### git branch testing
+## 🧪 Task 6
 
-
-## Task:
-
-In the local Git repository that can be found in the kode directory do the following:
+Task: In the local Git repository that can be found in the kode directory do the following:
 
 - Delete the branch called "testing".
 - The error you will encounter is expected.
 
-Figure out what is preventing you from performing the task, solve the issue, and then delete the "testing" branch?
+Figure out what is preventing you from performing the task, solve the issue, and then delete the "testing" branch.
 
-Branch with name testing is deleted?
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    cd kode
+    git checkout master
+    git branch --delete testing
 
-Navigate to kode directory.
+### Explanation
+- a branch cannot be deleted while it is the currently checked out branch
+- git checkout master → switch off the `testing` branch
+- git branch --delete testing → delete the branch safely
 
-### cd kode
-Check out to master branch first because active branches can't be deleted.
+</details>
 
-### git checkout master
-Delete the testing branch now
+---
 
-### git branch --delete testing
+## 🧪 Task 7
 
+Task: Go into the local Git repository found in the kode directory and find the file that modified in latest commit.
 
-## Task:
+<details>
+<summary>Answer</summary>
 
-Go into the local Git repository found in the kode directory and find the file that modified in latest commit.
+### Command
+    cd kode
+    git log --raw -1
 
-## Solution:
+### Explanation
+- git log → show commit history
+- --raw → show file-level change details
+- -1 → only show the latest commit
+- inspect the modified file listed in the output
+- expected lab answer: `file2.cpp`
 
-Check for the file modified in the latest commit.
+</details>
 
-### git log --raw
+---
 
-You will find output similar to below one.
+## 🧪 Task 8
 
-### commit 6a64b289a71e970f94bcb6b0bd07424a05a98b83 (HEAD -> master)
-Author: Bob <bob@kodekloud.com>
-Date:   Fri Feb 16 09:11:41 2024 +0000
+Task: Go into the local Git repository that you can find in the kode directory. Merge the documentation branch into the master branch.
 
-    Added text
+<details>
+<summary>Answer</summary>
 
-:100644 100644 e69de29 a11f211 M        file2.cpp
+### Command
+    cd kode
+    git checkout master
+    git merge documentation
 
-We can find the file file2.cpp is modified.
+### Explanation
+- git checkout master → switch to target branch
+- git merge documentation → merge `documentation` into `master`
 
+</details>
 
-## Task:
+---
 
-Go into the local Git repository that you can find in the kode directory. Merge the documentation branch into the master branch.
+## 🧪 Task 9
 
-NOTE: If you encounter an error while using a Git command, please exit the current directory and then re-enter it.
+Task: What command would you use to push the master branch from your local repository to a remote repository nicknamed origin?
 
-documentation branch merged to the master branch ?
+<details>
+<summary>Answer</summary>
 
-## Solution:
+### Command
+    git push origin master
 
-Navigate to kode directory.
+### Explanation
+- git push → send local commits to remote
+- origin → remote nickname
+- master → branch to push
 
-### cd kode
+</details>
 
-To merge the documentation branch to the master branch we need to checkout in the master branch first.
+---
 
-### git checkout master
+## 🧪 Task 10
 
-Now merge the documentation branch to the master branch.
+Task: Clone the remote repository from https://github.com/kodekloudhub/git-for-beginners-course.git in your /home/bob/ directory. A subdirectory for the local repository will be automatically created.
 
-### git merge documentation
+<details>
+<summary>Answer</summary>
 
+### Command
+    cd /home/bob
+    git clone https://github.com/kodekloudhub/git-for-beginners-course.git
 
-## Task:
+### Explanation
+- cd /home/bob → go to target parent directory
+- git clone → download remote repository
+- Git automatically creates the local repo directory based on the repository name
 
-What command would you use to push the master branch from your local repository to a remote repository nicknamed origin?
-
-## Solution:
-
-### git push origin master 
-is the command we use to push changes to master branch of remote repository.
-
-
-## Task:
-
-Clone the remote repository from https://github.com/kodekloudhub/git-for-beginners-course.git in your /home/bob/ directory. A subdirectory for the local repository will be automatically created.
-
-Repository cloned ?
-
-## Solution:
-
-Navigate to /home/bob directory by cd /home/bob
-Clone the repo by below command
-
-### git clone https://github.com/kodekloudhub/git-for-beginners-course.git
+</details>
