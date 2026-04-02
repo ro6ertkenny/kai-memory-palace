@@ -61,7 +61,7 @@ tar tfP /home/bob/logs.tar > /home/bob/tar_data.txt
 - -f → specify the archive file to read
 - -P → preserve absolute path names when listing
 - /home/bob/logs.tar → archive being inspected
-- > → redirect standard output into a file
+-  > → redirect standard output into a file
 - /home/bob/tar_data.txt → file receiving the listing output
 
 </details>
