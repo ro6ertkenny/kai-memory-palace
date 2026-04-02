@@ -1060,7 +1060,7 @@ You should be able to save the output in a file using redirection: <your-command
 - -size -10M → smaller than 10 MB
 - `>` → save output to file
 
-# Understanding `-size +5M -size -10M` (Range Filtering in `find`)
+Understanding `-size +5M -size -10M` (Range Filtering in `find`)
 
 ---
 
@@ -1221,7 +1221,6 @@ There is no simpler syntax — just remember:
     + = above  
     - = below
 
-</details>
 
 # Why the `\` Is BEFORE the `)` (Not After)
 
@@ -1310,6 +1309,8 @@ This applies everywhere in Bash:
 > `\` escapes the character that follows it — not the one before
 
 ---
+
+</details>
 
 ## 🧪 Task 15
 
