@@ -264,7 +264,7 @@ Execute the below command:
 ### Explanation
 
 - mv → move files/directories
-- * → all contents inside /home/bob/lfcs
+- \* → all contents inside /home/bob/lfcs
 - the lfcs directory itself is not moved, only its contents
 
 </details>
