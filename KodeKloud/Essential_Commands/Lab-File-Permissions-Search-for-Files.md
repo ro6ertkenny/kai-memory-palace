@@ -1222,7 +1222,7 @@ There is no simpler syntax — just remember:
     - = below
 
 
-# Why the `\` Is BEFORE the `)` (Not After)
+## Why the `\` Is BEFORE the `)` (Not After)
 
 ## Expression
     \( -size +5M -a -size -10M \)
