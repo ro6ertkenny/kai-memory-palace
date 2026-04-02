@@ -832,7 +832,7 @@ How many numbers in /home/bob/textfile begin with the number 2. Save the count i
 - -c → count matching lines
 - ^2 → match lines starting with 2
 - textfile → input file
-'>' → redirect output to file
+- '>' → redirect output to file
 - /home/bob/count → destination file
 
 </details>
@@ -851,7 +851,7 @@ How many lines in the /home/bob/testfile file begin with string Section, regardl
 - -c → count matching lines
 - ^SECTION → match lines starting with "SECTION"
 - testfile → input file
-'>' → redirect output to file
+- '>' → redirect output to file
 - /home/bob/count_lines → destination file
 
 </details>
@@ -869,7 +869,7 @@ Find all lines in the/home/bob/testfile file that contain string man; it must be
 - -w → match whole words only
 - man → target word
 - testfile → input file
-'>' → redirect output to file
+- '>' → redirect output to file
 - /home/bob/man_filtered → destination file
 
 </details>
@@ -886,7 +886,7 @@ Save the last 500 lines of the /home/bob/textfile file in the /home/bob/last fil
 - tail → output last part of a file
 - -500 → show last 500 lines
 - /home/bob/textfile → input file
-'>' → redirect output to file
+- '>' → redirect output to file
 - /home/bob/last → destination file
 
 
