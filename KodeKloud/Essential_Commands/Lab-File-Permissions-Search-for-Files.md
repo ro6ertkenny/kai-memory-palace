@@ -363,7 +363,7 @@ Do not use octal notation for this question.
 - g+s → setgid
 - o+t → sticky bit
 
-# Special Permissions in Linux (setuid, setgid, sticky bit)
+## Special Permissions in Linux (setuid, setgid, sticky bit)
 
 ## What are `s` and `t`?
 
@@ -509,7 +509,7 @@ Save the location of the file in the /home/bob/dogs file.
 - -name dogs.txt → match exact filename
 - `>` → save full path output to file
 
-# Why `-name` Was Used in This Task
+## Why `-name` Was Used in This Task
 
 ---
 
@@ -874,7 +874,7 @@ How many such files did you find?
 - `|` → send output from one command into the next
 - wc -l → count matching lines
 
-# Why `| wc -l` Was Added
+## Why `| wc -l` Was Added
 
 ---
 
@@ -1328,7 +1328,7 @@ It should give us a permission denied error while listing the contents of the di
 - chmod 0100 → owner gets execute only
 - no read permission → listing contents fails with permission denied
 
-# Why `chmod 0100` Works (and Why They Didn’t Use `u g o`)
+## Why `chmod 0100` Works (and Why They Didn’t Use `u g o`)
 
 ## 🧠 Core Question
 > Why is this so simple?  
@@ -1500,7 +1500,7 @@ And the task is really testing:
 
 > Do you understand how directory permissions actually behave?
 
-# Yes — `go=` Means “Set to NOTHING”
+## Yes — `go=` Means “Set to NOTHING”
 
 ## Command
     chmod u=x,go= /home/bob/LFCS
@@ -1642,7 +1642,7 @@ command
 - 5 → r-x for group
 - 5 → r-x for others
 
-# Why Is There a Leading `0` in `0755`?
+## Why Is There a Leading `0` in `0755`?
 
 ---
 
