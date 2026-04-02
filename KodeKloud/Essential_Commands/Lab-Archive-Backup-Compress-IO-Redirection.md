@@ -11,7 +11,6 @@ sudo tar -cvf logs.tar /var/log
 -f: Specify the filename of the archive.
 
 So, tar -cvf logs.tar /var/log means: "Create (-c) a verbose (-v) archive with filename (-f) logs.tar of the /var/log directory."
-</details>
 
 ### Explanation:
 - tar → archive tool
@@ -21,6 +20,8 @@ So, tar -cvf logs.tar /var/log means: "Create (-c) a verbose (-v) archive with f
 - -f → specify the archive filename
 - logs.tar → name of the tar archive being created
 - /var/log → source directory being archived
+
+</details>
 
 ---
 
@@ -33,7 +34,6 @@ sudo tar czfP logs.tar.gz /var/log/
 In the context of the tar command, the capital P flag stands for "absolute path". When used, it tells tar to preserve the full absolute path of files and directories during archiving, rather than making them relative or stripping the leading slash.
 
 This is useful if you want to extract the archive exactly where the files originally resided, maintaining the full directory structure.
-</details>
 
 ### Explanation:
 - tar → archive tool
@@ -45,6 +45,8 @@ This is useful if you want to extract the archive exactly where the files origin
 - logs.tar.gz → compressed archive filename
 - /var/log/ → source directory being archived
 
+</details>
+
 ---
 
 ## Task:
@@ -52,7 +54,6 @@ List the content of the /home/bob/logs.tar archive and save the output in the /h
 
 <details><summary>Answer</summary>
 tar tfP /home/bob/logs.tar > /home/bob/tar_data.txt
-</details>
 
 ### Explanation:
 - tar → archive tool
@@ -62,6 +63,8 @@ tar tfP /home/bob/logs.tar > /home/bob/tar_data.txt
 - /home/bob/logs.tar → archive being inspected
 - > → redirect standard output into a file
 - /home/bob/tar_data.txt → file receiving the listing output
+
+</details>
 
 ---
 
@@ -80,7 +83,6 @@ For example:
 tar -czf archive.tar.gz -C /path/to/directory .
 
 This creates an archive of the contents in /path/to/directory without including the full path
-</details>
 
 ### Explanation:
 - tar → archive tool
@@ -89,6 +91,8 @@ This creates an archive of the contents in /path/to/directory without including 
 - /home/bob/archive.tar.gz → archive being extracted
 - --directory or -C → change into the target directory before extracting
 - /tmp/ or /tmp → extraction destination
+
+</details>
 
 ---
 
@@ -101,7 +105,6 @@ sudo ./script.sh > /home/bob/output_stdout.txt
 The ./ before script.sh indicates that the script is located in the current directory. It's a way to tell the shell, "Run this script from the current directory," especially when the current directory isn't in the system's PATH.
 
 In your case, ./script.sh means you're executing the script.sh file in the directory you're currently in, rather than searching for it in the directories listed in PATH.
-</details>
 
 ### Explanation:
 - sudo → run with elevated privileges
@@ -110,6 +113,8 @@ In your case, ./script.sh means you're executing the script.sh file in the direc
 - /home/bob/output_stdout.txt → file receiving normal output
 - errors and warnings are not redirected here, so they still go to standard error
 
+</details>
+
 ---
 
 ## Task:
@@ -117,7 +122,6 @@ Execute the /home/bob/script.sh script and save all command output (both errors/
 
 <details><summary>Answer</summary>
 sudo ./script.sh > /home/bob/output.txt 2>&1
-</details>
 
 ### Explanation:
 - sudo → run with elevated privileges
@@ -126,6 +130,8 @@ sudo ./script.sh > /home/bob/output.txt 2>&1
 - 2>&1 → redirect standard error to the same place as standard output
 - result → both normal output and errors go into one file
 
+</details>
+
 ---
 
 ## Task:
@@ -133,7 +139,6 @@ Execute the /home/bob/script.sh script and save all errors only in the /home/bob
 
 <details><summary>Answer</summary>
 sudo ./script.sh 2> /home/bob/output_errors.txt
-</details>
 
 ### Explanation:
 - sudo → run with elevated privileges
@@ -141,6 +146,8 @@ sudo ./script.sh 2> /home/bob/output_errors.txt
 - 2> → redirect standard error only
 - /home/bob/output_errors.txt → file receiving only errors and warnings
 - standard output still goes to the terminal
+
+</details>
 
 ---
 
@@ -154,13 +161,14 @@ bzip2 is created?
 
 <details><summary>Answer</summary>
 bzip2 --keep /home/bob/file.txt
-</details>
 
 ### Explanation:
 - bzip2 → compress a file using bzip2
 - --keep → keep the original file after compression
 - /home/bob/file.txt → source file being compressed
 - result → original file remains and a .bz2 file is created
+
+</details>
 
 ---
 
@@ -171,7 +179,6 @@ Extract the contents of /home/bob/archive.tar.gz to the /opt directory
 sudo tar --extract --file /home/bob/archive.tar.gz --directory /opt/
 or
 sudo tar xf /home/bob/archive.tar.gz -C /opt
-</details>
 
 ### Explanation:
 - sudo → run with elevated privileges
@@ -182,6 +189,8 @@ sudo tar xf /home/bob/archive.tar.gz -C /opt
 - --directory or -C → change into the destination directory first
 - /opt/ or /opt → extraction destination
 
+</details>
+
 ---
 
 ## Task:
@@ -189,7 +198,6 @@ Use the cat command, and redirection, to add (append) the contents of /home/bob/
 
 <details><summary>Answer</summary>
 cat /home/bob/file.txt >> /home/bob/destination.txt
-</details>
 
 ### Explanation:
 - cat → print file contents to standard output
@@ -197,6 +205,8 @@ cat /home/bob/file.txt >> /home/bob/destination.txt
 - >> → append redirected output to the destination file
 - /home/bob/destination.txt → file receiving the appended content
 - append means existing content stays and new content is added at the end
+
+</details>
 
 ---
 
@@ -210,7 +220,6 @@ Check contents.
 <details><summary>Answer</summary>
 cd  /home/bob
 tar --create --file file.tar  file
-</details>
 
 ### Explanation:
 - cd /home/bob → move into bob's home directory
@@ -219,6 +228,8 @@ tar --create --file file.tar  file
 - --file file.tar → name of the archive file
 - file → source directory being archived
 - result → file.tar is created in /home/bob
+
+</details>
 
 ---
 
@@ -231,7 +242,6 @@ Is the gzip of "games.txt" file created?
 
 cd /home/bob
 gzip games.txt
-</details>
 
 ### Explanation:
 - cd /home/bob → move into the directory containing the file
@@ -239,6 +249,8 @@ gzip games.txt
 - games.txt → source file being compressed
 - result → games.txt.gz is created
 - by default, gzip removes the original uncompressed file
+
+</details>
 
 ---
 
@@ -250,7 +262,6 @@ Is the file uncompressed?
 <details><summary>Answer</summary>
 cd /home/bob
 unxz lfcs.txt.xz
-</details>
 
 ### Explanation:
 - cd /home/bob → move into the target directory
@@ -258,6 +269,8 @@ unxz lfcs.txt.xz
 - lfcs.txt.xz → compressed file being unpacked
 - result → lfcs.txt is restored
 - by default, the compressed .xz file is removed after decompression
+
+</details>
 
 ---
 
@@ -268,7 +281,6 @@ Verify the sorted output.
 
 <details><summary>Answer</summary>
 sort -du /home/bob/values.conf > /home/bob/values.sort
-</details>
 
 ### Explanation:
 - sort → sort lines from the file
@@ -277,6 +289,8 @@ sort -du /home/bob/values.conf > /home/bob/values.sort
 - /home/bob/values.conf → input file being sorted
 - > → redirect output into a file
 - /home/bob/values.sort → file receiving the sorted unique output
+
+</details>
 
 ---
 
@@ -289,7 +303,6 @@ Verify the sorted output
 
 <details><summary>Answer</summary>
 sort -duf /home/bob/values.conf > /home/bob/values.sorted
-</details>
 
 ### Explanation:
 - sort → sort lines from the file
@@ -299,3 +312,5 @@ sort -duf /home/bob/values.conf > /home/bob/values.sorted
 - /home/bob/values.conf → input file being sorted
 - > → redirect output into a file
 - /home/bob/values.sorted → file receiving the sorted unique case-insensitive output
+
+</details>
