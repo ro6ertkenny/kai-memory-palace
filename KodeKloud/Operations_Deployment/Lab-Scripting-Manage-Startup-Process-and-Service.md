@@ -7,9 +7,10 @@ Schedule this system to power off two hours later from now.
 Is this system scheduled to power off two hours from now?
 
 <details><summary>Answer</summary>
-#### sudo shutdown +120
 
-### Explanation:
+ sudo shutdown +120
+
+ Explanation:
 - shutdown → schedule system shutdown
 - sudo → run with elevated privileges
 - +120 → time in minutes (120 minutes = 2 hours)
@@ -26,9 +27,9 @@ Change it to boot to a graphical desktop by default.
 Has the system been configured to boot into a graphical desktop by default?
 
 <details><summary>Answer</summary>
-#### sudo systemctl set-default graphical.target
+ sudo systemctl set-default graphical.target
 
-### Explanation:
+ Explanation:
 - systemctl → manage systemd services and targets
 - set-default → set default boot target
 - graphical.target → graphical desktop environment
@@ -45,9 +46,9 @@ Cancel the scheduled shutdown you configured in the beginning.
 Has the scheduled shutdown been canceled?
 
 <details><summary>Answer</summary>
-#### sudo shutdown -c
+ sudo shutdown -c
 
-### Explanation:
+ Explanation:
 - shutdown → manage system shutdown
 - -c → cancel a scheduled shutdown
 - sudo → run with elevated privileges
@@ -63,9 +64,9 @@ How do we run script.sh that is located in our current directory?
 <details><summary>Answer</summary>
 We can run the script like this:
 
-#### ./script.sh
+ ./script.sh
 
-### Explanation:
+ Explanation:
 - ./script.sh → execute script in current directory
 - ./ → explicitly reference current directory
 - script.sh → script file being executed
@@ -81,7 +82,7 @@ What is the correct shebang to add in a script?
 <details><summary>Answer</summary>
 #!/bin/bash is the correct shebang to add in a script.
 
-### Explanation:
+ Explanation:
 - #! → shebang indicator
 - /bin/bash → path to bash interpreter
 - ensures script runs using bash shell
@@ -105,22 +106,22 @@ Does the archive have dir1 contents as mentioned in the task?
 <details><summary>Answer</summary>
 Create script.sh script:
 
-#### vi script.sh
+ vi script.sh
 
 Add in it the code given below:
 
-#### #!/bin/bash
-#### tar acf archive.tar.gz dir1
+ #!/bin/bash
+ tar acf archive.tar.gz dir1
 
 Make it executable:
 
-#### chmod u+x script.sh
+ chmod u+x script.sh
 
 Finally, execute the script:
 
-#### ./script.sh
+ ./script.sh
 
-### Explanation:
+ Explanation:
 - vi script.sh → create/edit script file
 - #!/bin/bash → define bash interpreter
 - tar → archive tool
@@ -147,17 +148,17 @@ Is the correct PID saved in the /home/bob/pid file?
 <details><summary>Answer</summary>
 Run the below command:
 
-#### systemctl status sshd.service
+ systemctl status sshd.service
 
 Then look for Main PID and save that value in the /home/bob/pid file:
 
-#### vi /home/bob/pid
+ vi /home/bob/pid
 
 For example:
 
-#### 134
+ 134
 
-### Explanation:
+ Explanation:
 - systemctl status → view service status
 - sshd.service → SSH daemon service
 - Main PID → process ID of running service
@@ -179,22 +180,22 @@ Check the script.
 <details><summary>Answer</summary>
 Create script2.sh script:
 
-#### vi /home/bob/script2.sh
+ vi /home/bob/script2.sh
 
 Add in it the code given below
 
-#### #!/bin/bash
-#### systemctl is-enabled sshd.service
+ #!/bin/bash
+ systemctl is-enabled sshd.service
 
 Make it executable:
 
-#### chmod u+x /home/bob/script2.sh
+ chmod u+x /home/bob/script2.sh
 
 Finally, execute the script:
 
-#### ./script2.sh
+ ./script2.sh
 
-### Explanation:
+ Explanation:
 - vi → create/edit script
 - #!/bin/bash → bash interpreter
 - systemctl is-enabled → check if service is enabled
@@ -219,22 +220,22 @@ Test and execute the script.
 <details><summary>Answer</summary>
 Create perm.sh script:
 
-#### vi /home/bob/perm.sh
+ vi /home/bob/perm.sh
 
 Add in it the code given below:
 
-#### #!/bin/bash
-#### chmod 0100 /home/bob/dir8
+ #!/bin/bash
+ chmod 0100 /home/bob/dir8
 
 Make it executable:
 
-#### chmod u+x /home/bob/perm.sh
+ chmod u+x /home/bob/perm.sh
 
 Finally, execute the script:
 
-#### ./perm.sh
+ ./perm.sh
 
-### Explanation:
+ Explanation:
 - vi → create/edit script
 - #!/bin/bash → bash interpreter
 - chmod → change file permissions
@@ -256,14 +257,14 @@ Is the script correct?
 <details><summary>Answer</summary>
 Update script permissions to make it executable
 
-#### chmod 700 /home/bob/script10.sh
+ chmod 700 /home/bob/script10.sh
 
 Fix some issues in the /home/bob/script10.sh script and, finally, it should look like this.
 
-#### #!/bin/bash
-#### cat test.txt
+ #!/bin/bash
+ cat test.txt
 
-### Explanation:
+ Explanation:
 - chmod 700 → give full permissions to owner only
 - script10.sh → script file
 - #!/bin/bash → bash interpreter
@@ -283,10 +284,10 @@ Is the sshd.service status copied to /home/bob/service.txt?
 <details><summary>Answer</summary>
 Execute the below commands:
 
-#### cd /home/bob
-#### sudo systemctl status sshd.service > service.txt
+ cd /home/bob
+ sudo systemctl status sshd.service > service.txt
 
-### Explanation:
+ Explanation:
 - cd /home/bob → change directory
 - systemctl status → get service status
 - sshd.service → target service
@@ -306,9 +307,9 @@ Is 'apache2.service' masked ?
 <details><summary>Answer</summary>
 Execute the below command:
 
-#### sudo systemctl mask apache2.service
+ sudo systemctl mask apache2.service
 
-### Explanation:
+ Explanation:
 - systemctl → manage systemd services
 - mask → disable service completely (cannot be started)
 - apache2.service → target service
@@ -327,9 +328,9 @@ Is 'apache2.service' unmasked ?
 <details><summary>Answer</summary>
 Execute the below command:
 
-#### sudo systemctl unmask apache2.service
+ sudo systemctl unmask apache2.service
 
-### Explanation:
+ Explanation:
 - systemctl → manage services
 - unmask → re-enable ability to start service
 - apache2.service → target service
@@ -360,33 +361,33 @@ Locate the file in the /etc/systemd/system folder with name kkloud.service,
 
 1. Change the restart on failure to always
 
-#### Restart=on-failure --> Restart=always
+ Restart=on-failure --> Restart=always
 
 2. Add the command to run when we want to stop the service in the service section.
 
-#### ExecStop=/usr/local/bin/kkloud --savedata
+ ExecStop=/usr/local/bin/kkloud --savedata
 
 3. Edit the required line under the Unit section.
 
-#### After=sshd.service
+ After=sshd.service
 
 Overall, the file should be like this after making changes.
 
-#### [Unit]
+ [Unit]
 Description=KodeKloud Service
 After=sshd.service
 
-#### [Service]
+ [Service]
 ExecStart=/usr/local/bin/kkloud
 ExecStop=/usr/local/bin/kkloud --savedata
 KillMode=process
 Restart=always
 Type=simple
 
-#### [Install]
+ [Install]
 WantedBy=multi-user.target
 
-### Explanation:
+ Explanation:
 - /etc/systemd/system → location of custom service files
 - Restart=always → restart service regardless of exit condition
 - ExecStop → command used to stop the service
