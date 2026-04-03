@@ -28,8 +28,8 @@ Has the system been configured to boot into a graphical desktop by default?
 
 <details><summary>Answer</summary>
  sudo systemctl set-default graphical.target
-
- Explanation:
+ 
+Explanation:
 - systemctl → manage systemd services and targets
 - set-default → set default boot target
 - graphical.target → graphical desktop environment
@@ -48,7 +48,7 @@ Has the scheduled shutdown been canceled?
 <details><summary>Answer</summary>
  sudo shutdown -c
 
- Explanation:
+Explanation:
 - shutdown → manage system shutdown
 - -c → cancel a scheduled shutdown
 - sudo → run with elevated privileges
@@ -62,9 +62,9 @@ Has the scheduled shutdown been canceled?
 How do we run script.sh that is located in our current directory?
 
 <details><summary>Answer</summary>
-We can run the script like this:
+ We can run the script like this:
 
- ./script.sh
+     ./script.sh
 
  Explanation:
 - ./script.sh → execute script in current directory
@@ -82,7 +82,7 @@ What is the correct shebang to add in a script?
 <details><summary>Answer</summary>
 #!/bin/bash is the correct shebang to add in a script.
 
- Explanation:
+Explanation:
 - #! → shebang indicator
 - /bin/bash → path to bash interpreter
 - ensures script runs using bash shell
@@ -111,6 +111,7 @@ Create script.sh script:
 Add in it the code given below:
 
  #!/bin/bash
+
  tar acf archive.tar.gz dir1
 
 Make it executable:
@@ -178,7 +179,9 @@ Remember to make this script executable and try to execute it at least once to v
 Check the script.
 
 <details><summary>Answer</summary>
+
 Create script2.sh script:
+
 
  vi /home/bob/script2.sh
 
