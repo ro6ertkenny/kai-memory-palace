@@ -11,9 +11,10 @@ Private key is created?
 Certificate signing request is created?
 
 <details><summary>Answer</summary>
+
 Use the below command to generate a key and certificate signing request.
 
-### openssl req -newkey rsa:4096 -keyout priv.key -out cert.csr
+ #### openssl req -newkey rsa:4096 -keyout priv.key -out cert.csr
 
 and enter password when it prompts like below
 
@@ -50,7 +51,8 @@ Common name is set as kodekloud.com ?
 <details><summary>Answer</summary>
 You can use the below command to generate a key and self-signed certificate.
 
-openssl req -x509 -noenc -days 365 -keyout priv.key -out kodekloud.crt
+#### openssl req -x509 -noenc -days 365 -keyout priv.key -out kodekloud.crt
+
 Enter kodekloud.com for common name
 
 ### Explanation:
@@ -106,13 +108,13 @@ Commit message is set correctly?
 <details><summary>Answer</summary>
 Navigate to directory kode
 
-### cd kode
+#### cd kode
 Stage the files with .cpp extension.
 
-### git add *.cpp
+#### git add *.cpp
 Commit the files with the commit message Added C++ files
 
-### git commit -m "Added C++ files"
+#### git commit -m "Added C++ files"
 
 ### Explanation:
 - cd kode → change into repository directory
@@ -137,7 +139,7 @@ Git branch with the name testing is created?
 Navigate to kode directory.
 Use the below command to create a branch with the name testing.
 
-### git branch testing
+#### git branch testing
 
 ### Explanation:
 - git branch testing → create a new branch named testing
@@ -161,13 +163,13 @@ Branch with name testing is deleted?
 <details><summary>Answer</summary>
 Navigate to kode directory.
 
-### cd kode
+#### cd kode
 Check out to master branch first because active branches can't be deleted.
 
-### git checkout master
+#### git checkout master
 Delete the testing branch now
 
-### git branch --delete testing
+#### git branch --delete testing
 
 ### Explanation:
 - cd kode → change into repository directory
@@ -186,11 +188,11 @@ Go into the local Git repository found in the kode directory and find the file t
 <details><summary>Answer</summary>
 Check for the file modified in the latest commit.
 
-### git log --raw
+#### git log --raw
 
 You will find output similar to below one.
 
-### commit 6a64b289a71e970f94bcb6b0bd07424a05a98b83 (HEAD -> master)
+#### commit 6a64b289a71e970f94bcb6b0bd07424a05a98b83 (HEAD -> master)
 Author: Bob <bob@kodekloud.com>
 Date:   Fri Feb 16 09:11:41 2024 +0000
 
@@ -221,15 +223,15 @@ documentation branch merged to the master branch ?
 <details><summary>Answer</summary>
 Navigate to kode directory.
 
-### cd kode
+#### cd kode
 
 To merge the documentation branch to the master branch we need to checkout in the master branch first.
 
-### git checkout master
+#### git checkout master
 
 Now merge the documentation branch to the master branch.
 
-### git merge documentation
+#### git merge documentation
 
 ### Explanation:
 - cd kode → change into repository directory
@@ -246,7 +248,7 @@ Now merge the documentation branch to the master branch.
 What command would you use to push the master branch from your local repository to a remote repository nicknamed origin?
 
 <details><summary>Answer</summary>
-### git push origin master 
+#### git push origin master 
 
 is the command we use to push changes to master branch of remote repository.
 
@@ -268,7 +270,7 @@ Repository cloned ?
 Navigate to /home/bob directory by cd /home/bob
 Clone the repo by below command
 
-### git clone https://github.com/kodekloudhub/git-for-beginners-course.git
+#### git clone https://github.com/kodekloudhub/git-for-beginners-course.git
 
 ### Explanation:
 - cd /home/bob → change to target directory
