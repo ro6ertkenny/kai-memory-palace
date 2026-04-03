@@ -21,7 +21,6 @@ Enter PEM pass phrase:kkloud
 Verifying - Enter PEM pass phrase:kkloud
 
 Leave rest of the options default
-</details>
 
 ### Explanation:
 - openssl → tool for SSL/TLS and cryptography operations
@@ -30,6 +29,8 @@ Leave rest of the options default
 - -keyout priv.key → save private key to file
 - -out cert.csr → save certificate signing request to file
 - passphrase → encrypts the private key with provided password
+
+</details>
 
 ---
 
@@ -51,7 +52,6 @@ You can use the below command to generate a key and self-signed certificate.
 
 openssl req -x509 -noenc -days 365 -keyout priv.key -out kodekloud.crt
 Enter kodekloud.com for common name
-</details>
 
 ### Explanation:
 - openssl → cryptography tool
@@ -62,6 +62,8 @@ Enter kodekloud.com for common name
 - -keyout priv.key → output private key file
 - -out kodekloud.crt → output certificate file
 - Common Name → identifies the domain (kodekloud.com)
+
+</details>
 
 ---
 
@@ -77,7 +79,6 @@ Identify the CN by below command
 in the output of the command Identify the common name.
 
 CN = labs.kodekloud.com
-</details>
 
 ### Explanation:
 - openssl → cryptography tool
@@ -85,6 +86,8 @@ CN = labs.kodekloud.com
 - -in my.crt → input certificate file
 - -text → display certificate details in readable format
 - CN → Common Name field in certificate
+
+</details>
 
 ---
 
@@ -110,7 +113,6 @@ Stage the files with .cpp extension.
 Commit the files with the commit message Added C++ files
 
 ### git commit -m "Added C++ files"
-</details>
 
 ### Explanation:
 - cd kode → change into repository directory
@@ -118,6 +120,8 @@ Commit the files with the commit message Added C++ files
 - *.cpp → wildcard matching all .cpp files
 - git commit → create a commit
 - -m "Added C++ files" → commit message
+
+</details>
 
 ---
 
@@ -134,11 +138,12 @@ Navigate to kode directory.
 Use the below command to create a branch with the name testing.
 
 ### git branch testing
-</details>
 
 ### Explanation:
 - git branch testing → create a new branch named testing
 - branch → represents a separate line of development
+
+</details>
 
 ---
 
@@ -163,13 +168,14 @@ Check out to master branch first because active branches can't be deleted.
 Delete the testing branch now
 
 ### git branch --delete testing
-</details>
 
 ### Explanation:
 - cd kode → change into repository directory
 - git checkout master → switch to master branch
 - active branch → cannot be deleted while checked out
 - git branch --delete testing → delete branch named testing
+
+</details>
 
 ---
 
@@ -193,13 +199,14 @@ Date:   Fri Feb 16 09:11:41 2024 +0000
 :100644 100644 e69de29 a11f211 M        file2.cpp
 
 We can find the file file2.cpp is modified.
-</details>
 
 ### Explanation:
 - git log → view commit history
 - --raw → show file-level changes in commits
 - M → indicates file was modified
 - file2.cpp → file changed in latest commit
+
+</details>
 
 ---
 
@@ -223,13 +230,14 @@ To merge the documentation branch to the master branch we need to checkout in th
 Now merge the documentation branch to the master branch.
 
 ### git merge documentation
-</details>
 
 ### Explanation:
 - cd kode → change into repository directory
 - git checkout master → switch to master branch
 - git merge documentation → merge documentation branch into master
 - merge → combine changes from another branch
+
+</details>
 
 ---
 
@@ -239,14 +247,15 @@ What command would you use to push the master branch from your local repository 
 
 <details><summary>Answer</summary>
 ### git push origin master 
+
 is the command we use to push changes to master branch of remote repository.
-</details>
 
 ### Explanation:
 - git push → send commits to remote repository
 - origin → remote repository name
 - master → branch being pushed
 
+</details>
 ---
 
 ## Task:
@@ -260,10 +269,11 @@ Navigate to /home/bob directory by cd /home/bob
 Clone the repo by below command
 
 ### git clone https://github.com/kodekloudhub/git-for-beginners-course.git
-</details>
 
 ### Explanation:
 - cd /home/bob → change to target directory
 - git clone → copy remote repository locally
 - URL → location of remote repository
 - result → new directory created with repository contents
+
+</details>
