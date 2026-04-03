@@ -8,7 +8,7 @@ Is this system scheduled to power off two hours from now?
 
 <details><summary>Answer</summary>
 
- sudo shutdown +120
+    sudo shutdown +120
 
  Explanation:
 - shutdown → schedule system shutdown
@@ -27,7 +27,8 @@ Change it to boot to a graphical desktop by default.
 Has the system been configured to boot into a graphical desktop by default?
 
 <details><summary>Answer</summary>
- sudo systemctl set-default graphical.target
+
+    sudo systemctl set-default graphical.target
  
 Explanation:
 - systemctl → manage systemd services and targets
@@ -46,7 +47,8 @@ Cancel the scheduled shutdown you configured in the beginning.
 Has the scheduled shutdown been canceled?
 
 <details><summary>Answer</summary>
- sudo shutdown -c
+
+    sudo shutdown -c
 
 Explanation:
 - shutdown → manage system shutdown
@@ -62,6 +64,7 @@ Explanation:
 How do we run script.sh that is located in our current directory?
 
 <details><summary>Answer</summary>
+
  We can run the script like this:
 
      ./script.sh
@@ -80,7 +83,8 @@ How do we run script.sh that is located in our current directory?
 What is the correct shebang to add in a script?
 
 <details><summary>Answer</summary>
-#!/bin/bash is the correct shebang to add in a script.
+
+    #!/bin/bash is the correct shebang to add in a script.
 
 Explanation:
 - #! → shebang indicator
@@ -104,23 +108,24 @@ Is script.sh created?
 Does the archive have dir1 contents as mentioned in the task?
 
 <details><summary>Answer</summary>
+
 Create script.sh script:
 
- vi script.sh
+    vi script.sh
 
 Add in it the code given below:
 
- #!/bin/bash
+    #!/bin/bash
 
- tar acf archive.tar.gz dir1
+    tar acf archive.tar.gz dir1
 
 Make it executable:
 
- chmod u+x script.sh
+    chmod u+x script.sh
 
 Finally, execute the script:
 
- ./script.sh
+    ./script.sh
 
  Explanation:
 - vi script.sh → create/edit script file
@@ -149,15 +154,15 @@ Is the correct PID saved in the /home/bob/pid file?
 <details><summary>Answer</summary>
 Run the below command:
 
- systemctl status sshd.service
+    systemctl status sshd.service
 
 Then look for Main PID and save that value in the /home/bob/pid file:
 
- vi /home/bob/pid
+    vi /home/bob/pid
 
 For example:
 
- 134
+    134
 
  Explanation:
 - systemctl status → view service status
@@ -180,23 +185,23 @@ Check the script.
 
 <details><summary>Answer</summary>
 
-Create script2.sh script:
+ Create script2.sh script:
 
-
- vi /home/bob/script2.sh
+    vi /home/bob/script2.sh
 
 Add in it the code given below
 
- #!/bin/bash
- systemctl is-enabled sshd.service
+    #!/bin/bash
+
+    systemctl is-enabled sshd.service
 
 Make it executable:
 
- chmod u+x /home/bob/script2.sh
+    chmod u+x /home/bob/script2.sh
 
 Finally, execute the script:
 
- ./script2.sh
+    ./script2.sh
 
  Explanation:
 - vi → create/edit script
@@ -221,22 +226,24 @@ Does /home/bob/perm.sh exist?
 Test and execute the script.
 
 <details><summary>Answer</summary>
+
 Create perm.sh script:
 
- vi /home/bob/perm.sh
+    vi /home/bob/perm.sh
 
 Add in it the code given below:
 
- #!/bin/bash
- chmod 0100 /home/bob/dir8
+    #!/bin/bash
+
+    chmod 0100 /home/bob/dir8
 
 Make it executable:
 
- chmod u+x /home/bob/perm.sh
+    chmod u+x /home/bob/perm.sh
 
 Finally, execute the script:
 
- ./perm.sh
+    ./perm.sh
 
  Explanation:
 - vi → create/edit script
@@ -258,14 +265,16 @@ We already have a script named script10.sh under /home/bob/. Make sure this scri
 Is the script correct?
 
 <details><summary>Answer</summary>
+
 Update script permissions to make it executable
 
- chmod 700 /home/bob/script10.sh
+    chmod 700 /home/bob/script10.sh
 
 Fix some issues in the /home/bob/script10.sh script and, finally, it should look like this.
 
- #!/bin/bash
- cat test.txt
+    #!/bin/bash
+
+    cat test.txt
 
  Explanation:
 - chmod 700 → give full permissions to owner only
@@ -285,10 +294,12 @@ Copy the output of the sshd.service status to /home/bob/service.txt.
 Is the sshd.service status copied to /home/bob/service.txt?
 
 <details><summary>Answer</summary>
+
 Execute the below commands:
 
- cd /home/bob
- sudo systemctl status sshd.service > service.txt
+    cd /home/bob
+
+    sudo systemctl status sshd.service > service.txt
 
  Explanation:
 - cd /home/bob → change directory
@@ -308,9 +319,10 @@ apache2 is already installed; mask its service.
 Is 'apache2.service' masked ?
 
 <details><summary>Answer</summary>
+
 Execute the below command:
 
- sudo systemctl mask apache2.service
+    sudo systemctl mask apache2.service
 
  Explanation:
 - systemctl → manage systemd services
@@ -329,9 +341,10 @@ Now, unmask the apache2 service.
 Is 'apache2.service' unmasked ?
 
 <details><summary>Answer</summary>
+
 Execute the below command:
 
- sudo systemctl unmask apache2.service
+    sudo systemctl unmask apache2.service
 
  Explanation:
 - systemctl → manage services
@@ -360,6 +373,7 @@ Is the stop command added to the service file?
 Is the kkloud.service configured to start after sshd.service ?
 
 <details><summary>Answer</summary>
+
 Locate the file in the /etc/systemd/system folder with name kkloud.service,
 
 1. Change the restart on failure to always
