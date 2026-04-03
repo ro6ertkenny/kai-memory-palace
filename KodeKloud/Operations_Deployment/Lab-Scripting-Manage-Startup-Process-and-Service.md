@@ -8,12 +8,13 @@ Is this system scheduled to power off two hours from now?
 
 <details><summary>Answer</summary>
 #### sudo shutdown +120
-</details>
 
 ### Explanation:
 - shutdown → schedule system shutdown
 - sudo → run with elevated privileges
 - +120 → time in minutes (120 minutes = 2 hours)
+
+</details>
 
 ---
 
@@ -26,13 +27,14 @@ Has the system been configured to boot into a graphical desktop by default?
 
 <details><summary>Answer</summary>
 #### sudo systemctl set-default graphical.target
-</details>
 
 ### Explanation:
 - systemctl → manage systemd services and targets
 - set-default → set default boot target
 - graphical.target → graphical desktop environment
 - sudo → run with elevated privileges
+
+</details>
 
 ---
 
@@ -44,12 +46,13 @@ Has the scheduled shutdown been canceled?
 
 <details><summary>Answer</summary>
 #### sudo shutdown -c
-</details>
 
 ### Explanation:
 - shutdown → manage system shutdown
 - -c → cancel a scheduled shutdown
 - sudo → run with elevated privileges
+
+</details>
 
 ---
 
@@ -61,12 +64,13 @@ How do we run script.sh that is located in our current directory?
 We can run the script like this:
 
 #### ./script.sh
-</details>
 
 ### Explanation:
 - ./script.sh → execute script in current directory
 - ./ → explicitly reference current directory
 - script.sh → script file being executed
+
+</details>
 
 ---
 
@@ -76,12 +80,13 @@ What is the correct shebang to add in a script?
 
 <details><summary>Answer</summary>
 #!/bin/bash is the correct shebang to add in a script.
-</details>
 
 ### Explanation:
 - #! → shebang indicator
 - /bin/bash → path to bash interpreter
 - ensures script runs using bash shell
+
+</details>
 
 ---
 
@@ -114,7 +119,6 @@ Make it executable:
 Finally, execute the script:
 
 #### ./script.sh
-</details>
 
 ### Explanation:
 - vi script.sh → create/edit script file
@@ -127,6 +131,8 @@ Finally, execute the script:
 - dir1 → directory being archived
 - chmod u+x → make script executable
 - ./script.sh → run script
+
+</details>
 
 ---
 
@@ -150,13 +156,14 @@ Then look for Main PID and save that value in the /home/bob/pid file:
 For example:
 
 #### 134
-</details>
 
 ### Explanation:
 - systemctl status → view service status
 - sshd.service → SSH daemon service
 - Main PID → process ID of running service
 - vi /home/bob/pid → save PID into file manually
+
+</details>
 
 ---
 
@@ -186,7 +193,6 @@ Make it executable:
 Finally, execute the script:
 
 #### ./script2.sh
-</details>
 
 ### Explanation:
 - vi → create/edit script
@@ -195,6 +201,8 @@ Finally, execute the script:
 - sshd.service → target service
 - chmod u+x → make script executable
 - ./script2.sh → execute script
+
+</details>
 
 ---
 
@@ -225,7 +233,6 @@ Make it executable:
 Finally, execute the script:
 
 #### ./perm.sh
-</details>
 
 ### Explanation:
 - vi → create/edit script
@@ -235,6 +242,8 @@ Finally, execute the script:
 - /home/bob/dir8 → target directory
 - chmod u+x → make script executable
 - ./perm.sh → execute script
+
+</details>
 
 ---
 
@@ -253,7 +262,6 @@ Fix some issues in the /home/bob/script10.sh script and, finally, it should look
 
 #### #!/bin/bash
 #### cat test.txt
-</details>
 
 ### Explanation:
 - chmod 700 → give full permissions to owner only
@@ -261,6 +269,8 @@ Fix some issues in the /home/bob/script10.sh script and, finally, it should look
 - #!/bin/bash → bash interpreter
 - cat → display file contents
 - test.txt → file being read
+
+</details>
 
 ---
 
@@ -275,7 +285,6 @@ Execute the below commands:
 
 #### cd /home/bob
 #### sudo systemctl status sshd.service > service.txt
-</details>
 
 ### Explanation:
 - cd /home/bob → change directory
@@ -283,6 +292,8 @@ Execute the below commands:
 - sshd.service → target service
 - > → redirect output to file
 - service.txt → destination file
+
+</details>
 
 ---
 
@@ -296,13 +307,14 @@ Is 'apache2.service' masked ?
 Execute the below command:
 
 #### sudo systemctl mask apache2.service
-</details>
 
 ### Explanation:
 - systemctl → manage systemd services
 - mask → disable service completely (cannot be started)
 - apache2.service → target service
 - sudo → run with elevated privileges
+
+</details>
 
 ---
 
@@ -316,13 +328,14 @@ Is 'apache2.service' unmasked ?
 Execute the below command:
 
 #### sudo systemctl unmask apache2.service
-</details>
 
 ### Explanation:
 - systemctl → manage services
 - unmask → re-enable ability to start service
 - apache2.service → target service
 - sudo → run with elevated privileges
+
+</details>
 
 ---
 
@@ -372,7 +385,6 @@ Type=simple
 
 #### [Install]
 WantedBy=multi-user.target
-</details>
 
 ### Explanation:
 - /etc/systemd/system → location of custom service files
@@ -382,3 +394,5 @@ WantedBy=multi-user.target
 - --savedata → argument passed during stop
 - After=sshd.service → define startup order dependency
 - systemd unit sections → [Unit], [Service], [Install] define service behavior
+
+</details>
