@@ -378,31 +378,31 @@ Locate the file in the /etc/systemd/system folder with name kkloud.service,
 
 1. Change the restart on failure to always
 
- Restart=on-failure --> Restart=always
+    Restart=on-failure --> Restart=always
 
 2. Add the command to run when we want to stop the service in the service section.
 
- ExecStop=/usr/local/bin/kkloud --savedata
+    ExecStop=/usr/local/bin/kkloud --savedata
 
 3. Edit the required line under the Unit section.
 
- After=sshd.service
+    After=sshd.service
 
 Overall, the file should be like this after making changes.
 
  [Unit]
-Description=KodeKloud Service
-After=sshd.service
+    Description=KodeKloud Service
+    After=sshd.service
 
  [Service]
-ExecStart=/usr/local/bin/kkloud
-ExecStop=/usr/local/bin/kkloud --savedata
-KillMode=process
-Restart=always
-Type=simple
+    ExecStart=/usr/local/bin/kkloud
+    ExecStop=/usr/local/bin/kkloud --savedata
+    KillMode=process
+    Restart=always
+    Type=simple
 
  [Install]
-WantedBy=multi-user.target
+    WantedBy=multi-user.target
 
  Explanation:
 - /etc/systemd/system → location of custom service files
