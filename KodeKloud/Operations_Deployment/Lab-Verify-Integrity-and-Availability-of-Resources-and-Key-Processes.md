@@ -132,13 +132,32 @@ Save the value in the /home/bob/cpu file:
 - vi → manually save the required value
 - /home/bob/cpu → destination file
 
+My Terminal Output:    Core(s) per socket:      6
+
+You can also type:
+
+#### lscpu | awk -F: '/Core\(s\) per socket/ {print $2}'
+
+⚙️ SIMP breakdown (lock this in)
+    
+    awk → text processor
+    -F: → split line by :
+    /pattern/ → find the correct line
+    {print $2} → print value after :
+        pattern { action }
+    xargs → trim whitespace
+
+👉 { } = the action block
+👉 /pattern/ = the filter
+👉 $N = the field selector
+
 </details>
 
 ---
 
 ## Task:
 
-On /dev/vdd, we have an XFS filesystem.Use the correct command to check this filesystem for errors and save the output in /home/bob/fscheck file.
+On /dev/vdd, we have an XFS filesystem. Use the correct command to check this filesystem for errors and save the output in /home/bob/fscheck file.
 
 Has the required file system been checked for errors?
 
@@ -152,8 +171,33 @@ Execute the below command:
 - -n → no-modify mode (check only, no changes)
 - /dev/vdd → target device
 - sudo → run with elevated privileges
-- > → redirect standard output to file
+- '>' → redirect standard output to file
 - 2>&1 → redirect standard error to same file
 - /home/bob/fscheck → destination file
+
+🔥 Mental model (lock this in)
+
+Filesystem	Check command	Safe check flag
+ext4    	fsck	            -n
+XFS     	xfs_repair	        -n
+
+🧠 What the lab is testing
+
+They want you to understand:
+
+    Correct tool → xfs_repair
+    Safe mode → -n
+    Output capture → > file 2>&1
+
+⚙️ About this part (also important)
+
+    > /home/bob/fscheck 2>&1
+
+👉 This ensures:
+
+    stdout → file
+    stderr → same file
+
+Because filesystem tools often print errors to stderr, not stdout.
 
 </details>
