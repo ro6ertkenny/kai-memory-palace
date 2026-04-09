@@ -6,13 +6,13 @@ What is the difference between "apt update" and "apt upgrade"?
 
 <details><summary>Answer</summary>
 
-</details>
-
 ### Explanation:
 - apt update → refresh package index from repositories
 - retrieves latest package lists but does not install anything
 - apt upgrade → install available upgrades for installed packages
 - upgrades packages to newer versions without removing existing ones
+
+</details>
 
 ---
 
@@ -31,7 +31,6 @@ Install the Apache web server
 
 #### sudo apt update 
 #### sudo apt install apache2
-</details>
 
 ### Explanation:
 - apt search → search for packages
@@ -39,6 +38,8 @@ Install the Apache web server
 - apt update → refresh package index
 - apt install apache2 → install Apache web server
 - apache2 → package name for Apache
+
+</details>
 
 ---
 
@@ -56,7 +57,6 @@ We can find the package by
 and save the output to below file
 
 #### vi /home/bob/package.txt
-</details>
 
 ### Explanation:
 - dpkg → package management tool
@@ -64,6 +64,8 @@ and save the output to below file
 - /bin/ls → file being searched
 - vi → manually save output to file
 - /home/bob/package.txt → destination file
+
+</details>
 
 ---
 
@@ -76,11 +78,11 @@ Is the package name saved to the /home/bob/name.txt file?
 <details><summary>Answer</summary>
 We can list the files that belong to the coreutils package by running the below command.
 
-dpkg --listfiles coreutils | grep ^/bin
+#### dpkg --listfiles coreutils | grep ^/bin
+
 Identify the package name that begins with the letter u (/bin/uname) and save the answer to
 
 #### vi /home/bob/name.txt
-</details>
 
 ### Explanation:
 - dpkg --listfiles coreutils → list files in coreutils package
@@ -89,6 +91,8 @@ Identify the package name that begins with the letter u (/bin/uname) and save th
 - /bin/uname → file starting with letter "u"
 - vi → save result manually
 - /home/bob/name.txt → destination file
+
+</details>
 
 ---
 
@@ -106,7 +110,6 @@ Execute the below command and observe the output
 Observe the highlighted section
 #### The following packages will be REMOVED:
 ####  libzip4 ziptool
-</details>
 
 ### Explanation:
 - apt-get remove → remove package
@@ -114,6 +117,8 @@ Observe the highlighted section
 - -y → automatically confirm prompts
 - ziptool → package being removed
 - dependencies → automatically removed with --auto-remove
+
+</details>
 
 ---
 
@@ -143,7 +148,6 @@ And add the repo
 Run the below command
 
 #### sudo apt update 
-</details>
 
 ### Explanation:
 - /etc/apt/sources.list → repository configuration file
@@ -151,6 +155,8 @@ Run the below command
 - deb http://us.archive.ubuntu.com/ubuntu/ focal main → repository entry
 - focal → Ubuntu 20.04 release
 - apt update → refresh package index with new repository
+
+</details>
 
 ---
 
@@ -187,7 +193,6 @@ Install the application
 Now access it by running command
 
 #### tmux
-</details>
 
 ### Explanation:
 - cd tmux → navigate to source code directory
@@ -197,3 +202,5 @@ Now access it by running command
 - make install → install compiled application
 - tmux → run installed application
 - sudo → run commands with elevated privileges
+
+</details>
