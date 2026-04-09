@@ -6,7 +6,8 @@ How can we see all processes running on the system along with their nice values?
 
 <details><summary>Answer</summary>
 Using the ps lax command, we can see all processes running on the system along with their nice values.
-</details>
+
+####     ps lax
 
 ### Explanation:
 - ps → display running processes
@@ -14,6 +15,8 @@ Using the ps lax command, we can see all processes running on the system along w
 - a → show processes for all users with a terminal
 - x → include processes without a terminal
 - nice value → scheduling priority adjustment shown in the process listing
+
+</details>
 
 ---
 
@@ -23,11 +26,14 @@ Which of the following commands will you use to sleep for 10 seconds?
 
 <details><summary>Answer</summary>
 You can use sleep 10 command to sleep for 10 seconds.
-</details>
+
+####    sleep 10
 
 ### Explanation:
 - sleep → pause for a specified amount of time
 - 10 → sleep duration in seconds
+
+</details>
 
 ---
 
@@ -37,11 +43,14 @@ By default, which directory contains the logs of most of the services running on
 
 <details><summary>Answer</summary>
 By default, the /var/log/ directory contains the logs of most of the services running on a Linux system.
-</details>
+
+####    cd /var/log
 
 ### Explanation:
 - /var/log/ → standard directory for many Linux service and system log files
 - logs → records of events, activity, and errors
+
+</details>
 
 ---
 
@@ -59,7 +68,6 @@ Execute the below command to identify the sshd process ID:
 Look for the PID value for the sshd process. Now, execute the below command:
 
 #### sudo renice 9 <PID>
-</details>
 
 ### Explanation:
 - ps aux → list running processes in detailed format
@@ -69,6 +77,26 @@ Look for the PID value for the sshd process. Now, execute the below command:
 - 9 → new nice value
 - sudo → run with elevated privileges
 - <PID> → target process ID
+
+> “Nice” controls **CPU priority**
+
+- lower nice value → higher priority (less “nice” to others)  
+- higher nice value → lower priority (more “nice” to others)
+
+---
+
+# 🧠 Mental Model
+
+    nice = how willing a process is to share CPU
+
+| Nice Value | Behavior |
+|------------|----------|
+| -20        | highest priority (very aggressive) |
+| 0          | default |
+| 9          | lower priority (more polite) |
+| 19         | lowest priority |
+
+</details>
 
 ---
 
@@ -84,14 +112,15 @@ Verify "/home/bob/files.txt" file.
 Execute the below command:
 
 #### sudo lsof -p 1 > /home/bob/files.txt
-</details>
 
 ### Explanation:
 - lsof → list open files
 - sudo → run with elevated privileges
 - -p 1 → limit output to process with PID 1
-- > → redirect output to file
+- '>' → redirect output to file
 - /home/bob/files.txt → destination file
+
+</details>
 
 ---
 
@@ -115,7 +144,6 @@ And look for the logs entries like this:
 Copy the IP address and save it in the /home/bob/ip.txt file:
 
 #### vi /home/bob/ip.txt
-</details>
 
 ### Explanation:
 - journalctl → view systemd journal logs
@@ -125,6 +153,8 @@ Copy the IP address and save it in the /home/bob/ip.txt file:
 - --no-pager → print directly without pager
 - Accepted publickey → successful SSH login indicator
 - vi /home/bob/ip.txt → save the IP manually into file
+
+</details>
 
 ---
 
@@ -142,13 +172,17 @@ Execute the below command:
 Copy the PID and save it in the /home/bob/pid.txt file.
 
 #### vi /home/bob/pid.txt
-</details>
 
 ### Explanation:
 - pgrep → find process IDs by name
 - -a → show PID and full command line
+     `-a` stands for:
+     **“all arguments”**
+     show the full command line (not just the PID)    
 - rpcbind → target process name
 - vi /home/bob/pid.txt → save the PID manually into file
+
+</details>
 
 ---
 
@@ -166,16 +200,35 @@ Execute the below command and look for the Main PID:
 Send it a SIGHUP signal using the below command:
 
 #### sudo kill -SIGHUP <pid>
-</details>
 
 ### Explanation:
 - systemctl status → show service status details
 - ssh.service → target service
 - Main PID → process ID managed by the service
 - kill → send a signal to a process
+    > `kill` is a **signal-sending tool**, not just a “terminate process” tool
+    A signal is a message sent to a process to tell it to do something    
 - -SIGHUP → send hangup signal
 - sudo → run with elevated privileges
 - <pid> → target process ID
+
+## Common Signals
+
+| Signal   | Meaning |
+|----------|--------|
+| SIGTERM  | politely stop |
+| SIGKILL  | force kill |
+| SIGHUP   | reload / re-read config |
+
+## ⚠️ Important
+
+This does NOT stop ssh
+
+👉 it tells ssh:
+
+> “reload yourself”
+
+</details>
 
 ---
 
@@ -189,7 +242,6 @@ Is the search result saved in the /home/bob/reboot.log file?
 Use the below command:
 
 #### sudo grep -r --text 'reboot' /var/log/ > reboot.log
-</details>
 
 ### Explanation:
 - grep → search text in files
@@ -198,8 +250,10 @@ Use the below command:
 - --text → treat files as text
 - 'reboot' → search string
 - /var/log/ → directory being searched
-- > → redirect output to file
+- '>' → redirect output to file
 - reboot.log → destination file
+
+</details>
 
 ---
 
@@ -214,15 +268,33 @@ Use the below commands:
 
 #### cd /home/bob
 #### sudo journalctl -p err > .priority/priority.log
-</details>
 
 ### Explanation:
 - cd /home/bob → change to bob's home directory
 - journalctl → view journal logs
 - sudo → run with elevated privileges
 - -p err → show only error-priority logs
-- > → redirect output to file
+    `-p` = **priority filter** in journalctl ... think "pick priority level"
+-'>' → redirect output to file
 - .priority/priority.log → destination file
+    The `.` makes it a **hidden directory**
+
+## 🔍 What “priority” Means
+
+Logs have levels:
+
+| Level | Meaning |
+|-------|--------|
+| emerg | system unusable |
+| alert | immediate action required |
+| crit  | critical |
+| err   | errors |
+| warning | warnings |
+| notice | normal but important |
+| info  | informational |
+| debug | debugging |
+
+</details>
 
 ---
 
@@ -237,7 +309,6 @@ Use the below commands:
 
 #### cd /home/bob
 #### sudo journalctl -p info -g '^c' > .priority/boot.log
-</details>
 
 ### Explanation:
 - cd /home/bob → change to bob's home directory
@@ -245,8 +316,34 @@ Use the below commands:
 - sudo → run with elevated privileges
 - -p info → show info-priority logs
 - -g '^c' → filter log messages matching lines that begin with c
-- > → redirect output to file
+- '>' → redirect output to file
 - .priority/boot.log → destination file
+
+## `-p info`
+
+👉 means:
+> only show **info-level logs**
+
+Think:
+- ignore errors, warnings, debug  
+- only show normal informational messages  
+
+---
+
+## 🧠 Mental Model
+
+    -p info = “only normal logs”
+
+---
+
+## `-g '^c'`
+
+👉 means:
+> only show lines that **start with the letter `c`**
+
+> In `journalctl`, `-g` means: **filter logs using a pattern (regex search)**
+
+</details>
 
 ---
 
@@ -261,14 +358,15 @@ Verify the contents of "/home/bob/resources.txt" file.
 Execute the below command:
 
 ps u 1 > /home/bob/resources.txt
-</details>
 
 ### Explanation:
 - ps → display process information
 - u → user-oriented format with CPU and memory usage
 - 1 → target PID
-- > → redirect output to file
+- '>' → redirect output to file
 - /home/bob/resources.txt → destination file
+
+</details>
 
 ---
 
@@ -282,9 +380,10 @@ Is the required command running in the background?
 Execute the below command:
 
 #### sleep 3000 &
-</details>
 
 ### Explanation:
 - sleep → pause for a specified duration
 - 3000 → sleep duration in seconds
 - & → run command in the background
+
+</details>
