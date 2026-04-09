@@ -1,6 +1,6 @@
 # 🧠 kai-memory-palace
 
-A structured knowledge base for repeatable learning, operations, and reference notes.
+A structured knowledge base for all things Linux & Kubernetes
 
 ## 🗺️ Navigation
 
