@@ -18,7 +18,6 @@ Copy the SELinux context from the output and save it in the /home/bob/sshd file.
 For example, if the context is system_u:system_r:initrc_t:s0, then the file contents should be:
 
 #### system_u:system_r:initrc_t:s0
-</details>
 
 ### Explanation:
 - ps → display running processes
@@ -28,6 +27,8 @@ For example, if the context is system_u:system_r:initrc_t:s0, then the file cont
 - SELinux context → format user:role:type:level
 - vi → manually save context
 - /home/bob/sshd → destination file
+
+</details>
 
 ---
 
@@ -41,13 +42,14 @@ Check if the kernel.modules_disabled kernel runtime parameter is turned on.
 Execute the below command:
 
 #### sysctl -w kernel.modules_disabled=1
-</details>
 
 ### Explanation:
 - sysctl → view or modify kernel runtime parameters
 - -w → write/change parameter value
 - kernel.modules_disabled → parameter controlling module loading
 - =1 → disable loading of new kernel modules
+
+</details>
 
 ---
 
@@ -66,7 +68,6 @@ Execute the below command:
 You should see sudo_exec_t in the output. Save it in the /home/bob/selabel file:
 
 #### vi /home/bob/selabel
-</details>
 
 ### Explanation:
 - ls → list file details
@@ -75,6 +76,8 @@ You should see sudo_exec_t in the output. Save it in the /home/bob/selabel file:
 - sudo_exec_t → SELinux type for sudo binary
 - vi → manually save value
 - /home/bob/selabel → destination file
+
+</details>
 
 ---
 
@@ -90,13 +93,14 @@ Is kernel runtime parameter enabled?
 Use the below command:
 
 #### sysctl -w net.ipv6.conf.lo.seg6_enabled=1
-</details>
 
 ### Explanation:
 - sysctl → manage kernel parameters
 - -w → write/change parameter value
 - net.ipv6.conf.lo.seg6_enabled → IPv6 Segment Routing setting for loopback
 - =1 → enable the parameter
+
+</details>
 
 ---
 
@@ -120,13 +124,14 @@ Add the below code in this file and save it:
 Apply the changes:
 
 #### sysctl -p
-</details>
 
 ### Explanation:
 - /etc/sysctl.conf → persistent kernel parameter configuration file
 - vi → edit configuration file
 - vm.swappiness=10 → reduce swap usage preference
 - sysctl -p → apply configuration without reboot
+    > `-p` stands for: **“load parameters from a file”** | “pull parameters from config file”
+</details>
 
 ---
 
@@ -140,13 +145,14 @@ Is SELinux context updated for the /var/index.html file?
 Use the below command:
 
 #### chcon -t httpd_sys_content_t /var/index.html
-</details>
 
 ### Explanation:
 - chcon → change SELinux context
 - -t → set SELinux type
 - httpd_sys_content_t → type for web server content
 - /var/index.html → target file
+
+</details>
 
 ---
 
@@ -160,13 +166,14 @@ Check SELinux status.
 Execute the below command:
 
 #### sudo setenforce 0
-</details>
 
 ### Explanation:
 - setenforce → change SELinux mode
 - 0 → set SELinux to permissive mode
 - sudo → run with elevated privileges
 - permissive → logs violations but does not enforce policies
+
+</details>
 
 ---
 
@@ -184,7 +191,6 @@ Execute the below command:
 Copy the SELinux Roles value for staff_u user and save it in the /home/bob/serole file:
 
 #### vi /home/bob/serole
-</details>
 
 ### Explanation:
 - semanage → manage SELinux policy
@@ -193,6 +199,8 @@ Copy the SELinux Roles value for staff_u user and save it in the /home/bob/serol
 - roles → permissions associated with SELinux user
 - vi → manually save values
 - /home/bob/serole → destination file
+
+</details>
 
 ---
 
@@ -206,7 +214,6 @@ Default labels are restored for /var/log directory?
 Run the below command to restore SELinux labels.
 
 #### sudo restorecon -R /var/log/
-</details>
 
 ### Explanation:
 - restorecon → restore default SELinux contexts
@@ -214,3 +221,6 @@ Run the below command to restore SELinux labels.
 - /var/log/ → target directory
 - sudo → run with elevated privileges
 - default labels → reset based on SELinux policy
+
+</details>
+
