@@ -16,7 +16,6 @@ Execute the below command and copy the used space value:
 Save the value in the /home/bob/used file:
 
 #### vi /home/bob/used
-</details>
 
 ### Explanation:
 - df → display filesystem disk space usage
@@ -24,6 +23,8 @@ Save the value in the /home/bob/used file:
 - output → shows total, used, available, and percentage used
 - vi → manually save the percentage value
 - /home/bob/used → destination file
+
+</details>
 
 ---
 
@@ -41,7 +42,6 @@ Execute the below command and copy the required value:
 Save the value in the /home/bob/bin file:
 
 #### vi /home/bob/bin
-</details>
 
 ### Explanation:
 - du → estimate disk usage
@@ -50,6 +50,8 @@ Save the value in the /home/bob/bin file:
 - /bin/ → target directory
 - vi → manually save the value
 - /home/bob/bin → destination file
+
+</details>
 
 ---
 
@@ -69,7 +71,6 @@ Execute the below command and copy the required value:
 Save the value in the /home/bob/memory file:
 
 #### vi /home/bob/memory
-</details>
 
 ### Explanation:
 - free → display memory usage
@@ -77,6 +78,8 @@ Save the value in the /home/bob/memory file:
 - output → includes total, used, free memory
 - vi → manually save total RAM value
 - /home/bob/memory → destination file
+
+</details>
 
 ---
 
@@ -97,13 +100,14 @@ Execute the below command and copy the required value:
 Save the value in the /home/bob/up file:
 
 #### vi /home/bob/up
-</details>
 
 ### Explanation:
 - uptime → show system runtime duration
 - output → includes how long system has been running
 - vi → manually save parsed uptime value
 - /home/bob/up → destination file
+
+</details>
 
 ---
 
@@ -121,13 +125,14 @@ Execute the below command and copy the required value:
 Save the value in the /home/bob/cpu file:
 
 #### vi /home/bob/cpu
-</details>
 
 ### Explanation:
 - lscpu → display CPU architecture information
 - output → includes cores per socket, CPU count, threads
 - vi → manually save the required value
 - /home/bob/cpu → destination file
+
+</details>
 
 ---
 
@@ -141,7 +146,6 @@ Has the required file system been checked for errors?
 Execute the below command:
 
 #### sudo xfs_repair -n /dev/vdd > /home/bob/fscheck 2>&1
-</details>
 
 ### Explanation:
 - xfs_repair → check and repair XFS filesystem
@@ -151,3 +155,5 @@ Execute the below command:
 - > → redirect standard output to file
 - 2>&1 → redirect standard error to same file
 - /home/bob/fscheck → destination file
+
+</details>
