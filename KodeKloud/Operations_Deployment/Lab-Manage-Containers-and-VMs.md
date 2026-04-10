@@ -16,13 +16,14 @@ D. It deletes both the virtual machine called TestMachine and the data stored on
 
 <details><summary>Answer</summary>
 It forces a power off for the virtual machine called TestMachine.
-</details>
 
 ### Explanation:
 - virsh → manage virtual machines via libvirt
 - destroy → forcefully stop (power off) a VM
 - TestMachine → target virtual machine
 - force off → similar to pulling power, not graceful shutdown
+
+</details>
 
 ---
 
@@ -32,12 +33,13 @@ Which of the following commands would you use to set the virtual machine called 
 
 <details><summary>Answer</summary>
 You can use virsh autostart VM1 command to set the virtual machine called VM1 to automatically start up at boot.
-</details>
 
 ### Explanation:
 - virsh → manage VMs
 - autostart → enable VM to start automatically at system boot
 - VM1 → target virtual machine
+
+</details>
 
 ---
 
@@ -46,16 +48,16 @@ You can use virsh autostart VM1 command to set the virtual machine called VM1 to
 Which of the following commands is used to list all docker containers (including stopped containers) present on a system?
 
 <details><summary>Answer</summary>
-Pull docker.io/library/nginx image on this system.
 
-Is the required docker image pulled?
-</details>
+#### docker ps -a
 
 ### Explanation:
 - docker ps -a → list all containers including stopped ones
 - docker → container management tool
 - ps → list running containers
 - -a → include all containers
+
+</details>
 
 ---
 
@@ -77,7 +79,6 @@ Is the correct PORT mapped?
 Execute the below command to run the docker container:
 
 #### docker run -d -p 1234:80 --name website docker.io/library/nginx
-</details>
 
 ### Explanation:
 - docker run → create and start a container
@@ -85,6 +86,8 @@ Execute the below command to run the docker container:
 - -p 1234:80 → map host port 1234 to container port 80
 - --name website → assign name to container
 - docker.io/library/nginx → image used
+
+</details>
 
 ---
 
@@ -109,7 +112,6 @@ Now, remove the image.
 Or you can force remove the image:
 
 #### docker rmi $IMAGE_ID -f
-</details>
 
 ### Explanation:
 - docker images → list images
@@ -118,6 +120,8 @@ Or you can force remove the image:
 - docker rm → remove container
 - docker rmi → remove image
 - -f → force removal even if in use
+
+</details>
 
 ---
 
@@ -140,13 +144,14 @@ Delete the running containers if any:
 Delete the stopped/exited containers if any:
 
 #### docker rm <container-id>
-</details>
 
 ### Explanation:
 - docker ps -a → list all containers
 - docker stop → stop running containers
 - docker rm → remove containers
-- <container-id> → identifier for each container
+- '<container-id>' → identifier for each container
+
+</details>
 
 ---
 
@@ -168,7 +173,6 @@ Run the below command to complete the task.
 Check for containers using the below command.
 
 #### docker ps
-</details>
 
 ### Explanation:
 - docker run → create and start container
@@ -178,6 +182,8 @@ Check for containers using the below command.
 - --name webinstance1 → assign container name
 - httpd → Apache image
 - docker ps → verify running containers
+
+</details>
 
 ---
 
@@ -201,13 +207,14 @@ Look for the value(s) under Name and save it in /home/bob/vm file:
 So, if the VM name is VM1, then the file content should be:
 
 #### VM1
-</details>
 
 ### Explanation:
 - virsh list --all → list all VMs (running and stopped)
 - Name → VM identifier
 - vi → manually save VM name
 - /home/bob/vm → destination file
+
+</details>
 
 ---
 
@@ -221,11 +228,12 @@ Has VM1 been started?
 Execute the below command:
 
 #### virsh start VM1
-</details>
 
 ### Explanation:
 - virsh start → start a virtual machine
 - VM1 → target VM
+
+</details>
 
 ---
 
@@ -240,13 +248,14 @@ Execute the below commands:
 
 #### virsh destroy VM1
 #### virsh undefine VM1
-</details>
 
 ### Explanation:
 - virsh destroy → force stop VM
 - virsh undefine → remove VM definition
 - VM1 → target VM
 - combination → fully removes VM from system
+
+</details>
 
 ---
 
@@ -270,13 +279,14 @@ Now, list out the virtual machines:
 Identify the name of the VM from the above command and start it. Let's say, if VM name is VM2:
 
 #### virsh start VM2
-</details>
 
 ### Explanation:
 - virsh define → create VM from XML config
 - /opt/testmachine2.xml → VM configuration file
 - virsh list --all → verify VM creation
 - virsh start → start VM
+
+</details>
 
 ---
 
@@ -291,11 +301,12 @@ Is VM2 virtual machine set to autostart at boot?
 Execute the below command:
 
 #### virsh autostart VM2
-</details>
 
 ### Explanation:
 - virsh autostart → enable VM auto-start at boot
 - VM2 → target VM
+
+</details>
 
 ---
 
@@ -328,7 +339,6 @@ force a power off in our case since we have no operating system in there:
 Start the VM again:
 
 #### virsh start VM2
-</details>
 
 ### Explanation:
 - virsh setmaxmem → set maximum memory
@@ -339,6 +349,66 @@ Start the VM again:
 - virsh destroy → force stop
 - virsh start → restart VM
 
+## Why BOTH `setmaxmem` and `setmem` Are Used
+
+## Commands
+    virsh setmaxmem VM2 80M --config
+    virsh setmem VM2 80M --config
+
+- **maximum memory (ceiling)**
+- **current memory (actual usage)**
+
+# 🧠 Mental Model
+
+Think of it like:
+
+    max memory = limit  
+    current memory = what it's using right now  
+
+---
+
+# 🔍 What Each Command Does
+
+## 1️⃣ `setmaxmem`
+
+    virsh setmaxmem VM2 80M --config
+
+👉 sets:
+> the MAXIMUM memory the VM is allowed to use
+
+---
+
+## 2️⃣ `setmem`
+
+    virsh setmem VM2 80M --config
+
+👉 sets:
+> the CURRENT memory assigned to the VM
+
+---
+
+# ⚠️ Important Rule
+
+> You CANNOT set current memory higher than max memory 
+
+👉 keeps them aligned
+
+---
+
+# ⚙️ What `--config` Means
+
+    --config
+
+👉 make change **persistent** (survives reboot)
+
+    VM memory has TWO states:
+    - allowed maximum
+    - currently assigned
+
+👉 both must be managed
+
+</details>
+
 ---
 
 ## Task:
@@ -348,6 +418,7 @@ There is a cloud image available in /var/lib/libvrt/images/ folder use that imag
 Name - kk-ubuntu
 Memory - 1024 
 vcpus - 1 
+    **virtual CPU**
 disk path - /var/lib/libvirt/images/ubuntu-22.04-minimal-cloudimg-amd64.img
 os-variant - ubuntu22.04 
 graphics -  none 
@@ -367,7 +438,6 @@ virt-install \
     --os-variant ubuntu22.04 \
     --graphics none \
     --network network=default
-</details>
 
 ### Explanation:
 - virt-install → create virtual machines
@@ -379,3 +449,5 @@ virt-install \
 - --os-variant ubuntu22.04 → OS type
 - --graphics none → disable graphical output
 - --network network=default → attach default network
+
+</details>
