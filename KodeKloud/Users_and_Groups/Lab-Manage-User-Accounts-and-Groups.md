@@ -10,13 +10,14 @@ Has the expiration date been set for user jane?
 Use the below command:
 
 #### sudo usermod -e 2030-03-01 jane
-</details>
 
 ### Explanation:
 - usermod → modify user account
 - sudo → run with elevated privileges
 - -e 2030-03-01 → set account expiration date
 - jane → target user
+
+</details>
 
 ---
 
@@ -30,13 +31,19 @@ Has system account "apachedev" been created?
 Use the below command:
 
 #### sudo useradd --system apachedev
-</details>
 
 ### Explanation:
 - useradd → create new user
 - --system → create system account (no login, lower UID)
+   
+     root → UID 0
+    system users → usually UID < 1000
+    normal users → usually UID ≥ 1000
+
 - apachedev → username
 - sudo → run with elevated privileges
+
+</details>
 
 ---
 
@@ -50,13 +57,14 @@ Has Jane user account been unexpired?
 Use the below command:
 
 #### sudo usermod -e "" jane
-</details>
 
 ### Explanation:
 - usermod → modify user account
 - -e "" → remove expiration date (never expires)
 - jane → target user
 - sudo → run with elevated privileges
+
+</details>
 
 ---
 
@@ -70,14 +78,18 @@ Has user Jack been added and is its shell /bin/csh?
 Execute the below command:
 
 #### sudo useradd -s /bin/csh -m jack
-</details>
 
 ### Explanation:
 - useradd → create user
 - -s /bin/csh → set login shell
-- -m → create home directory
+    -s = shell
+    “set the user’s login shell”    
+- -m → make home
+    "make the home directory"
 - jack → username
 - sudo → run with elevated privileges
+
+</details>
 
 ---
 
@@ -93,13 +105,32 @@ Is user Jack's home directory also removed?
 Execute the below command:
 
 #### sudo userdel -r jack
-</details>
 
 ### Explanation:
 - userdel → delete user
 - -r → remove home directory and mail spool
+    -r = recursive (go into subdirectories)
+    BUT in `userdel`:
+    `-r` = remove user’s associated data
 - jack → target user
 - sudo → run with elevated privileges
+
+# 🧠 Mental Model
+
+    userdel -r = remove user + their “stuff”
+
+# ⚠️ Important: It Does NOT Remove Everything
+
+## ❌ Files OUTSIDE home are NOT removed
+
+Example:
+
+    /tmp/jack_file
+    /opt/app/jack_data
+
+👉 these remain
+
+</details>
 
 ---
 
@@ -113,13 +144,18 @@ Is password expiration set for user Jane?
 Execute the below command:
 
 #### sudo chage --lastday 0 jane
-</details>
 
 ### Explanation:
 - chage → change password aging info
 - --lastday 0 → set last password change to day 0 (forces change)
+    Day 0 = **birth of the account**
+    password is considered:
+    never updated  
+    not valid 
 - jane → target user
 - sudo → run with elevated privileges
+
+</details>
 
 ---
 
@@ -133,14 +169,50 @@ Is user Jane added to the developers group?
 Execute the below command:
 
 #### sudo usermod -a -G developers jane
-</details>
 
 ### Explanation:
 - usermod → modify user account
 - -a → append to existing groups
 - -G developers → add to developers group
+    -g = main group  
+    -G = extra groups  
 - jane → target user
 - sudo → run with elevated privileges
+
+## 🔍 Why It's Needed
+
+Without `-a`:
+
+    usermod -G developers jane
+
+👉 result:
+- user ONLY in `developers`
+- removed from all other groups ❌
+
+---
+
+## ✅ With `-a`
+
+    usermod -a -G developers jane
+
+👉 result:
+- keeps existing groups  
+- ADDS `developers`  
+
+---
+
+# 🧠 Mental Model
+
+    -G = replace  
+    -a -G = append  
+
+---
+
+# 🔁 Memory Hook
+
+    -a = add (don’t overwrite)
+
+</details>
 
 ---
 
@@ -154,13 +226,16 @@ Is cricket group created with GID 9875?
 Execute the below command:
 
 #### sudo groupadd -g 9875 cricket
-</details>
 
 ### Explanation:
 - groupadd → create group
 - -g 9875 → set group ID
+    group name = human-readable  
+    GID        = system uses this number internally  
 - cricket → group name
 - sudo → run with elevated privileges
+
+</details>
 
 ---
 
@@ -174,7 +249,6 @@ Is the group renamed from cricket to soccer with the same GID?
 Execute the below command:
 
 #### sudo groupmod -n soccer cricket
-</details>
 
 ### Explanation:
 - groupmod → modify group
@@ -182,6 +256,8 @@ Execute the below command:
 - cricket → existing group name
 - GID → unchanged during rename
 - sudo → run with elevated privileges
+
+</details>
 
 ---
 
@@ -197,7 +273,6 @@ Is user sam a member of group soccer?
 Execute the below command:
 
 #### sudo useradd -G soccer sam  --uid 5322
-</details>
 
 ### Explanation:
 - useradd → create user
@@ -205,6 +280,15 @@ Execute the below command:
 - --uid 5322 → assign user ID
 - sam → username
 - sudo → run with elevated privileges
+
+# 🧠 Mental Model
+
+    group = container  
+    user  = member  
+
+👉 You can’t add a member to a container that doesn’t exist
+
+</details>
 
 ---
 
@@ -218,13 +302,14 @@ Has user sam's primary group been set to "rugby"?
 Execute the below command:
 
 #### sudo usermod -g rugby sam
-</details>
 
 ### Explanation:
 - usermod → modify user account
 - -g rugby → set primary group
 - sam → target user
 - sudo → run with elevated privileges
+
+</details>
 
 ---
 
@@ -238,12 +323,13 @@ Has the group called appdevs been deleted?
 Execute the below command:
 
 #### sudo groupdel appdevs
-</details>
 
 ### Explanation:
 - groupdel → delete group
 - appdevs → group name
 - sudo → run with elevated privileges
+
+</details>
 
 ---
 
@@ -257,10 +343,26 @@ Are the required changes made?
 Execute below given command:
 
 #### sudo chage -W 2 jane
-</details>
 
 ### Explanation:
 - chage → manage password aging
 - -W 2 → set warning period to 2 days
 - jane → target user
 - sudo → run with elevated privileges
+
+# 🧪 Related Options (ALL in Days)
+
+| Option | Meaning |
+|--------|--------|
+| `-M`   | max days password is valid |
+| `-m`   | min days before change allowed |
+| `-W`   | warning days before expiry |
+| `-E`   | account expiration date |
+
+---
+
+# 🧠 Mental Model (LOCK THIS IN)
+
+    chage = everything is in DAYS
+
+</details>
