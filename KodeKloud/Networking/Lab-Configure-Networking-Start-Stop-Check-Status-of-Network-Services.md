@@ -6,11 +6,43 @@ Where do we configure static hostname resolution?
 
 <details><summary>Answer</summary>
 We can configure static hostname resolution in /etc/hosts file.
-</details>
 
 ### Explanation:
 - /etc/hosts → local hostname resolution file
 - static mapping → manually map IP addresses to hostnames
+
+## 🧠 What You’re Doing
+
+> Mapping a hostname → to an IP address manually
+
+👉 bypasses DNS completely
+
+
+## 🔥 Mental Model
+
+    /etc/hosts = local DNS override
+
+
+## ⚙️ Step-by-Step Process
+
+## 1️⃣ Open the hosts file
+    sudo vi /etc/hosts
+
+
+## 2️⃣ Add a new entry
+
+Format:
+    IP_ADDRESS   HOSTNAME
+
+
+## 🧪 Example
+
+    192.168.1.50   webserver
+    10.0.0.25      dbserver
+
+## 3️⃣ Save and exit
+
+</details>
 
 ---
 
@@ -20,7 +52,6 @@ How do we see what processes on our system are listening for incoming network co
 
 <details><summary>Answer</summary>
 Using sudo ss -tunlp command we can see what processes on our system are listening for incoming network connections, on the TCP and UDP protocols.
-</details>
 
 ### Explanation:
 - ss → socket statistics tool
@@ -30,6 +61,8 @@ Using sudo ss -tunlp command we can see what processes on our system are listeni
 - -n → show numeric addresses
 - -l → show listening sockets
 - -p → show process using the socket
+
+</details>
 
 ---
 
@@ -57,7 +90,6 @@ For example, if the IP address is 172.16.1.0/24, then add it in the file:
 #### 172.16.1.0/24
 
 Finally, save the file.
-</details>
 
 ### Explanation:
 - ip a → show IP addresses of interfaces
@@ -65,6 +97,57 @@ Finally, save the file.
 - CIDR notation → IP address with subnet mask
 - vi → manually save value
 - /home/bob/ip → destination file
+
+## 🧠 Alternative Commands 
+
+## ✅ Option 1 (CLEANEST — LFCS READY)
+
+    ip -o -f inet addr show eth0
+
+## 🔍 What This Does
+
+    -o        → one-line output  
+    -f inet   → IPv4 only  
+    addr show → show addresses  
+    eth0      → specific interface  
+
+## 🧪 Example Output
+
+    2: eth0    inet 192.168.1.10/24 brd ...
+
+👉 you want:
+    192.168.1.10/24
+
+## 🔥 Extract JUST the IP (EXAM GOLD)
+
+    ip -o -f inet addr show eth0 | awk '{print $4}'
+
+## Output
+
+    192.168.1.10/24
+
+## 🧠 Mental Model
+
+    ip command → gives data  
+    awk        → extracts what you need  
+
+## 🧪 Then Save It
+
+    ip -o -f inet addr show eth0 | awk '{print $4}' > /home/bob/ip
+
+To filter, you must use:
+
+    show eth0
+
+## 🧨 Operator Insight
+
+Think:
+
+    ip = data  
+    flags = filter  
+    awk = extract  
+
+</details>
 
 ---
 
@@ -89,7 +172,6 @@ For example, if the IP address value is 172.17.0.1, then add it in the file:
 #### 172.17.0.1
 
 Finally, save the file.
-</details>
 
 ### Explanation:
 - ip route show → display routing table
@@ -97,6 +179,8 @@ Finally, save the file.
 - IP after "via" → gateway address
 - vi → manually save value
 - /home/bob/gateway.txt → destination file
+
+</details>
 
 ---
 
@@ -124,7 +208,6 @@ For example, if the PID value is 1123, then add it in the file:
 #### 1123
 
 Finally, save the file.
-</details>
 
 ### Explanation:
 - ss → view socket information
@@ -135,6 +218,121 @@ Finally, save the file.
 - grep :22 → filter for port 22
 - pid= → identifies process ID
 - vi → manually save value
+
+## Why `-t` (TCP) for Port 22?
+
+## 🧠 Short Answer
+
+> Because **SSH (port 22) uses TCP**, not UDP
+
+## 🔥 Key Concept
+
+> Different services use different protocols:
+
+| Protocol | Use Case |
+|----------|--------|
+| TCP | reliable connections (SSH, HTTP, HTTPS) |
+| UDP | fast, connectionless (DNS, streaming) |
+
+## 🔍 SSH Uses TCP
+
+Port:
+    22
+
+Service:
+    sshd
+
+👉 uses:
+> TCP only
+
+# 🧠 Mental Model
+
+    SSH = login session → must be reliable → uses TCP
+
+## 🔥 What `-t` Does
+
+    ss -tlnp
+
+👉 shows:
+> only TCP sockets
+
+## 🔍 Breakdown
+
+    -t → TCP only  
+    -l → listening sockets  
+    -n → numeric (no DNS)  
+    -p → show process/PID  
+
+## 🧪 Why Not UDP?
+
+Because:
+
+👉 SSH needs:
+- guaranteed delivery  
+- ordered packets  
+- persistent connection  
+
+👉 UDP does NOT provide that
+
+## ⚠️ What If You Omit `-t`?
+
+    ss -lnp
+
+👉 shows:
+- TCP  
+- UDP  
+- everything  
+
+👉 more clutter
+
+## 🧠 Why Labs Use `-t`
+
+To:
+- reduce noise  
+- focus only on relevant protocol  
+
+## 🔁 Memory Hook
+
+    TCP = connection → login → SSH  
+
+## 🧪 Real Check
+
+    ss -tlnp | grep :22
+
+👉 shows:
+    sshd process + PID
+
+## ⚡ Alternative (Broader)
+
+    ss -lnp | grep :22
+
+👉 still works  
+👉 but includes unnecessary protocols
+
+## 🧠 Mental Model (LOCK THIS IN)
+
+    port → service → protocol → filter with ss
+
+## 🔁 1-Line Recall
+
+    SSH (22) = TCP → use `-t`
+
+## 🧨 Operator Insight
+
+Always think:
+
+    “What protocol does this service use?”
+
+👉 then filter accordingly
+
+## Final Takeaway
+
+    ss -tlnp | grep :22
+
+👉 uses TCP filter because:
+> SSH runs over TCP, not UDP
+
+</details>
 
 ---
 
@@ -161,7 +359,6 @@ For example, if the PID value is 1123, then add it in the file:
 #### 1123
 
 Finally, save the file.
-</details>
 
 ### Explanation:
 - ss → socket statistics tool
@@ -173,6 +370,136 @@ Finally, save the file.
 - grep :53 → filter for port 53
 - vi → manually save PID
 - /home/bob/process_pid → destination file
+
+## Why UDP for Port 53 + How to Know Ports for LFCS
+
+## 🧠 Core Question
+1. Why UDP for port 53?  
+2. How do I KNOW which ports use TCP vs UDP?
+
+## 🔥 1. Why UDP for Port 53?
+
+> Port 53 = **DNS (Domain Name System)**
+
+## 🔥 DNS Uses UDP (Most of the Time)
+
+Because:
+- fast  
+- lightweight  
+- no connection setup  
+
+## 🧠 Mental Model
+
+    DNS = quick lookup → use UDP
+
+## ⚠️ BUT (Important)
+
+DNS can ALSO use TCP:
+- large responses  
+- zone transfers  
+
+
+## ✅ That’s Why Lab Used
+
+    ss -tlnpu
+
+👉 includes:
+- `-t` → TCP  
+- `-u` → UDP  
+
+👉 covers BOTH cases
+
+---
+
+## 🔥 2. How Are You Supposed to Know This?
+
+## 🎯 LFCS Expectation
+
+You are NOT expected to memorize EVERYTHING  
+BUT you SHOULD know **common ports + protocols**
+
+## 🧠 Core Ports to Know (LOCK THESE IN)
+
+| Port | Service | Protocol |
+|------|--------|----------|
+| 22   | SSH    | TCP |
+| 80   | HTTP   | TCP |
+| 443  | HTTPS  | TCP |
+| 21   | FTP    | TCP |
+| 25   | SMTP   | TCP |
+| 53   | DNS    | UDP (primarily) |
+| 67/68| DHCP   | UDP |
+
+## 🔁 Memory Hooks
+
+## 🔥 TCP = connection-based
+
+Think:
+    login, websites, sessions
+
+👉 SSH, HTTP, HTTPS → TCP
+
+## 🔥 UDP = fast + lightweight
+
+Think:
+    quick requests
+
+👉 DNS, DHCP → UDP
+
+## 🧠 Mental Model
+
+    TCP → reliable (slow)  
+    UDP → fast (no guarantees)
+
+## 🔥 Why Use BOTH Flags?
+
+    ss -tlnpu
+
+👉 means:
+> “show me everything (TCP + UDP)”
+
+## 🧪 Safer Exam Strategy
+
+Instead of guessing:
+
+    ss -tlnpu | grep :53
+
+👉 ALWAYS works
+
+## ⚡ Alternative Commands
+
+## Only UDP
+    ss -ulnp
+
+## Only TCP
+    ss -tlnp
+
+## 🧠 Mental Model (LOCK THIS IN)
+
+    don’t guess protocol → include both
+
+## 🔁 1-Line Recall
+
+    53 = DNS → usually UDP  
+    safest → use `-t -u`
+
+## 🧨 Operator Insight
+
+In real-world debugging:
+
+👉 ALWAYS check BOTH:
+    TCP + UDP
+
+## Final Takeaway
+
+- Port 53 = DNS → mainly UDP  
+- Use:
+
+    ss -tlnpu | grep :53
+
+👉 to avoid missing anything
+
+</details>
 
 ---
 
@@ -202,7 +529,6 @@ In this case, the value should be ttyd:
 #### ttyd
 
 Finally, save the file.
-</details>
 
 ### Explanation:
 - netstat → network statistics tool
@@ -213,6 +539,8 @@ Finally, save the file.
 - grep :8080 → filter for port 8080
 - PID/process → format shows process name
 - vi → manually save value
+
+</details>
 
 ---
 
@@ -232,13 +560,14 @@ Add the below line in it:
 #### 8.8.8.8         example.com
 
 Save and exit.
-</details>
 
 ### Explanation:
 - /etc/hosts → local hostname mapping file
 - 8.8.8.8 → target IP address
 - example.com → hostname
 - sudo vi → edit file with privileges
+
+</details>
 
 ---
 
@@ -252,7 +581,6 @@ Is extra IP added?
 You can use the below command to set the new IP address.
 
 #### sudo ip a add 192.168.9.3/24 dev eth1
-</details>
 
 ### Explanation:
 - ip a add → add IP address to interface
@@ -260,6 +588,23 @@ You can use the below command to set the new IP address.
 - dev eth1 → target interface
 - sudo → run with elevated privileges
 - temporary → not persistent after reboot
+
+## CIDR Notation (What `/24` Means)
+
+> CIDR = **IP address + subnet size**
+
+> CIDR = **Classless Inter-Domain Routing**
+
+## 🔁 Memory Hook
+
+    /24 = “standard home network”
+
+## 🧠 Mental Model (LOCK THIS IN)
+
+    IP + /number = address + network size
+
+
+</details>
 
 ---
 
@@ -305,7 +650,6 @@ After configuring, now apply the changes by following the command.
 #### sudo netplan generate
 #### sudo networkctl reload
 #### sudo networkctl reconfigure enp6s0
-</details>
 
 ### Explanation:
 - /etc/netplan → network configuration directory
@@ -316,6 +660,8 @@ After configuring, now apply the changes by following the command.
 - netplan generate → generate configuration
 - networkctl reload → reload network config
 - networkctl reconfigure → apply to interface
+
+</details>
 
 ---
 
@@ -348,7 +694,6 @@ You can apply the configuration by two commands as follows.
 Check the changes using the below command.
 
 #### ip a | grep enp6s0
-</details>
 
 ### Explanation:
 - netplan config → modify IP address
@@ -357,6 +702,8 @@ Check the changes using the below command.
 - networkctl reload → reload network
 - networkctl reconfigure → apply to interface
 - ip a → verify IP assignment
+
+</details>
 
 ---
 
@@ -374,13 +721,14 @@ Execute any one of the following commands:
 or
 
 #### sudo ip r > /home/bob/route.txt
-</details>
 
 ### Explanation:
 - ip route show / ip r → display routing table
 - sudo → run with elevated privileges
-- > → redirect output
+- '>' → redirect output
 - /home/bob/route.txt → destination file
+
+</details>
 
 ---
 
@@ -394,7 +742,6 @@ Is the required output stored in the /home/bob/incoming.txt?
 Execute the below commands:
 
 #### sudo netstat -tulpn | grep LISTEN > /home/bob/incoming.txt
-</details>
 
 ### Explanation:
 - netstat → network statistics tool
@@ -404,7 +751,109 @@ Execute the below commands:
 - -p → show process info
 - -n → numeric output
 - grep LISTEN → filter active listening ports
-- > → redirect output to file
+- '>' → redirect output to file
+
+## Why `grep LISTEN` in This Command?
+
+> To show ONLY services that are **waiting for incoming connections**
+
+## Full Breakdown
+
+## `netstat -tulpn`
+
+| Flag | Meaning |
+|------|--------|
+| `-t` | TCP sockets |
+| `-u` | UDP sockets |
+| `-l` | listening sockets ONLY |
+| `-p` | show process (PID) |
+| `-n` | numeric output |
+
+## ⚠️ Key Insight
+
+> `-l` already means “listening”
+
+## 🧠 So Why `grep LISTEN`?
+
+Because `netstat` still outputs a **STATE column**, like:
+
+    tcp   0   0 0.0.0.0:22   0.0.0.0:*   LISTEN
+
+👉 `grep LISTEN`:
+- filters only those lines  
+- makes output cleaner  
+- ensures ONLY listening entries are saved  
+
+## 🧪 What the Output Looks Like
+
+Without grep:
+    tcp   ... LISTEN
+    tcp   ... ESTABLISHED
+    udp   ... (no LISTEN label)
+
+With grep:
+    tcp   ... LISTEN
+
+## ⚠️ Important Detail (ADVANCED)
+
+UDP does NOT always show `LISTEN`
+
+👉 so:
+
+    grep LISTEN
+
+❌ may exclude some UDP entries
+
+## 🧠 Mental Model
+
+    -l        = filter internally  
+    grep      = filter visually/output  
+
+## 🔥 Cleaner Alternative
+
+For LFCS, better:
+
+    sudo netstat -tulpn > /home/bob/incoming.txt
+
+👉 because:
+- `-l` already filters listening  
+- keeps UDP entries too  
+
+## 🧠 When SHOULD You Use `grep LISTEN`?
+
+When:
+- task explicitly says “LISTEN”  
+- or you only care about TCP services  
+
+## 🔁 Memory Hook
+
+    LISTEN = waiting for connections
+
+## 🔁 1-Line Recall
+
+    `grep LISTEN` = show only listening services (mostly TCP)
+
+## 🧨 Operator Insight
+
+For exams:
+
+👉 safest:
+    use `-l`
+
+👉 optional:
+    use `grep LISTEN` for clarity
+
+## Final Takeaway
+
+    sudo netstat -tulpn | grep LISTEN
+
+👉 filters output to:
+> only processes actively listening for incoming connections
+
+BUT:
+> `-l` already does most of the work
+
+</details>
 
 ---
 
@@ -422,10 +871,11 @@ Edit the /etc/systemd/resolved.conf file.
 Uncomment the below line in it and update to 8.8.8.8: 8.8.8.8:
 
 #### #DNS --> DNS=8.8.8.8
-</details>
 
 ### Explanation:
 - /etc/systemd/resolved.conf → DNS configuration file
 - DNS=8.8.8.8 → set global DNS resolver
 - uncomment → enable configuration line
 - sudo vim → edit file with privileges
+
+</details>
