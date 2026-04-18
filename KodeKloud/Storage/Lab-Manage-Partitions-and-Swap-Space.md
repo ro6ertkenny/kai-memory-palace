@@ -6,11 +6,12 @@ How do we display block devices such as disks or partitions?
 
 <details><summary>Answer</summary>
 Using lsblk command, we can display block devices.
-</details>
 
 ### Explanation:
 - lsblk → list block devices
 - shows disks, partitions, mount points, and sizes
+
+</details>
 
 ---
 
@@ -20,12 +21,145 @@ How do we format a partition as swap space?
 
 <details><summary>Answer</summary>
 We can format a partition as swap space using the sudo mkswap /dev/vdb3 command where /dev/vdb3 is the partition we want to format.
-</details>
 
 ### Explanation:
 - mkswap → create swap filesystem
 - /dev/vdb3 → target partition
 - sudo → run with elevated privileges
+
+## If LFCS Asks About Swap — What Do You Look For?
+
+## 🧠 Short Answer
+
+> For **formatting** swap:
+
+You are looking for:
+
+    a block device / partition
+
+NOT a directory.
+
+## 🔥 This:
+
+    sudo mkswap /dev/vdb3
+
+uses:
+
+    /dev/vdb3
+
+which is a device file.
+
+## 🧠 Mental Model
+
+    /dev = where block devices appear
+
+## 🔍 If Asked “Find a Partition To Use For Swap”
+
+Check:
+
+## 1. List block devices
+    lsblk
+
+## 2. See partitions
+    sudo fdisk -l
+
+## 3. Check existing swaps
+    swapon --show
+
+## 🧪 Example
+
+    lsblk
+
+might show:
+
+    vdb
+    └─vdb3
+
+👉 that might be the target:
+
+    /dev/vdb3
+
+## ⚠️ This Is NOT In A Directory Like
+
+❌ not:
+
+    /swap
+    /var/swap
+
+Those would be for swap FILES (different thing)
+
+## 🔥 Two Different Things
+
+## Swap Partition
+Uses:
+
+    /dev/vdb3
+
+Create:
+    mkswap /dev/vdb3
+
+## Swap File
+Uses:
+
+    /swapfile
+
+Create with:
+    fallocate
+    chmod
+    mkswap /swapfile
+
+Different object.
+
+## 🧠 If LFCS Says “Partition”
+
+Think immediately:
+
+    /dev/...
+
+## 🔁 Memory Hook
+
+    swap partition → look in /dev
+
+## ⚡ After Formatting (Important Next Steps)
+
+Usually:
+
+    sudo mkswap /dev/vdb3
+    sudo swapon /dev/vdb3
+
+And for persistence:
+
+    /etc/fstab
+
+## 🔁 1-Line Recall
+
+    If it says swap partition → look at block devices in /dev
+
+## 🧨 Operator Insight
+
+Exam pattern:
+
+- identify device → `lsblk`
+- format swap → `mkswap`
+- enable swap → `swapon`
+
+That’s the flow.
+
+## Final Takeaway
+
+If LFCS asks about swap partitions:
+
+👉 look for devices under:
+
+    /dev
+
+using:
+
+    lsblk
+
+not a directory.
+
+</details>
 
 ---
 
@@ -57,13 +191,14 @@ vda1 is the partition in which / is mounted. Copy it and save in a file as asked
 The file content should be:
 
 #### vda1
-</details>
 
 ### Explanation:
 - lsblk → display block devices and mount points
 - MOUNTPOINT / → identifies root filesystem
 - vda1 → partition where root is mounted
 - vi → manually save value
+
+</details>
 
 ---
 
@@ -85,12 +220,88 @@ Look for the value under NAME and save it in a file as asked.
 For example, if the value is /swapfile.img, then the file content should be:
 
 #### /swapfile.img
-</details>
 
 ### Explanation:
 - swapon --show → list active swap devices/files
 - NAME → shows swap file or partition path
 - vi → manually save value
+
+## Regarding my question about why a .img file ... and Kia said "even this ..."
+
+    /banana
+
+(yes, really 😄)
+
+## 🧠 Linux Does NOT Care About Extensions
+
+Just like:
+
+    env > myfile
+
+doesn’t need:
+
+    myfile.txt
+
+Same idea.
+
+## 🔍 What Makes It A Swap File?
+
+NOT the name.
+
+NOT `.img`.
+
+👉 This makes it swap:
+
+    mkswap /swapfile.img
+
+and then:
+
+    swapon /swapfile.img
+
+## 🧠 Mental Model
+
+    name does not define function  
+    formatting does
+
+## ❓Why Use `.img` Then?
+
+Usually because:
+
+> people think of it as a disk image file
+
+## 🔥 Before `mkswap`
+
+Suppose you create a file:
+
+    sudo fallocate -l 1G /swapfile
+
+👉 right now it is just:
+
+> an ordinary file
+
+Nothing special yet.
+
+## 🔍 Breakdown
+
+    fallocate   → allocate space for a file  
+    -l          → length (how much space)  
+    1G          → 1 gigabyte  
+    /swapfile   → file to create/use
+
+## 🔥 Then You Run
+
+    sudo mkswap /swapfile
+
+👉 NOW:
+
+it is formatted as swap.
+
+## 🧠 That’s What I Meant
+
+    name does not define function  
+    formatting does
+
+</details>
 
 ---
 
@@ -127,7 +338,6 @@ You can follow these same steps for all three partitions.
 Further, you can verify the created partitions using the below command:
 
 #### lsblk
-</details>
 
 ### Explanation:
 - fdisk → partition disk
@@ -136,6 +346,146 @@ Further, you can verify the created partitions using the below command:
 - +10M / +21M / +15M → partition sizes
 - w → write changes
 - lsblk → verify partitions
+
+## So:
+
+    fdisk
+
+≈ fixed disk utility
+
+## What Are `m` and `n` in `fdisk`?
+
+## 🧠 Short Answer
+
+Inside interactive `fdisk`:
+
+    m = menu (help)
+    n = new partition
+
+## 🔥 This:
+
+    Command (m for help):
+
+is a prompt.
+
+It means:
+
+> “Type a command here”
+
+## 🧠 If You Type
+
+    m
+
+👉 `fdisk` shows menu/help:
+
+- n → new partition  
+- d → delete partition  
+- p → print partition table  
+- w → write changes  
+- q → quit without saving
+
+## 🔁 Memory Hook
+
+    m = menu
+
+(not “manual”)
+
+## 🔥 What About `n`?
+
+    n
+
+means:
+
+> new partition
+
+## You type:
+
+    n
+
+and `fdisk` starts asking:
+
+- primary or extended?  
+- partition number?  
+- size?  
+
+## 🧠 Mental Model
+
+    m = show choices
+
+    n = make new slice
+
+## 🔍 Your Flow
+
+Start:
+
+    sudo fdisk /dev/vdd
+
+Prompt:
+
+    Command (m for help):
+
+Type:
+
+    n
+
+Then:
+
+    Select (default p):
+
+Type:
+
+    p
+
+(primary)
+
+Then size:
+
+    +10M
+
+Then save:
+
+    w
+
+(write)
+
+## ⚠️ What Is `w` Again?
+
+    w = write
+
+👉 commit changes to disk
+
+Until `w`:
+
+changes are mostly not committed.
+
+## 🧪 Why They Keep Saying “m for help”
+
+Because it is literally the prompt text built into fdisk.
+
+It reminds you:
+
+> if lost, press:
+
+    m
+
+## 🔁 1-Line Recall
+
+    m = menu  
+    n = new  
+    w = write
+
+## 🧨 Operator Insight
+
+These three alone get you through many basic LFCS fdisk tasks.
+
+## Final Takeaway
+
+In `fdisk`:
+
+    m → show help/menu  
+    n → create new partition
+
+</details>
 
 ---
 
@@ -156,13 +506,14 @@ You can validate with:
 #### swapon --show
 
 If the user is not root, you need to use the commands with sudo.
-</details>
 
 ### Explanation:
 - mkswap → format partition as swap
 - swapon → enable swap
 - /dev/vdd2 → target partition
 - swapon --show → verify active swap
+
+</details>
 
 ---
 
@@ -182,12 +533,13 @@ You can validate with:
 #### swapon --show
 
 If the user is not root, you need to use the command with sudo.
-</details>
 
 ### Explanation:
 - swapoff → disable swap
 - /dev/vdd2 → target partition
 - swapon --show → confirm removal
+
+</details>
 
 ---
 
@@ -227,7 +579,6 @@ Now, using arrow keys, select the Write option and press Enter. It will ask for 
 Now, using arrow keys, select the Quit option and press Enter. You are done!!
 
 You can confirm your changes by listing the partitions using the lsblk command.
-</details>
 
 ### Explanation:
 - cfdisk → interactive partition editor
@@ -235,3 +586,11 @@ You can confirm your changes by listing the partitions using the lsblk command.
 - 21M → new size
 - Write → save changes
 - lsblk → verify updated partition size
+
+## 🧠 Mental Model
+
+    fdisk  = command-line partition editor
+
+    cfdisk = menu-driven partition editor
+
+</details>
