@@ -22,7 +22,6 @@ Copy the output under OPTIONS and save that in the /root/moptions file:
 Its content should be something like:
 
 #### rw,relatime,discard,errors=remount-ro
-</details>
 
 ### Explanation:
 - findmnt → show mounted filesystems and options
@@ -30,6 +29,8 @@ Its content should be something like:
 - OPTIONS → mount options used
 - vi → manually save values
 - /root/moptions → destination file
+
+</details>
 
 ---
 
@@ -45,12 +46,13 @@ Execute the below command:
 #### umount /mnt
 
 If the user is not root, you need to use the command with sudo.
-</details>
 
 ### Explanation:
 - umount → unmount filesystem
 - /mnt → mount point
 - sudo → required if not root
+
+</details>
 
 ---
 
@@ -66,7 +68,6 @@ Execute the below command:
 #### mount -o ro,noexec,nosuid /dev/vdd1 /mnt
 
 If the user is not root, you need to use the command with sudo.
-</details>
 
 ### Explanation:
 - mount → attach filesystem
@@ -76,6 +77,8 @@ If the user is not root, you need to use the command with sudo.
 - nosuid → ignore setuid/setgid bits
 - /dev/vdd1 → source device
 - /mnt → mount point
+
+</details>
 
 ---
 
@@ -91,7 +94,6 @@ Execute the below command:
 #### mount -o remount,rw /dev/vdd1 /mnt
 
 If the user is not root, you need to use the command with sudo.
-</details>
 
 ### Explanation:
 - mount → manage mounts
@@ -99,6 +101,8 @@ If the user is not root, you need to use the command with sudo.
 - rw → read-write mode
 - /dev/vdd1 → target device
 - /mnt → mount point
+
+</details>
 
 ---
 
@@ -117,7 +121,6 @@ Edit /etc/fstab file:
 Add below given line in it:
 
 #### /dev/vdd1 /mnt ext4 defaults,ro 0 2
-</details>
 
 ### Explanation:
 - /etc/fstab → filesystem configuration file
@@ -127,3 +130,28 @@ Add below given line in it:
 - defaults,ro → default options plus read-only
 - 0 → dump setting
 - 2 → fsck order
+
+## 🧠 Mental Model
+
+In `/etc/fstab`:
+
+fields are separated by:
+
+    spaces
+
+options inside one field are separated by:
+
+    commas
+
+## 🔁 Memory Hook
+
+    spaces separate fields  
+    commas separate options
+
+## 🔁 1-Line Recall
+
+    defaults,ro
+
+✅ no space after comma
+
+</details>
