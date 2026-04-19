@@ -6,12 +6,13 @@ What file do we need to edit to tell the Linux OS which filesystems it should au
 
 <details><summary>Answer</summary>
 We will need to edit /etc/fstab file to tell the Linux OS which filesystems it should automatically mount when it boots up.
-</details>
 
 ### Explanation:
 - /etc/fstab → filesystem table
 - defines which filesystems mount at boot
 - contains device, mount point, type, and options
+
+</details>
 
 ---
 
@@ -31,12 +32,16 @@ D. The command mkfs.xfs is wrong. It should be mkfs-xfs.
 
 <details><summary>Answer</summary>
 The lowercase -l option is wrong. It should be -L, with an uppercase L
-</details>
 
-### Explanation:
-- mkfs.xfs → create XFS filesystem
-- -L → set filesystem label
-- -l → incorrect option for label
+#### sudo mkfs.xfs -L "BackupVolume" /dev/vdd1
+
+#### Explanation:
+    mkfs.xfs      → make XFS filesystem  
+    -L           → Label (uppercase L)  
+    "BackupVolume" → filesystem label  
+    /dev/vdd1    → target partition
+
+</details>
 
 ---
 
@@ -52,12 +57,13 @@ Execute the below command:
 #### mkfs.xfs -L "DataDisk" /dev/vdd
 
 If the user is not root, you need to use the command with sudo.
-</details>
 
 ### Explanation:
 - mkfs.xfs → create XFS filesystem
 - -L "DataDisk" → assign label
 - /dev/vdd → target device
+
+</details>
 
 ---
 
@@ -73,12 +79,27 @@ Execute the below command:
 #### mkfs.ext4 -N 2048 /dev/vde
 
 If the user is not root, you need to use the command with sudo.
-</details>
 
 ### Explanation:
 - mkfs.ext4 → create ext4 filesystem
 - -N 2048 → specify number of inodes
 - /dev/vde → target device
+
+## 🧠 What Is An Inode Again?
+
+Think:
+
+> an inode is metadata for a file
+
+Every file consumes:
+- one inode  
+- plus data blocks
+
+## 🔥 So `-N` Controls
+
+How many files the filesystem can potentially track.
+
+</details>
 
 ---
 
@@ -94,12 +115,96 @@ Execute the below command:
 #### mount /dev/vdd /mnt
 
 If the user is not root, you need to use the command with sudo.
-</details>
 
 ### Explanation:
 - mount → attach filesystem
 - /dev/vdd → source device
 - /mnt → mount point directory
+
+## Does This Mount Permanently?
+
+> ❌ NO — this is a **temporary mount**
+
+## 🔥 What It Does
+
+It attaches:
+
+    /dev/vdd
+
+to this mount point:
+
+    /mnt
+
+for the current running system.
+
+## 🧠 Mental Model
+
+    device appears “under” /mnt
+
+## ⚠️ But Only Until
+
+- reboot  
+- unmount  
+- some system changes
+
+Then it can disappear.
+
+## 🔍 Why It Is NOT Permanent
+
+Because:
+
+> it does NOT write anything to:
+
+    /etc/fstab
+
+## 🔥 Permanent Mounts Use
+
+    /etc/fstab
+
+Example:
+
+    /dev/vdd   /mnt   ext4   defaults   0 0
+
+Then:
+
+    sudo mount -a
+
+to test it.
+
+## 🧠 Mental Model
+
+    mount command  = temporary
+
+    fstab entry    = persistent
+
+## ⚠️ One More Important Thing
+
+Usually you mount a filesystem/partition like:
+
+    /dev/vdd1
+
+(not whole disk `vdd`, unless special case)
+
+Often:
+
+    /dev/vdd
+    └─ /dev/vdd1
+
+You normally mount:
+
+    /dev/vdd1
+
+## 🔁 Memory Hook
+
+    mount now = temporary
+
+    fstab = forever
+
+## 🔁 1-Line Recall
+
+    `mount /dev/vdd /mnt` does NOT make it permanent.
+
+</details>
 
 ---
 
@@ -115,11 +220,12 @@ Execute the below command:
 #### umount /mnt
 
 If the user is not root, you need to use the command with sudo.
-</details>
 
 ### Explanation:
 - umount → detach filesystem
 - /mnt → mount point being unmounted
+
+</details>
 
 ---
 
@@ -151,7 +257,6 @@ Add this line in it:
 #### /dev/vde /test ext4 defaults 0 2
 
 Save and exit.
-</details>
 
 ### Explanation:
 - mkdir /test → create mount point
@@ -162,6 +267,8 @@ Save and exit.
 - defaults → default mount options
 - 0 → dump setting
 - 2 → filesystem check order at boot
+
+</details>
 
 ---
 
@@ -185,7 +292,6 @@ Add this line in it:
 #### /dev/vdd none swap defaults 0 0
 
 Save and exit.
-</details>
 
 ### Explanation:
 - /etc/fstab → filesystem configuration file
@@ -194,6 +300,90 @@ Save and exit.
 - swap → filesystem type
 - defaults → default options
 - 0 0 → skip dump and fsck
+
+> `fsck` = **file system check**
+
+## So:
+
+    fsck
+
+means:
+
+> check and repair filesystems
+
+## 🧪 Example
+
+    sudo fsck /dev/vdd1
+
+👉 check that filesystem for problems
+
+## 🔥 Why It Appears In `/etc/fstab`
+
+This part:
+
+    0 0
+
+are the last two fields.
+
+## Field 5
+    0
+
+= dump backup flag
+
+## Field 6
+    0
+
+= fsck check order
+
+## 🧠 That Second Zero Means
+
+    do NOT run fsck on boot
+
+## ⚠️ Why For Swap?
+
+Because:
+
+> swap is NOT a normal filesystem like ext4
+
+So:
+
+❌ no fsck needed
+
+## 🧠 Mental Model
+
+    ext4 may need fsck
+
+    swap does not
+
+## 🔁 Memory Hook
+
+    fsck = filesystem doctor 🩺
+
+## 🧪 Example For Root Filesystem
+
+Often:
+
+    /dev/vda1 / ext4 defaults 0 1
+
+That:
+
+    1
+
+means check it at boot.
+
+## 🔁 1-Line Recall
+
+    fsck = check/repair filesystem
+
+and in:
+
+    0 0
+
+the last 0 means:
+
+    skip fsck
+
+</details>
 
 ---
 
@@ -209,9 +399,10 @@ Execute below given command:
 #### xfs_admin -L "SwapFS" /dev/vdd
 
 If the user is not root, you need to use the command with sudo.
-</details>
 
 ### Explanation:
 - xfs_admin → manage XFS filesystem parameters
 - -L "SwapFS" → set new label
 - /dev/vdd → target filesystem
+
+</details>
