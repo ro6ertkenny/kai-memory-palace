@@ -12,12 +12,25 @@ Execute the below command:
 #### apt install lvm2 -y
 
 Note: Use sudo with the command in case of a non-root user.
-</details>
 
 ### Explanation:
 - apt install → install package
 - lvm2 → Logical Volume Manager tools
 - -y → auto confirm installation
+
+> `lvm2` means:
+
+**Logical Volume Manager version 2**
+
+> **LVM (Logical Volume Manager) lets you take one or more physical disks and treat them like flexible storage you can combine, split, resize, and manage more easily than fixed partitions.**
+
+> Think:
+
+    disks → pooled storage → logical volumes
+
+like turning several hard drives into adjustable storage you can grow later.
+
+</details>
 
 ---
 
@@ -33,12 +46,13 @@ Execute the below command:
 #### pvcreate /dev/vdd /dev/vde 
 
 Note: Use sudo with the command in case of a non-root user.
-</details>
 
 ### Explanation:
 - pvcreate → initialize disks as physical volumes
 - /dev/vdd /dev/vde → target devices
 - PV → base layer of LVM
+
+</details>
 
 ---
 
@@ -60,12 +74,13 @@ Note: Use sudo with the command in case of a non-root user.
 Look for the PSize of /dev/vde and save its value in the /root/pvsize file:
 
 #### vi /root/pvsize
-</details>
 
 ### Explanation:
 - pvs → list physical volumes
 - PSize → size of physical volume
 - vi → manually save value
+
+</details>
 
 ---
 
@@ -81,11 +96,12 @@ Execute the below command:
 #### pvremove /dev/vde
 
 Note: Use sudo with the command in case of a non-root user.
-</details>
 
 ### Explanation:
 - pvremove → remove physical volume from LVM
 - /dev/vde → target device
+
+</details>
 
 ---
 
@@ -101,12 +117,13 @@ Execute the below command:
 #### vgcreate volume1 /dev/vdd 
 
 Note: Use sudo with the command in case of a non-root user.
-</details>
 
 ### Explanation:
 - vgcreate → create volume group
 - volume1 → VG name
 - /dev/vdd → physical volume used
+
+</details>
 
 ---
 
@@ -122,12 +139,13 @@ Execute the below command:
 #### vgextend volume1 /dev/vde
 
 Note: Use sudo with the command in case of a non-root user.
-</details>
 
 ### Explanation:
 - vgextend → add PV to VG
 - volume1 → target volume group
 - /dev/vde → additional storage device
+
+</details>
 
 ---
 
@@ -143,12 +161,13 @@ Execute the below command:
 #### vgreduce volume1 /dev/vde
 
 Note: Use sudo with the command in case of a non-root user.
-</details>
 
 ### Explanation:
 - vgreduce → remove PV from VG
 - volume1 → target volume group
 - /dev/vde → device being removed
+
+</details>
 
 ---
 
@@ -172,12 +191,13 @@ Note: Use sudo with the command in case of a non-root user.
 Look for the VSize of volume1 and save its value in the /root/volume1 file:
 
 #### vi /root/volume1
-</details>
 
 ### Explanation:
 - vgs → display volume groups
 - VSize → total size of VG
 - vi → manually save value
+
+</details>
 
 ---
 
@@ -199,13 +219,14 @@ Execute the below command:
 #### lvcreate --size 0.5G --name smalldata volume1
 
 Note: Use sudo with the command in case of a non-root user.
-</details>
 
 ### Explanation:
 - lvcreate → create logical volume
 - --size 0.5G → set size
 - --name smalldata → LV name
 - volume1 → volume group
+
+</details>
 
 ---
 
@@ -224,12 +245,13 @@ Execute the below command:
 Enter y if asked for the confirmation.
 
 Note: Use sudo with the command in case of a non-root user.
-</details>
 
 ### Explanation:
 - lvresize → change LV size
 - --size 752M → new size
 - volume1/smalldata → target LV
+
+</details>
 
 ---
 
@@ -246,11 +268,114 @@ Execute the below command:
 #### mkfs.xfs /dev/volume1/smalldata
 
 Note: Use sudo with the command in case of a non-root user.
-</details>
 
 ### Explanation:
 - mkfs.xfs → create XFS filesystem
 - /dev/volume1/smalldata → logical volume path
+
+## How Do You Know It Goes In `/dev`?
+
+> Because:
+
+    smalldata
+
+is a **logical volume** (a block device)
+
+and block devices live under:
+
+    /dev
+
+# 🔥 Key Rule
+
+If the thing is a:
+
+- disk  
+- partition  
+- logical volume  
+- swap device
+
+👉 think:
+
+    /dev/...
+
+## 🧠 Mental Model
+
+    /dev = where Linux exposes devices
+
+# 🔍 The Task Told You
+
+It said:
+
+> logical volume called:
+
+    smalldata
+
+inside volume group:
+
+    volume1
+
+## In LVM, that maps to:
+
+    /dev/volume1/smalldata
+
+Pattern:
+
+    /dev/<VG>/<LV>
+
+## 🧪 General LVM Pattern
+
+Volume Group:
+    volume1
+
+Logical Volume:
+    smalldata
+
+Path:
+    /dev/volume1/smalldata
+
+## ⚠️ Why Not Just:
+
+    mkfs.xfs smalldata
+
+❌ because `mkfs` needs a device target.
+
+It formats a block device.
+
+## 🧠 How I “Know”
+
+Because:
+
+    mkfs.* commands target devices
+
+not arbitrary names.
+
+## 🔁 Memory Hook
+
+    If it’s storage you format →
+
+    look in /dev
+
+## 🧪 Same Pattern Elsewhere
+
+Partition:
+
+    mkfs.ext4 /dev/vdb1
+
+Swap:
+
+    mkswap /dev/vdb3
+
+Logical volume:
+
+    mkfs.xfs /dev/volume1/smalldata
+
+Same idea.
+
+## 🔁 1-Line Recall
+
+    Logical volumes are block devices, and block devices live under `/dev`.
+
+</details>
 
 ---
 
@@ -268,9 +393,10 @@ Execute the below command:
 Enter y if asked for the confirmation.
 
 Note: Use sudo with the command in case of a non-root user.
-</details>
 
 ### Explanation:
 - lvremove → delete logical volume
 - volume1/smalldata → target LV
 - sudo → required for destructive operation
+
+</details>
