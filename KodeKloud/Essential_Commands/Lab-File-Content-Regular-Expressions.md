@@ -661,41 +661,43 @@ In the /home/bob/textfile file, there's a number that has 5 digits. Save the num
 - egrep → search using extended regular expressions
 - [0-9]{5} → match exactly five digits
 - textfile → input file being searched
- > → redirect output to file
+- '>' → redirect output to file
 - /home/bob/number → destination file
 
-# Understanding `[ ]` and `{ }` in `egrep '[0-9]{5}'`
+## Why `egrep` (or `grep -E`) Instead of `find`?
 
----
+> Because you’re searching **inside a file’s content**, not searching for files.
+
+## Why `egrep` (or `grep -E`) Over `grep`?
+
+> Because you need **extended regex features** like:
+
+    {5}
+
+👉 and plain `grep` doesn’t support that unless you escape it.
+
+## Understanding `[ ]` and `{ }` in `egrep '[0-9]{5}'`
 
 ## 🧠 Core Question
 > What do `[ ]` and `{ }` mean?
-
----
-
-## 🔥 Short Answer
 
 | Symbol | Meaning |
 |--------|--------|
 | `[ ]`  | match ONE character from a set |
 | `{ }`  | match a specific NUMBER of times |
 
----
 
-# 🔍 1. `[ ]` → Character Class
+## 🔍 1. `[ ]` → Character Class
 
     [0-9]
 
 👉 means:
 > match ANY ONE digit from 0 through 9
 
----
 
 ## 🧠 Mental Model
 
     [ ] = “one of these”
-
----
 
 ## 🧪 Examples
 
@@ -705,7 +707,6 @@ In the /home/bob/textfile file, there's a number that has 5 digits. Save the num
 | `[0-9]` | any digit |
 | `[A-Z]` | uppercase letters |
 
----
 
 # 🔍 2. `{ }` → Quantifier (How Many Times)
 
@@ -714,13 +715,9 @@ In the /home/bob/textfile file, there's a number that has 5 digits. Save the num
 👉 means:
 > exactly 5 times
 
----
-
 ## 🧠 Mental Model
 
     {n} = repeat n times
-
----
 
 ## 🧪 Examples
 
@@ -730,9 +727,7 @@ In the /home/bob/textfile file, there's a number that has 5 digits. Save the num
 | `[a]{3}`   | aaa |
 | `[A-Z]{2}` | 2 uppercase letters |
 
----
-
-# 🔥 Combine Them
+## 🔥 Combine Them
 
     [0-9]{5}
 
@@ -752,9 +747,7 @@ In the /home/bob/textfile file, there's a number that has 5 digits. Save the num
     1234      (too short)
     123456    (too long unless partial match allowed)
 
----
-
-# ⚠️ Why Quotes `' '` Are Used
+## ⚠️ Why Quotes `' '` Are Used
 
     '[0-9]{5}'
 
@@ -764,9 +757,7 @@ Without quotes:
 - `{}` might be interpreted by shell
 - pattern could break
 
----
-
-# 🧠 Full Mental Model
+## 🧠 Full Mental Model
 
     [0-9]     → choose a digit  
     {5}       → do it 5 times  
@@ -774,24 +765,18 @@ Without quotes:
 👉 result:
 > 5-digit number
 
----
-
-# ⚡ Exam Pattern
+## ⚡ Exam Pattern
 
 If you see:
 - “X digits” → use `{X}`
 - “numbers only” → `[0-9]`
 
----
-
-# 🔁 1-Line Recall
+## 🔁 1-Line Recall
 
     [ ] = choose one  
     { } = how many times  
 
----
-
-# 🧨 Operator Insight
+## 🧨 Operator Insight
 
 This is **regex (pattern matching)** — used in:
 
@@ -802,9 +787,7 @@ This is **regex (pattern matching)** — used in:
 
 👉 Mastering this = huge LFCS advantage
 
----
-
-# Final Takeaway
+## Final Takeaway
 
     [0-9]{5}
 
@@ -871,6 +854,91 @@ Find all lines in the/home/bob/testfile file that contain string man; it must be
 - testfile → input file
 - '>' → redirect output to file
 - /home/bob/man_filtered → destination file
+
+## Yes — That Task Is Poorly Worded 👍 (Here’s the Clean Version)
+
+## 🧠 Clean Rewrite
+
+> Find all lines in `/home/bob/testfile` that contain the **exact word** `man` (not as part of another word like `manpath`).  
+> Save the results to `/home/bob/man_filtered`.
+
+## 🔥 What They REALLY Mean
+
+Match:
+
+    man
+
+❌ NOT:
+
+    manpath  
+    command  
+    manual  
+
+## 🧠 Mental Model
+
+    whole word only
+
+## ✅ Correct Command
+
+    grep -w man testfile > /home/bob/man_filtered
+
+## 🔍 Why `-w`?
+
+    -w = word match
+
+👉 ensures:
+
+    man
+
+is matched as a standalone word
+
+
+## 🧪 Example Matches
+
+## ✅ MATCH
+
+    keep man
+
+    /usr/man
+
+## ❌ NO MATCH
+
+    manpath  
+    command  
+
+## ⚠️ Why This Confuses People
+
+Because the task mixes:
+
+- examples  
+- weird phrasing  
+- unclear wording  
+
+Instead of just saying:
+
+> match whole word only
+
+## 🧠 Will LFCS Be This Confusing?
+
+## ❌ Usually NO
+
+LFCS tasks are typically:
+
+- shorter  
+- more direct  
+- action-based  
+
+Example LFCS-style:
+
+> Find lines containing the exact word “man” and save output.
+
+## 🔁 Memory Hook
+
+    -w = whole word
+
+## 🔁 1-Line Recall
+
+    `grep -w` matches exact words only, not partial matches.
 
 </details>
 
