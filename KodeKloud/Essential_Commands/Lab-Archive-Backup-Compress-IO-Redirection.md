@@ -4,11 +4,12 @@
 Create a tar archive logs.tar (under bob's home) of the/var/log/ directory
 
 <details><summary>Answer</summary>
+
 sudo tar -cvf logs.tar /var/log
 
--c: Create a new archive.
--v: Verbose — show files being added (nice for confirmation).
--f: Specify the filename of the archive.
+    -c: Create a new archive.
+    -v: Verbose — show files being added (nice for confirmation).
+    -f: Specify the filename of the archive.
 
 So, tar -cvf logs.tar /var/log means: "Create (-c) a verbose (-v) archive with filename (-f) logs.tar of the /var/log directory."
 
@@ -29,7 +30,8 @@ So, tar -cvf logs.tar /var/log means: "Create (-c) a verbose (-v) archive with f
 Create a compressed tar archive logs.tar.gz (under bob's home) of the /var/log/ directory
 
 <details><summary>Answer</summary>
-sudo tar czfP logs.tar.gz /var/log/
+
+    sudo tar czfP logs.tar.gz /var/log/
 
 In the context of the tar command, the capital P flag stands for "absolute path". When used, it tells tar to preserve the full absolute path of files and directories during archiving, rather than making them relative or stripping the leading slash.
 
@@ -80,9 +82,7 @@ And:
 
 > NO — it’s not the only way, but it is the **correct and expected way (LFCS)**
 
----
-
-# 🧠 What `tar` Actually Does
+## 🧠 What `tar` Actually Does
 
 `tar` = **Tape Archive**
 
@@ -90,8 +90,6 @@ And:
 - create archives
 - extract archives
 - list contents
-
----
 
 ## ⚙️ Command Breakdown
 
@@ -103,8 +101,6 @@ And:
 | `f`  | file (specify archive file) |
 | `P`  | preserve full paths |
 
----
-
 ## 🧠 Mental Model
 
     tar = archive manager
@@ -113,9 +109,7 @@ NOT:
 - text search tool (`grep`)
 - file viewer (`cat`)
 
----
-
-# 🔍 What This Command Does
+## 🔍 What This Command Does
 
     tar tfP logs.tar
 
@@ -123,17 +117,13 @@ NOT:
 
 WITHOUT extracting it
 
----
-
-# 🧪 Example Output
+## 🧪 Example Output
 
     /var/log/syslog
     /var/log/auth.log
     /var/log/messages
 
----
-
-# 🔥 Why NOT Use `cat` or `less`?
+## 🔥 Why NOT Use `cat` or `less`?
 
 You *can* do:
 
@@ -143,29 +133,22 @@ You *can* do:
 ❌ binary garbage  
 ❌ unreadable output  
 
----
 
 ## 🧠 Why?
 
 Because `.tar` is:
 > a structured archive format — not plain text
 
----
-
-# 🔥 Are There Other Tools?
+## 🔥 Are There Other Tools?
 
 Yes, but `tar` is the **standard**
 
----
-
-# ⚡ Exam Pattern
+## ⚡ Exam Pattern
 
 If you see:
 - “list contents of tar file” → use:
 
     tar -t
-
----
 
 ## Common Variations
 
@@ -173,15 +156,11 @@ If you see:
     tar -xvf file.tar      → extract  
     tar -cvf file.tar      → create  
 
----
-
-# 🔁 1-Line Recall
+## 🔁 1-Line Recall
 
     tar -t = “tell me what’s inside”
 
----
-
-# 🧨 Operator Insight
+## 🧨 Operator Insight
 
 Think:
 
@@ -191,9 +170,7 @@ Think:
 - `-x` → unpack  
 - `-c` → create  
 
----
-
-# Final Takeaway
+## Final Takeaway
 
     tar tfP file.tar
 
@@ -207,15 +184,17 @@ Think:
 Extract the contents of /home/bob/archive.tar.gz to the /tmp directory
 
 <details><summary>Answer</summary>
-tar --extract --file /home/bob/archive.tar.gz --directory /tmp/
+    tar --extract --file /home/bob/archive.tar.gz --directory /tmp/
+
 or
-tar xf /home/bob/archive.tar.gz -C /tmp
----
+
+    tar xf /home/bob/archive.tar.gz -C /tmp
+
 The uppercase -C flag in tar doesn't mean "copy." Instead, it stands for "change to directory" before performing the operation. Think of it as telling tar to switch to a specific directory and then do its thing there—like a quick change of location before acting.
 
 For example:
 
-tar -czf archive.tar.gz -C /path/to/directory .
+####    tar -czf archive.tar.gz -C /path/to/directory
 
 This creates an archive of the contents in /path/to/directory without including the full path
 
@@ -244,7 +223,8 @@ In your case, ./script.sh means you're executing the script.sh file in the direc
 ### Explanation:
 - sudo → run with elevated privileges
 - ./script.sh → execute the script from the current directory
--'>' → redirect standard output only
+        The `./` tells Linux to execute the script; `.sh` is just the filename.
+- '>' → redirect standard output only
 - /home/bob/output_stdout.txt → file receiving normal output
 - errors and warnings are not redirected here, so they still go to standard error
 
@@ -426,7 +406,7 @@ sudo ./script.sh > /home/bob/output.txt 2>&1
 
 ---
 
-# 🧠 Mental Model
+## 🧠 Mental Model
 
 | Stream | Meaning |
 |--------|--------|
@@ -448,9 +428,29 @@ NOT:
 👉 it means:
 > “follow wherever 1 is going”
 
----
+## 🧠 Why The `&` Is Needed
 
-# 🧪 Final Result
+Without `&`:
+
+    2>1
+
+would mean:
+
+> redirect STDERR to a file literally named:
+
+    1
+
+## But with `&`:
+
+    2>&1
+
+means:
+
+> redirect STDERR to the same stream as STDOUT
+
+    & = “this is a descriptor, not a file”
+
+## 🧪 Final Result
 
     ./script.sh > output.txt 2>&1
 
@@ -460,16 +460,12 @@ NOT:
 - stdout ✅  
 - stderr ✅  
 
----
-
-# ⚠️ ORDER MATTERS (VERY IMPORTANT)
+## ⚠️ ORDER MATTERS (VERY IMPORTANT)
 
 ## Correct:
     command > file 2>&1
 
 👉 both go to file ✅
-
----
 
 ## WRONG:
     command 2>&1 > file
@@ -478,45 +474,29 @@ NOT:
 - stderr → goes to terminal ❌
 - stdout → goes to file
 
----
-
 ## 🧠 Why?
 
 Because:
 - redirections are processed LEFT → RIGHT
 
----
-
-# 🔍 Visual Flow
+## 🔍 Visual Flow
 
 ### Correct order:
     stdout → file  
     stderr → follows stdout → file  
 
----
-
-### Wrong order:
-    stderr → follows stdout (still terminal)  
-    stdout → file  
-
----
-
-# 🔁 1-Line Recall
+## 🔁 1-Line Recall
 
     2>&1 = “send errors where output is going”
 
----
-
-# ⚡ Modern Alternative
+## ⚡ Modern Alternative
 
     command &> file
 
 👉 same result:
 - stdout + stderr → file
 
----
-
-# 🧨 Operator Insight
+## 🧨 Operator Insight
 
 Think of it like:
 
@@ -525,9 +505,7 @@ Think of it like:
 
 👉 `2>&1` = “stderr follows stdout”
 
----
-
-# Final Takeaway
+## Final Takeaway
 
     > file     → send output to file  
     2>&1       → send errors to SAME place  
@@ -607,7 +585,7 @@ cat /home/bob/file.txt >> /home/bob/destination.txt
 ### Explanation:
 - cat → print file contents to standard output
 - /home/bob/file.txt → source file being read
-- '>>' → append redirected output to the destination file
+- '>>' → append redirected output to the destination file | `>>` = Redirect AND Append ✅
 - /home/bob/destination.txt → file receiving the appended content
 - append means existing content stays and new content is added at the end
 
@@ -616,25 +594,19 @@ cat /home/bob/file.txt >> /home/bob/destination.txt
 ## 🧠 Core Question
 > Does the extra `>` in `>>` mean append?
 
----
-
 ## 🔥 Short Answer
 
 > YES — `>>` means:
 > “append output to the file (do NOT overwrite)”
 
----
-
-# 🧠 Difference Between `>` and `>>`
+## 🧠 Difference Between `>` and `>>`
 
 | Operator | Behavior |
 |----------|----------|
 | `>`      | overwrite file |
 | `>>`     | append to file |
 
----
-
-# 🔍 What This Command Does
+## 🔍 What This Command Does
 
     cat /home/bob/file.txt >> /home/bob/destination.txt
 
@@ -643,8 +615,6 @@ cat /home/bob/file.txt >> /home/bob/destination.txt
 
 👉 and ADDS it to the end of:
     destination.txt
-
----
 
 ## 🧪 Example
 
@@ -659,15 +629,11 @@ cat /home/bob/file.txt >> /home/bob/destination.txt
     line2
     (contents of file.txt appended here)
 
----
-
-# ⚠️ Important Behavior
+## ⚠️ Important Behavior
 
 ## If file exists:
 - `>>` → appends  
 - `>` → deletes old content and replaces  
-
----
 
 ## If file does NOT exist:
 👉 BOTH:
@@ -675,30 +641,22 @@ cat /home/bob/file.txt >> /home/bob/destination.txt
 
 👉 will CREATE the file
 
----
-
-# 🧠 Mental Model
+## 🧠 Mental Model
 
     >  = replace  
     >> = stack on top  
 
----
-
-# 🔁 1-Line Recall
+## 🔁 1-Line Recall
 
     `>>` = append, don’t destroy
 
----
-
-# ⚡ Exam Pattern
+## ⚡ Exam Pattern
 
 If you see:
 - “add to file” → `>>`
 - “write fresh output” → `>`
 
----
-
-# 🧨 Operator Insight
+## 🧨 Operator Insight
 
 Use `>>` when:
 - logging
@@ -709,9 +667,7 @@ Use `>` when:
 - you want a clean file
 - previous content doesn’t matter
 
----
-
-# Final Takeaway
+## Final Takeaway
 
     >> = append to existing file (safe, non-destructive)
 
@@ -819,7 +775,7 @@ Is the file uncompressed?
 
 ### Explanation:
 - cd /home/bob → move into the target directory
-- unxz → decompress an .xz file
+- unxz → uncompress an .xz file
 - lfcs.txt.xz → compressed file being unpacked
 - result → lfcs.txt is restored
 - by default, the compressed .xz file is removed after decompression
