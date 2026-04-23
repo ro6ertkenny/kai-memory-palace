@@ -27,9 +27,42 @@ Leave rest of the options default
 - openssl → tool for SSL/TLS and cryptography operations
 - req → generate certificate requests
 - -newkey rsa:4096 → create a new 4096-bit RSA private key
+        rsa:4096 = algorithm:size
 - -keyout priv.key → save private key to file
 - -out cert.csr → save certificate signing request to file
 - passphrase → encrypts the private key with provided password
+
+## What Does RSA Mean?
+
+## 🧠 Short Answer
+
+> **RSA = Rivest, Shamir, Adleman**
+
+👉 the last names of the three creators.
+
+## 🔍 Who?
+
+- Rivest  
+- Shamir  
+- Adleman  
+
+They created the RSA algorithm.
+
+## 🧠 What RSA Is
+
+> A **public-key encryption algorithm**
+
+Used for:
+- SSH keys  
+- SSL/TLS  
+- secure communication  
+
+## 🔥 Mental Model
+
+    RSA = lock with two keys
+
+- public key → share it  
+- private key → keep it secret  
 
 </details>
 
@@ -64,6 +97,76 @@ Enter kodekloud.com for common name
 - -keyout priv.key → output private key file
 - -out kodekloud.crt → output certificate file
 - Common Name → identifies the domain (kodekloud.com)
+
+## Why Do You Use `x509` Here?
+
+> Because:
+
+    .crt file = X.509 certificate
+
+So you use:
+
+    openssl x509
+
+to read it.
+
+## 🔍 What Is X.509?
+
+> X.509 is the **standard format for certificates**
+
+Used in:
+- SSL/TLS  
+- HTTPS  
+- SSH (sometimes indirectly)
+
+    file type → determines subcommand
+
+## File Types → OpenSSL Commands
+
+| File | Use |
+|-----|-----|
+| `.key` | private key |
+| `.csr` | certificate request → `openssl req` |
+| `.crt` / `.pem` | certificate → `openssl x509` |
+
+## 🔥 So Here:
+
+Task gives:
+
+    my.crt
+
+👉 that tells you:
+
+> this is a certificate
+
+
+## Therefore:
+
+    openssl x509 -in my.crt -text
+
+## 🧠 How You “Know”
+
+You’re mapping:
+
+    file type → tool
+
+## 🔁 Memory Hook
+
+    crt = certificate → x509
+
+## 🧪 What `-text` Does
+
+    -text
+
+👉 prints human-readable details
+
+Including:
+
+    CN = labs.kodekloud.com
+
+## 🔁 1-Line Recall
+
+    Use `openssl x509` for `.crt` files because they are X.509 certificates.
 
 </details>
 
@@ -145,6 +248,88 @@ Use the below command to create a branch with the name testing.
 - git branch testing → create a new branch named testing
 - branch → represents a separate line of development
 
+## Is a Git Branch Just a Folder?
+
+## 🧠 Short Answer
+
+> ❌ NO — a branch is NOT a folder/directory
+
+## 🔥 What a Branch REALLY Is
+
+> A branch is:
+
+**a pointer to a commit**
+
+## 🧠 Mental Model
+
+    branch = movable label → points to a commit
+
+## 🔍 Example
+
+When you run:
+
+    git branch testing
+
+👉 Git creates:
+
+    a new pointer called "testing"
+
+pointing to the current commit.
+
+## ⚠️ No New Folder Is Created
+
+Nothing new appears like:
+
+    /testing/
+
+❌ that does NOT happen.
+
+# 🔍 Where Does It Exist Then?
+
+Inside Git’s internal data:
+
+    .git/
+
+## Specifically:
+
+    .git/refs/heads/testing
+
+👉 this file stores the commit reference.
+
+## 🧠 Think Like This
+
+    commits = snapshots
+
+    branch  = name pointing to a snapshot
+
+## 🔥 What Happens When You Switch
+
+    git checkout testing
+
+👉 now:
+
+- your working directory changes  
+- files update to match that branch  
+
+## 🧠 Why It FEELS Like a Folder
+
+Because:
+
+- files change  
+- project state changes  
+
+But:
+
+👉 it's just Git moving the pointer and updating files
+
+## 🔁 Memory Hook
+
+    branch = pointer, not folder
+
+## 🔁 1-Line Recall
+
+    A Git branch is a pointer to a commit, not a directory on your system.
+
 </details>
 
 ---
@@ -208,6 +393,18 @@ We can find the file file2.cpp is modified.
 - M → indicates file was modified
 - file2.cpp → file changed in latest commit
 
+    git log        → summary view
+
+    git log --raw  → summary + low-level file changes
+
+## 🔥 How To FORCE Seeing The Difference
+
+Try:
+
+    git log --raw -1
+
+👉 shows raw details for latest commit
+
 </details>
 
 ---
@@ -248,7 +445,8 @@ Now merge the documentation branch to the master branch.
 What command would you use to push the master branch from your local repository to a remote repository nicknamed origin?
 
 <details><summary>Answer</summary>
-#### git push origin master 
+
+    git push origin master 
 
 is the command we use to push changes to master branch of remote repository.
 
@@ -270,7 +468,7 @@ Repository cloned ?
 Navigate to /home/bob directory by cd /home/bob
 Clone the repo by below command
 
-#### git clone https://github.com/kodekloudhub/git-for-beginners-course.git
+    git clone https://github.com/kodekloudhub/git-for-beginners-course.git
 
 ### Explanation:
 - cd /home/bob → change to target directory
