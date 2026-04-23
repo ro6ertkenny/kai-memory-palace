@@ -305,7 +305,7 @@ Execute the below commands:
 - cd /home/bob → change directory
 - systemctl status → get service status
 - sshd.service → target service
-- > → redirect output to file
+- '>' → redirect output to file
 - service.txt → destination file
 
 </details>
