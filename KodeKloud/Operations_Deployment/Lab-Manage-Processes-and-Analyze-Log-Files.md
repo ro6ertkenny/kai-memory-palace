@@ -16,6 +16,46 @@ Using the ps lax command, we can see all processes running on the system along w
 - x → include processes without a terminal
 - nice value → scheduling priority adjustment shown in the process listing
 
+## Nice Values (Simp, Operator-Ready)
+
+> **Nice value = how “nice” a process is about letting others use CPU**
+
+## 🔥 Mental Model
+
+    higher nice  → more polite → uses LESS CPU  
+    lower nice   → less polite → uses MORE CPU  
+
+## 🔍 Range
+
+    -20  → highest priority (least nice 😈)
+     0   → default
+    19   → lowest priority (most nice 😊)
+
+## 🧠 Think Like This
+
+    nice process = “you go first”
+
+    not nice     = “I go first”
+
+## 🔥 Why It Matters
+
+Linux scheduler decides:
+
+> who gets CPU time
+
+Nice value influences that decision.
+
+## 🧪 Example
+
+## Default process
+    nice = 0
+
+## Lower priority (more nice)
+    nice -n 10 command
+
+## Higher priority (less nice)
+    sudo nice -n -10 command
+
 </details>
 
 ---
@@ -50,6 +90,103 @@ By default, the /var/log/ directory contains the logs of most of the services ru
 - /var/log/ → standard directory for many Linux service and system log files
 - logs → records of events, activity, and errors
 
+## 🔥 LFCS + Operator Log Files (What Actually Matters)
+
+> You do NOT need all of them.
+
+👉 Focus on a **core set** that covers:
+- auth  
+- system  
+- kernel  
+- packages  
+- boot  
+
+## 🧠 The CORE Logs (Know These Cold)
+
+## 1️⃣ Authentication (VERY IMPORTANT)
+    /var/log/auth.log
+
+👉 SSH, sudo, login issues
+
+## 2️⃣ System Log (Catch-All)
+    /var/log/syslog
+
+👉 general system activity
+
+## 3️⃣ Kernel Log
+    /var/log/kern.log
+
+👉 hardware, drivers, kernel issues
+
+## 4️⃣ Boot Log
+    /var/log/boot.log
+
+👉 startup problems
+
+## 5️⃣ Package Management
+    /var/log/apt/
+    /var/log/dpkg.log
+
+👉 installs, updates, failures
+
+## 🔥 ALSO IMPORTANT (Know What They Are)
+
+## Failed Logins
+    /var/log/btmp
+
+👉 failed login attempts
+
+## Login History
+    /var/log/wtmp
+    /var/log/lastlog
+
+👉 user login tracking
+
+## Kernel Messages (alt view)
+    dmesg
+
+👉 live kernel buffer
+
+## 🧠 SECONDARY (Nice to Know)
+
+## Crash Reports
+    /var/log/apport.log
+
+## Cloud Init (cloud systems)
+    /var/log/cloud-init.log
+
+## Service-specific logs
+    /var/log/cups
+    /var/log/openvpn
+
+👉 only relevant if that service matters
+
+## ⚠️ What You Can Mostly Ignore for LFCS
+
+- gpu-manager.log  
+- speech-dispatcher  
+- fontconfig.log  
+- hp  
+- gdm3  
+
+👉 too niche
+
+## 🧠 Mental Model
+
+    auth.log   → WHO accessed  
+    syslog     → WHAT happened  
+    kern.log   → HARDWARE/kernel  
+    boot.log   → STARTUP  
+    apt/dpkg   → SOFTWARE changes  
+
+## 🔁 Memory Hook
+
+    auth / sys / kern / boot / apt
+
+## 🔁 1-Line Recall
+
+    Focus on auth.log, syslog, kern.log, boot.log, and apt/dpkg logs — those cover most real operator and LFCS scenarios.
+
 </details>
 
 ---
@@ -78,23 +215,29 @@ Look for the PID value for the sshd process. Now, execute the below command:
 - sudo → run with elevated privileges
 - <PID> → target process ID
 
-> “Nice” controls **CPU priority**
+## What Does the `re` in `renice` Mean?
 
-- lower nice value → higher priority (less “nice” to others)  
-- higher nice value → lower priority (more “nice” to others)
+> `re` = **redo / change**
 
----
+## 🔍 Break It Down
 
-# 🧠 Mental Model
+    nice   → set priority when starting a process
 
-    nice = how willing a process is to share CPU
+    renice → change priority AFTER it’s already running
 
-| Nice Value | Behavior |
-|------------|----------|
-| -20        | highest priority (very aggressive) |
-| 0          | default |
-| 9          | lower priority (more polite) |
-| 19         | lowest priority |
+## 🧠 Mental Model
+
+    nice   = set it at launch
+
+    renice = adjust it later
+
+## 🔥 So:
+
+    renice 9 <PID>
+
+means:
+
+> change the nice value of an existing process to 9
 
 </details>
 
@@ -154,6 +297,82 @@ Copy the IP address and save it in the /home/bob/ip.txt file:
 - Accepted publickey → successful SSH login indicator
 - vi /home/bob/ip.txt → save the IP manually into file
 
+> **`journalctl` = search systemd logs (the “live system log database”)**
+
+## Mental Model
+
+    find       → “where is the file?”
+    journalctl → “what happened in the system?”
+
+## 🔥 Think Like This
+
+    old Linux → /var/log files  
+    modern Linux → journalctl
+
+
+## 🔍 Step 1 — Look at SSH logs
+
+    sudo journalctl --unit=ssh.service
+
+## Why?
+
+    --unit=ssh.service
+
+👉 filters ONLY SSH logs
+
+## 🔍 Step 2 — Limit Output
+
+    -n 20
+
+👉 last 20 entries (recent activity)
+
+## 🔍 Step 3 — Remove Pager
+
+    --no-pager
+
+👉 prints directly (no scrolling UI)
+
+## 🔍 Step 4 — Look for THIS Pattern
+
+    Accepted publickey for root from 10.0.0.5
+
+## 🔥 KEY SIGNAL
+
+    Accepted = successful login
+
+## 🧠 What You Extract
+
+👉 the IP:
+
+    10.0.0.5
+
+## 🔍 Step 5 — Save It
+
+    echo 10.0.0.5 > /home/bob/ip.txt
+
+## 🔁 Memory Hook
+
+    journalctl = system activity history
+
+## 🔥 SUPER IMPORTANT (LFCS)
+
+## When to use WHAT
+
+| Situation | Tool |
+|----------|------|
+| Find files | find |
+| Search inside files | grep |
+| Search system logs | journalctl |
+
+## 🧠 Mental Model
+
+    logs = events  
+    journalctl = event viewer
+
+## 🔁 1-Line Recall
+
+    Use `journalctl` to search system logs (like SSH activity), not `find` or `/var/log`.
+
 </details>
 
 ---
@@ -181,6 +400,30 @@ Copy the PID and save it in the /home/bob/pid.txt file.
      show the full command line (not just the PID)    
 - rpcbind → target process name
 - vi /home/bob/pid.txt → save the PID manually into file
+
+> `pgrep` = **process + grep**
+
+👉 “grep for processes”
+
+    p = process  
+    grep = search text  
+
+## So:
+
+    pgrep
+
+means:
+
+> search (grep) through the process list
+
+## 🧠 Mental Model
+
+    ps → shows all processes  
+    grep → filters text  
+
+👉 combine them mentally:
+
+    ps + grep = pgrep
 
 </details>
 
@@ -211,6 +454,31 @@ Send it a SIGHUP signal using the below command:
 - -SIGHUP → send hangup signal
 - sudo → run with elevated privileges
 - <pid> → target process ID
+
+⚠️  Why The Provided Answer Looks Incomplete
+
+They wrote:
+
+    sudo kill -SIGHUP
+
+❌ missing the PID
+
+## ✅ Correct Command
+
+    sudo kill -SIGHUP <PID>
+
+Example:
+
+    sudo kill -SIGHUP 1234
+
+## 🧠 Mental Model
+
+    systemctl → find the PID  
+    kill      → send signal to that PID  
+
+## 🔁 1-Line Recall
+
+    The PID is shown as “Main PID” in `systemctl status`, and you must pass it to `kill -SIGHUP`.
 
 ## Common Signals
 
@@ -252,6 +520,145 @@ Use the below command:
 - /var/log/ → directory being searched
 - '>' → redirect output to file
 - reboot.log → destination file
+
+## Why `--text` (“treat files as text”)?
+
+> Because `/var/log` contains **some non-text (binary/compressed) files**, and `grep` may skip or complain about them unless you force it to treat them as text.
+
+## 🔍 What Happens Without `--text`
+
+Running:
+
+    grep -r 'reboot' /var/log/
+
+👉 you might see:
+
+    Binary file matches
+    (or files skipped)
+
+## Why?
+
+Some files in `/var/log` are:
+
+- compressed (`.gz`)
+- binary formats
+- not plain text
+
+## 🔥 What `--text` Does
+
+    --text   (same as `-a`)
+
+👉 tells `grep`:
+
+> “treat everything like text anyway”
+
+## Result
+
+- no “binary file matches” message  
+- actual matching lines are printed (when possible)
+
+## 🧠 Mental Model
+
+    normal grep → skips binary  
+    grep --text → force-read as text  
+
+## ⚠️ Important Reality
+
+For `.gz` files, better tool is:
+
+    zgrep -r 'reboot' /var/log/
+
+👉 because it understands compression
+
+## 🧪 So Why Did the Lab Use `--text`?
+
+- keeps it simple  
+- avoids binary warnings  
+- works “good enough” for exam context  
+
+## 🔁 Memory Hook
+
+    --text = force text mode
+
+## 🔁 1-Line Recall
+
+    `--text` tells `grep` to treat all files as text so it won’t skip or warn on binary/log files.
+
+## How Do You Know `^c` Means “Starts With c”?
+
+## 🧠 Short Answer
+
+> Because this is **regex (regular expression)** syntax
+
+## 🔥 Core Rule (LOCK THIS IN)
+
+    ^  = start of line
+
+## So:
+
+    ^c
+
+means:
+
+> lines that START with the letter `c`
+
+## 🧠 Mental Model
+
+    ^ = beginning anchor
+
+Think:
+
+    ^ → “start here”
+
+## 🔍 Why It Appears in `journalctl`
+
+Because:
+
+    -g
+
+means:
+
+> filter using a regex pattern
+
+## 🔥 So This:
+
+    -g '^c'
+
+means:
+
+> only show log lines that begin with `c`
+
+## 🧪 Examples
+
+| Pattern | Meaning |
+|--------|--------|
+| `^c` | starts with c |
+| `c$` | ends with c |
+| `^ssh` | starts with ssh |
+| `error` | contains error anywhere |
+
+## 🧠 How You’re “Supposed to Know”
+
+For LFCS:
+
+👉 You need **basic regex anchors**
+
+## The ONLY Ones You REALLY Need
+
+    ^ = starts with  
+    $ = ends with  
+
+## 🔁 Memory Hook
+
+    ^ = beginning
+
+## 🔁 Visual Trick
+
+    ^ looks like an arrow pointing UP → “start here”
+
+## 🔁 1-Line Recall
+
+    `^c` means “match lines that start with c” because `^` is the start-of-line anchor in regex.
 
 </details>
 
@@ -328,13 +735,9 @@ Think:
 - ignore errors, warnings, debug  
 - only show normal informational messages  
 
----
-
 ## 🧠 Mental Model
 
     -p info = “only normal logs”
-
----
 
 ## `-g '^c'`
 
@@ -342,6 +745,37 @@ Think:
 > only show lines that **start with the letter `c`**
 
 > In `journalctl`, `-g` means: **filter logs using a pattern (regex search)**
+
+## 🧪 Examples
+
+| Pattern | Meaning |
+|--------|--------|
+| `^c` | starts with c |
+| `c$` | ends with c |
+| `^ssh` | starts with ssh |
+| `error` | contains error anywhere |
+
+For LFCS:
+
+👉 You need **basic regex anchors**
+
+## The ONLY Ones You REALLY Need
+
+    ^ = starts with  
+    $ = ends with  
+
+## 🔁 Memory Hook
+
+    ^ = beginning
+
+## 🔁 Visual Trick
+
+    ^ looks like an arrow pointing UP → “start here”
+
+## 🔁 1-Line Recall
+
+    `^c` means “match lines that start with c” because `^` is the start-of-line anchor in regex.
+
 
 </details>
 
@@ -357,7 +791,7 @@ Verify the contents of "/home/bob/resources.txt" file.
 <details><summary>Answer</summary>
 Execute the below command:
 
-ps u 1 > /home/bob/resources.txt
+    ps u 1 > /home/bob/resources.txt
 
 ### Explanation:
 - ps → display process information
