@@ -65,6 +65,39 @@ and save the output to below file
 - vi → manually save output to file
 - /home/bob/package.txt → destination file
 
+👉 `dpkg` = **Debian Package**
+
+## 🧪 CORRECT LFCS WAY (BETTER)
+
+👉 Instead of using `vi`, use redirect:
+
+    dpkg --search /bin/ls > /home/bob/package.txt
+
+## ⚠️ LFCS GOTCHA
+
+👉 `dpkg` = low-level tool  
+👉 `apt` = high-level tool (uses dpkg underneath)
+
+## 🧠 RELATED COMMANDS (LOCK THESE IN)
+
+### 📌 List installed packages
+    dpkg -l
+
+### 📌 Install package file
+    dpkg -i package.deb
+
+### 📌 Remove package
+    dpkg -r package
+
+## 🧠 FINAL LOCK-IN
+
+👉 `d` = Debian  
+👉 `pkg` = package  
+
+👉 `dpkg` = Debian package manager  
+
+👉 `--search` = “who owns this file?”
+
 </details>
 
 ---
@@ -92,6 +125,65 @@ Identify the package name that begins with the letter u (/bin/uname) and save th
 - vi → save result manually
 - /home/bob/name.txt → destination file
 
+## 🔍 BREAKDOWN (SIMP)
+
+### `dpkg --listfiles coreutils`
+👉 list ALL files in the coreutils package
+
+### `|`
+👉 pipe → send output to next command
+
+### `grep ^/bin`
+👉 filter only files that:
+- start with `/bin`
+
+👉 `^` = “starts with”
+
+## 🎯 TASK REQUIREMENT
+
+👉 Find:
+
+    /bin/uname
+
+👉 AND:
+
+👉 Save it to:
+
+    /home/bob/name.txt
+
+## ✅ CORRECT LFCS COMMAND
+
+    dpkg --listfiles coreutils | grep ^/bin/u > /home/bob/name.txt
+
+## 🧠 WHY THIS IS BETTER
+
+👉 You:
+- filter directly to the correct file (`u`)
+- save it immediately
+- avoid manual editing
+
+## ⚠️ LFCS EXAM MINDSET
+
+👉 ALWAYS prefer:
+
+    command → filter → redirect
+
+## 🧠 SIMP PATTERN
+
+👉 Think:
+
+    find → filter → save
+
+## 🧠 FINAL LOCK-IN
+
+👉 YES — use `>`  
+👉 avoid `vi` unless required  
+👉 automate everything  
+
+👉 Goal:
+
+    one clean command → correct output file
+
 </details>
 
 ---
@@ -117,6 +209,93 @@ Observe the highlighted section
 - -y → automatically confirm prompts
 - ziptool → package being removed
 - dependencies → automatically removed with --auto-remove
+
+## 🧠 LFCS — `dpkg` vs `apt-get` (REMOVING PACKAGES)
+
+## 🎯 SHORT ANSWER
+
+👉 YES, you *can* use `dpkg`…
+
+👉 BUT ❗ **`apt-get` is the CORRECT tool for this task**
+
+## 🧠 CORE DIFFERENCE
+
+| Tool     | Level        | Handles Dependencies? |
+|----------|-------------|-----------------------|
+| dpkg     | low-level   | ❌ NO                 |
+| apt-get  | high-level  | ✅ YES                |
+
+## 🔥 WHY `dpkg` IS NOT IDEAL HERE
+
+### If you run:
+
+    sudo dpkg -r ziptool
+
+👉 It will:
+- remove ONLY `ziptool`
+- ❌ NOT remove dependencies
+- ❌ possibly leave broken packages
+
+👉 Worse:
+
+If dependencies are still required:
+- dpkg may FAIL
+- or leave system in inconsistent state
+
+## ✅ CORRECT LFCS COMMAND
+
+    sudo apt-get remove --auto-remove -y ziptool
+
+## 🔍 SIMP BREAKDOWN
+
+### `remove`
+👉 uninstall the package
+
+### `--auto-remove`
+👉 remove unused dependencies too
+
+### `-y`
+👉 auto-confirm (no prompts)
+
+## 🧠 WHY LFCS EXPECTS THIS
+
+👉 The task says:
+
+> remove package **AND its dependencies**
+
+👉 Only `apt-get` (or `apt`) does that cleanly
+
+## 🧪 WHAT `dpkg` IS GOOD FOR
+
+### 📌 Remove package ONLY
+    sudo dpkg -r ziptool
+
+### 📌 Force remove (dangerous)
+    sudo dpkg -P ziptool
+
+👉 But:
+- ❌ no dependency cleanup
+- ❌ not exam-friendly for this task
+
+## 🔧 CLEANUP (IF YOU USED `dpkg`)
+
+You’d need:
+
+    sudo apt-get autoremove
+
+👉 Now you're basically using apt anyway
+
+## 🧠 FINAL LOCK-IN
+
+👉 `dpkg` = manual, low-level  
+👉 `apt-get` = smart, dependency-aware  
+
+👉 If task mentions:
+    “dependencies”
+
+👉 Use:
+
+    apt-get remove --auto-remove
 
 </details>
 
@@ -203,4 +382,97 @@ Now access it by running command
 - tmux → run installed application
 - sudo → run commands with elevated privileges
 
+👉 `tmux` = **terminal multiplexer**
+
+> 🗣️ “tmux lets me run multiple terminals inside one terminal”
+
+## 🧠 WHAT IT DOES
+
+👉 Inside ONE terminal, you can:
+
+- open multiple sessions
+- split screen into panes
+- switch between tasks
+- keep processes running after disconnect
+
+## 🧪 REAL USE CASE
+
+👉 You SSH into a server:
+
+    ssh server
+
+Start tmux:
+
+    tmux
+
+Run something long:
+
+    apt-get update
+
+👉 Disconnect (close SSH)
+
+👉 Reconnect later…
+
+    tmux attach
+
+✔️ Your session is STILL running
+
+## 🔥 WHY THIS IS POWERFUL
+
+👉 tmux = “don’t lose your work”
+
+## ⚠️ IS IT INSTALLED BY DEFAULT?
+
+👉 ❌ NO (usually NOT on Ubuntu)
+
+## 📦 INSTALL IT
+
+    sudo apt-get update
+    sudo apt-get install tmux
+
+## 🛠️ BASIC COMMANDS
+
+### Start session
+    tmux
+
+### Detach (leave session running)
+    Ctrl + b  then  d
+
+### List sessions
+    tmux ls
+
+### Reattach
+    tmux attach
+
+### Kill session
+    tmux kill-session
+
+## 🧠 SPLIT SCREEN
+
+### Vertical split
+    Ctrl + b  then  %
+
+### Horizontal split
+    Ctrl + b  then  "
+
+## ⚠️ LFCS NOTE
+
+👉 tmux is NOT usually tested directly
+
+👉 BUT it is:
+- VERY useful during exam
+- helps manage multiple tasks
+
+## 🧠 FINAL LOCK-IN
+
+👉 tmux = multiple terminals + persistent sessions  
+👉 not installed by default → install it  
+👉 key combo = Ctrl + b  
+
+👉 Think:
+
+    “tmux keeps my terminal alive”
+
 </details>
+
+
