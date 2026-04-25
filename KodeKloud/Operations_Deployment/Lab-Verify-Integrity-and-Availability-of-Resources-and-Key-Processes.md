@@ -151,6 +151,111 @@ You can also type:
 👉 /pattern/ = the filter
 👉 $N = the field selector
 
+
+👉 `awk` = **pull out exactly what you want from messy output**
+
+## 🧠 THE PROBLEM
+
+Command:
+
+    lscpu
+
+👉 gives you a LOT of info:
+
+    Architecture:        x86_64
+    CPU(s):              12
+    Core(s) per socket:  6
+    Thread(s) per core:  2
+    ...
+
+👉 LFCS task wants ONLY:
+
+    6
+
+## 🔥 WHY NOT JUST USE `lscpu`?
+
+👉 Because:
+- too much output
+- not clean
+- harder to automate
+
+## ✅ WHY USE `awk`
+
+👉 It lets you:
+
+1. **Find the line you want**
+2. **Extract only the value**
+
+## 🧪 COMMAND
+
+    lscpu | awk -F: '/Core(s) per socket/ {print $2}'
+
+## 🔍 SIMP BREAKDOWN
+
+### `lscpu`
+👉 get all CPU info
+
+### `|`
+👉 send output to awk
+
+### `awk`
+👉 process text
+
+### `-F:`
+👉 split each line at `:`
+👉 `-F` = **Field Separator**
+
+### `/Core(s) per socket/`
+👉 find the correct line
+
+### `{print $2}`
+👉 print what comes AFTER `:`
+
+## 🧠 WHAT HAPPENS
+
+Input line:
+
+    Core(s) per socket:  6
+
+After split (`:`):
+
+    $1 = Core(s) per socket
+    $2 =  6
+
+👉 Output:
+
+    6
+
+## 🧠 SIMP MEMORY
+
+👉 Think:
+
+> 🗣️ “awk finds the line and grabs the value”
+
+## ⚠️ LFCS GOTCHA
+
+👉 Output may have spaces:
+
+    " 6"
+
+👉 Clean it with:
+
+    ... | xargs
+
+## 🧪 FINAL CLEAN COMMAND
+
+    lscpu | awk -F: '/Core(s) per socket/ {print $2}' | xargs > /home/bob/cpu
+
+
+## 🧠 FINAL LOCK-IN
+
+👉 `awk` = filter + extract  
+👉 `-F:` = split at colon  
+👉 `$2` = value after colon  
+
+👉 Use awk when:
+    you need ONE clean value from messy output
+
 </details>
 
 ---
@@ -177,9 +282,9 @@ Execute the below command:
 
 🔥 Mental model (lock this in)
 
-Filesystem	Check command	Safe check flag
-ext4    	fsck	            -n
-XFS     	xfs_repair	        -n
+    Filesystem	Check command	Safe check flag
+    ext4    	fsck	            -n
+    XFS     	xfs_repair	        -n
 
 🧠 What the lab is testing
 
@@ -199,5 +304,128 @@ They want you to understand:
     stderr → same file
 
 Because filesystem tools often print errors to stderr, not stdout.
+
+This line:
+
+    Filesystem Check command Safe check flag ext4 fsck -n XFS xfs_repair -n
+
+👉 looks messy… but it’s just a **mapping table**
+
+
+## 🧠 CLEAN VERSION (UNDERSTAND THIS)
+
+| Filesystem | Command       | Safe Check Flag |
+|-----------|--------------|-----------------|
+| ext4      | fsck         | -n              |
+| XFS       | xfs_repair   | -n              |
+
+
+## 🎯 CORE IDEA
+
+👉 Different filesystems use **different tools**
+
+
+## 🧠 SIMP MEMORY
+
+👉 Think:
+
+    ext4 → fsck  
+    XFS  → xfs_repair  
+
+## 🔑 WHAT DOES `-n` MEAN?
+
+👉 `-n` = **NO CHANGES (read-only check)**
+
+👉 Say:
+
+> 🗣️ “check only, don’t fix”
+
+## 🧪 EXAMPLES
+
+### ext4 check (safe)
+    fsck -n /dev/sda1
+
+### XFS check (safe)
+    xfs_repair -n /dev/sda1
+
+## ⚠️ LFCS GOTCHA
+
+👉 NEVER run repair tools without `-n` unless asked
+
+👉 Without `-n`:
+- it will MODIFY the filesystem
+- risky in exams
+
+## 🔥 WHAT THE LAB IS TESTING
+
+You must know:
+
+1️⃣ Correct tool for filesystem  
+2️⃣ Use safe mode (`-n`)  
+3️⃣ Capture output  
+
+
+## ⚙️ OUTPUT CAPTURE (IMPORTANT)
+
+    > /home/bob/fscheck 2>&1
+
+## 🔍 SIMP BREAKDOWN
+
+### `>`
+👉 send normal output (stdout) to file
+
+### `2>&1`
+👉 send errors (stderr) to SAME place
+
+👉 Read it like:
+
+> 🗣️ “send 2 (errors) to wherever 1 (normal output) is going”
+
+## 🔍 BREAKDOWN
+
+### `>`
+👉 redirect stdout (1) to a file
+
+### `2>&1`
+👉 redirect stderr (2) → to same place as stdout (1)
+
+> 🗣️ “& = reference a descriptor, not a file”
+
+👉 `&` = “this is a descriptor”  
+👉 `2>&1` = send errors → same place as output  
+
+👉 Think:
+
+    “don’t treat 1 like a file — it’s a stream”
+
+## 🧠 WHY THIS MATTERS
+
+👉 Filesystem tools print:
+- info → stdout
+- errors → stderr
+
+👉 If you don’t use `2>&1`:
+❌ you miss half the output
+
+## 🧠 SIMP MEMORY
+
+👉 Think:
+
+> 🗣️ “send EVERYTHING to the file”
+
+## 🧪 FULL EXAMPLE
+
+    xfs_repair -n /dev/sda1 > /home/bob/fscheck 2>&1
+
+👉 Result:
+- full report saved
+- no changes made
+
+## 🧠 FINAL LOCK-IN
+
+👉 ext4 → fsck  
+👉 XFS → xfs_repair  
+👉 -n → safe (no changes)  
+👉 > file 2>&1 → capture everything  
 
 </details>
