@@ -92,7 +92,7 @@ Execute the below command:
 
 ### Explanation:
 - env → display all environment variables
-- > → redirect output to file
+- '>' → redirect output to file
 - /home/bob/env → destination file
 
 ## 🔁 1-Line Recall
@@ -265,6 +265,54 @@ Execute the below command:
 A full correct copy requires:
 
 #### cp -r /etc/skel/. /home/bob/default_data/
+
+## 🔍 WHY THE `.` MATTERS
+
+👉 `.` = “this directory (current level)”
+
+👉 So:
+
+    /etc/skel/.
+
+👉 Means:
+
+> “everything inside /etc/skel”
+
+## 🔥 EXTRA IMPORTANT
+
+👉 It ALSO includes:
+
+- hidden files (`.bashrc`, `.profile`, etc.)
+
+👉 Think:
+
+> 🗣️ “dot = contents, not container”
+
+## 🧪 WHAT `/etc/skel` IS
+
+👉 Template directory for new users
+
+When you create a user:
+- these files get copied into their home directory
+
+## ⚠️ LFCS GOTCHA
+
+👉 Without `.`:
+❌ wrong structure  
+❌ extra directory created  
+
+👉 With `.`:
+✅ correct structure  
+✅ matches how user homes are built  
+
+## 🧠 FINAL LOCK-IN
+
+👉 `/etc/skel/.` = contents of skel  
+👉 `.` = include hidden files + no extra folder  
+
+👉 Think:
+
+    “dot = dump contents here”
 
 </details>
 
