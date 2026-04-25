@@ -64,6 +64,8 @@ Use the below command:
 - jane → target user
 - sudo → run with elevated privileges
 
+> 🗣️ “empty = forever”
+
 </details>
 
 ---
@@ -88,6 +90,10 @@ Execute the below command:
     "make the home directory"
 - jack → username
 - sudo → run with elevated privileges
+
+👉 `csh` = **C Shell**
+
+👉 It’s a Unix shell designed to look like the **C programming language**
 
 </details>
 
@@ -115,11 +121,9 @@ Execute the below command:
 - jack → target user
 - sudo → run with elevated privileges
 
-# 🧠 Mental Model
-
     userdel -r = remove user + their “stuff”
 
-# ⚠️ Important: It Does NOT Remove Everything
+## ⚠️ Important: It Does NOT Remove Everything
 
 ## ❌ Files OUTSIDE home are NOT removed
 
@@ -189,8 +193,6 @@ Without `-a`:
 - user ONLY in `developers`
 - removed from all other groups ❌
 
----
-
 ## ✅ With `-a`
 
     usermod -a -G developers jane
@@ -199,16 +201,12 @@ Without `-a`:
 - keeps existing groups  
 - ADDS `developers`  
 
----
-
-# 🧠 Mental Model
+## 🧠 Mental Model
 
     -G = replace  
     -a -G = append  
 
----
-
-# 🔁 Memory Hook
+## 🔁 Memory Hook
 
     -a = add (don’t overwrite)
 
@@ -257,6 +255,10 @@ Execute the below command:
 - GID → unchanged during rename
 - sudo → run with elevated privileges
 
+👉 `-n` = **new name**
+
+> 🗣️ “rename group `cricket` → to `soccer`”
+
 </details>
 
 ---
@@ -280,8 +282,6 @@ Execute the below command:
 - --uid 5322 → assign user ID
 - sam → username
 - sudo → run with elevated privileges
-
-# 🧠 Mental Model
 
     group = container  
     user  = member  
@@ -350,7 +350,15 @@ Execute below given command:
 - jane → target user
 - sudo → run with elevated privileges
 
-# 🧪 Related Options (ALL in Days)
+👉 `-W` ≠ universal warning flag  
+👉 meaning depends on command  
+👉 always verify  
+
+👉 Think:
+
+    “each command has its own language”
+
+## 🧪 Related Options (ALL in Days)
 
 | Option | Meaning |
 |--------|--------|
@@ -361,7 +369,7 @@ Execute below given command:
 
 ---
 
-# 🧠 Mental Model (LOCK THIS IN)
+## 🧠 Mental Model (LOCK THIS IN)
 
     chage = everything is in DAYS
 
