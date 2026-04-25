@@ -23,6 +23,28 @@ It forces a power off for the virtual machine called TestMachine.
 - TestMachine → target virtual machine
 - force off → similar to pulling power, not graceful shutdown
 
+👉 `virsh` = **Virtualization Shell**
+
+## 🧠 BREAKDOWN
+
+    vir = virtualization
+    sh  = shell
+
+👉 So:
+
+> 🗣️ “virsh = shell to manage virtual machines”
+
+
+👉 `virsh` is a command-line tool to manage:
+
+- virtual machines (VMs)
+- networks
+- storage
+
+👉 usually with:
+
+    libvirt
+
 </details>
 
 ---
@@ -56,6 +78,18 @@ Which of the following commands is used to list all docker containers (including
 - docker → container management tool
 - ps → list running containers
 - -a → include all containers
+
+👉 `ps` = **processes**
+
+👉 Even though Docker shows containers…
+
+👉 Containers = running processes
+
+👉 `-a` = **all**
+
+👉 Think:
+
+> 🗣️ “-a = all containers”
 
 </details>
 
@@ -149,7 +183,7 @@ Delete the stopped/exited containers if any:
 - docker ps -a → list all containers
 - docker stop → stop running containers
 - docker rm → remove containers
-- '<container-id>' → identifier for each container
+- 'container-id' → identifier for each container
 
 </details>
 
@@ -182,6 +216,18 @@ Check for containers using the below command.
 - --name webinstance1 → assign container name
 - httpd → Apache image
 - docker ps → verify running containers
+
+👉 Think:
+
+> 🗣️ “detach = don’t tie up my terminal”
+
+## ⚠️ LFCS REALITY
+
+👉 Exam may NOT explicitly say `--detach`
+
+👉 But you should:
+- use it when running services
+- especially when you need to verify after
 
 </details>
 
@@ -349,6 +395,14 @@ Start the VM again:
 - virsh destroy → force stop
 - virsh start → restart VM
 
+👉 `virsh dominfo` = **show info about a virtual machine**
+
+### `dominfo`
+👉 **domain info**
+
+👉 In libvirt:
+- “domain” = virtual machine (VM)
+
 ## Why BOTH `setmaxmem` and `setmem` Are Used
 
 ## Commands
@@ -358,16 +412,12 @@ Start the VM again:
 - **maximum memory (ceiling)**
 - **current memory (actual usage)**
 
-# 🧠 Mental Model
-
 Think of it like:
 
     max memory = limit  
     current memory = what it's using right now  
 
----
-
-# 🔍 What Each Command Does
+## 🔍 What Each Command Does
 
 ## 1️⃣ `setmaxmem`
 
@@ -376,8 +426,6 @@ Think of it like:
 👉 sets:
 > the MAXIMUM memory the VM is allowed to use
 
----
-
 ## 2️⃣ `setmem`
 
     virsh setmem VM2 80M --config
@@ -385,17 +433,13 @@ Think of it like:
 👉 sets:
 > the CURRENT memory assigned to the VM
 
----
-
-# ⚠️ Important Rule
+## ⚠️ Important Rule
 
 > You CANNOT set current memory higher than max memory 
 
 👉 keeps them aligned
 
----
-
-# ⚙️ What `--config` Means
+## ⚙️ What `--config` Means
 
     --config
 
@@ -415,14 +459,13 @@ Think of it like:
 
 There is a cloud image available in /var/lib/libvrt/images/ folder use that image to spin up the virtual machine with the following details
 
-Name - kk-ubuntu
-Memory - 1024 
-vcpus - 1 
-    **virtual CPU**
-disk path - /var/lib/libvirt/images/ubuntu-22.04-minimal-cloudimg-amd64.img
-os-variant - ubuntu22.04 
-graphics -  none 
-network - default
+    Name - kk-ubuntu
+    Memory - 1024 
+    vcpus - 1 
+    **virtual CPU** disk path - /var/lib/libvirt/images/ubuntu-22.04-minimal-cloudimg-amd64.img
+    os-variant - ubuntu22.04 
+    graphics -  none 
+    network - default
 
 Note: It will take some time for the process to be completed.
 
@@ -430,6 +473,7 @@ Is virtual machine kk-ubuntu is in running state?
 
 <details><summary>Answer</summary>
 virt-install \
+    
     --name kk-ubuntu \
     --memory 1024 \
     --vcpus 1 \
