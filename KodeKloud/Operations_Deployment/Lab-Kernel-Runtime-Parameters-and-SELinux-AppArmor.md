@@ -28,6 +28,50 @@ For example, if the context is system_u:system_r:initrc_t:s0, then the file cont
 - vi → manually save context
 - /home/bob/sshd → destination file
 
+### `a`
+👉 show processes for **ALL users**
+
+### `u`
+👉 show **user-oriented format**
+
+👉 adds columns like:
+- USER
+- CPU %
+- MEM %
+- START TIME
+
+### `x`
+👉 include processes **not attached to a terminal**
+
+👉 (background daemons like `sshd`)
+
+---
+
+## 🧠 SIMP MEMORY
+
+👉 Think:
+
+> 🗣️ “a = all users, u = user view, x = everything”
+
+### 'Z'
+> 🗣️ “Z = Zero-Trust / Security Context”
+👉 Not official — but VERY helpful mentally:
+
+- SELinux = security layer
+- `Z` = “show security labels”
+
+## 🧠 ANOTHER WAY TO REMEMBER
+
+👉 Look at what it adds:
+
+    system_u:system_r:sshd_t:s0
+
+👉 That’s a **security label**
+
+👉 So think:
+
+> 🗣️ “Z shows security zoning”
+
 </details>
 
 ---
@@ -48,6 +92,17 @@ Execute the below command:
 - -w → write/change parameter value
 - kernel.modules_disabled → parameter controlling module loading
 - =1 → disable loading of new kernel modules
+
+| Setting | Meaning                          |
+|--------|----------------------------------|
+| =1     | disable module loading ❌         |
+| =0     | allow module loading ✅          |
+
+👉 Once set to:
+
+    =1
+
+👉 You CANNOT re-enable module loading without reboot
 
 </details>
 
@@ -130,7 +185,8 @@ Apply the changes:
 - vi → edit configuration file
 - vm.swappiness=10 → reduce swap usage preference
 - sysctl -p → apply configuration without reboot
-    > `-p` stands for: **“load parameters from a file”** | “pull parameters from config file”
+- `-p` stands for: **“load parameters from a file”** | “pull parameters from config file”
+
 </details>
 
 ---
@@ -199,6 +255,16 @@ Copy the SELinux Roles value for staff_u user and save it in the /home/bob/serol
 - roles → permissions associated with SELinux user
 - vi → manually save values
 - /home/bob/serole → destination file
+
+👉 `-l` = **list**
+
+## 🧠 CORE IDEA
+
+👉 `semanage user -l`
+
+👉 Means:
+
+> 🗣️ “list SELinux users”
 
 </details>
 
