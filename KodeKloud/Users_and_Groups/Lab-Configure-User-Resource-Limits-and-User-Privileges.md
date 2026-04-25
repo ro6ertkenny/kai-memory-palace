@@ -114,7 +114,7 @@ Save and exit.
 - /etc/security/limits.conf → file for PAM resource limits
 - sudo vi → edit file with elevated privileges
 - trinity → target user
-- - → apply both soft and hard limits
+- '-' → apply both soft and hard limits
 - nproc → process count limit
 - 30 → maximum number of processes
 
@@ -379,6 +379,13 @@ Save and exit.
 - 20 → maximum allowed processes
 - /etc/security/limits.conf → limits configuration file
 
+👉 `@` = **group**
+
+> 🗣️ “apply this limit to ALL users in the salesteam group”
+
+👉 `@` tells the system:
+- this is a group (NOT a user)
+
 </details>
 
 ---
@@ -436,6 +443,13 @@ With:
 
 > applies this rule to:
     all users in the **salesteam group**
+
+👉 `%` = group in sudoers  
+👉 `@` = group in limits.conf  
+
+👉 Think:
+
+    “sudo = %, limits = @”
 
 ## 2️⃣ First `ALL`
 
