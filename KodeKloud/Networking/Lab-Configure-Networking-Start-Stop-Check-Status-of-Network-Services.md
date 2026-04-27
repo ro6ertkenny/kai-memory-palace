@@ -53,6 +53,8 @@ How do we see what processes on our system are listening for incoming network co
 <details><summary>Answer</summary>
 Using sudo ss -tunlp command we can see what processes on our system are listening for incoming network connections, on the TCP and UDP protocols.
 
+####    sudo ss -tunlp
+
 ### Explanation:
 - ss → socket statistics tool
 - sudo → run with elevated privileges
@@ -146,6 +148,24 @@ Think:
     ip = data  
     flags = filter  
     awk = extract  
+
+> `{print $4}` means:
+
+**print the 4th column (field) of each line**
+
+## `awk`
+
+👉 text processing tool (works with columns)
+
+## `$4`
+
+👉 column number 4
+
+## `{print $4}`
+
+👉 “for each line, print column 4”
+
+   You determine `$4` by first viewing the output and counting the fields
 
 </details>
 
@@ -499,6 +519,31 @@ In real-world debugging:
 
 👉 to avoid missing anything
 
+## ⚠️ Why The Lab Told You To Use `-u`
+
+Because:
+
+> DNS commonly uses UDP
+
+👉 and they want to make sure you include it
+
+## 🔁 Mental Model
+
+    TCP = connection-based  
+    UDP = connectionless  
+
+Some services use BOTH.
+
+## 🔁 Memory Hook
+
+    -t = TCP  
+    -u = UDP  
+    -tu = both
+
+## 🔁 1-Line Recall
+
+    You see both because `-t` and `-u` were used, and some services (like DNS on port 53) use both TCP and UDP.
+
 </details>
 
 ---
@@ -539,6 +584,34 @@ Finally, save the file.
 - grep :8080 → filter for port 8080
 - PID/process → format shows process name
 - vi → manually save value
+
+## Why Did They Use `netstat` Instead of `ss`?
+
+> They *could have used either* — both work.
+
+👉 The lab used `netstat` because:
+- it’s older and widely taught  
+- its output is easier to read for beginners  
+
+## 🔥 Reality (IMPORTANT FOR LFCS)
+
+> ✅ `ss` is the modern tool  
+> ❌ `netstat` is considered legacy (but still works)
+
+## Command
+    sudo ss -tlnp | grep :8080
+
+## 🧠 Output You’ll See
+
+Something like:
+
+    users:(("ttyd",pid=993,fd=3))
+
+## Extract:
+
+    ttyd
+
+👉 that’s the process name
 
 </details>
 
@@ -588,6 +661,15 @@ You can use the below command to set the new IP address.
 - dev eth1 → target interface
 - sudo → run with elevated privileges
 - temporary → not persistent after reboot
+
+## Parts
+
+    ip      → networking tool  
+    a       → address (short for `addr`)  
+    add     → add something  
+    192...  → IP address  
+    dev     → device  
+    eth1    → interface  
 
 ## CIDR Notation (What `/24` Means)
 
@@ -661,6 +743,82 @@ After configuring, now apply the changes by following the command.
 - networkctl reload → reload network config
 - networkctl reconfigure → apply to interface
 
+## Why Did They Add `chmod 600`? 🤔
+
+> It’s **not required for the task**, but it’s done to ensure:
+
+👉 **secure and accepted permissions for Netplan**
+
+## 🔥 What `chmod 600` Means
+
+    chmod 600 file
+
+👉 permissions become:
+
+    rw-------
+
+## Breakdown
+
+    6 → owner = read + write  
+    0 → group = no access  
+    0 → others = no access  
+
+## 🧠 Why Do This For Netplan?
+
+Netplan config files:
+
+    /etc/netplan/*.yaml
+
+are expected to be:
+
+- owned by root  
+- not writable/readable by others  
+
+## ⚠️ If permissions are too open:
+
+You might see warnings like:
+
+    permissions for /etc/netplan/... are too open
+
+## 🔥 So They Added It To:
+
+- avoid permission warnings  
+- follow best practice  
+- ensure config is accepted cleanly  
+
+## 🧠 Important For LFCS
+
+> ❌ Not always required  
+> ✅ But GOOD practice  
+
+## 🔍 What Actually Matters For the Task
+
+The task asked:
+
+> configure the interface
+
+So the REAL required steps are:
+
+1. create the file  
+2. add config  
+3. apply it  
+
+## `chmod 600` is:
+
+👉 extra hardening / correctness step
+
+## 🧠 Mental Model
+
+    config files → should be locked down
+
+# 🔁 Memory Hook
+
+    600 = only root can touch it
+
+# 🔁 1-Line Recall
+
+    `chmod 600` is added to secure Netplan configs and avoid permission warnings, even if the task doesn’t explicitly require it.
+
 </details>
 
 ---
@@ -702,6 +860,28 @@ Check the changes using the below command.
 - networkctl reload → reload network
 - networkctl reconfigure → apply to interface
 - ip a → verify IP assignment
+
+> `enp6s0` is a **network interface name** (your network card)
+
+👉 a specific network adapter on your system
+
+Like:
+
+- ethernet port  
+- virtual NIC  
+- VM network interface  
+
+    enp6s0 = “this machine’s network port”
+
+Modern Linux uses **predictable interface names** instead of:
+
+    eth0, eth1
+
+## 🔍 Break It Down
+
+    en  = ethernet  
+    p6  = PCI bus 6  
+    s0  = slot 0  
 
 </details>
 
@@ -853,6 +1033,44 @@ For exams:
 BUT:
 > `-l` already does most of the work
 
+## ✅ Modern `ss` Equivalent (Instead of `netstat`)
+
+####    sudo ss -tulpn | grep LISTEN > /home/bob/incoming.txt
+
+## 🔥 Even Better (Cleaner — No `grep` Needed)
+
+    sudo ss -tulpn state listening > /home/bob/incoming.txt
+
+## 🔍 Breakdown
+
+## `ss -tulpn`
+
+    -t → TCP  
+    -u → UDP  
+    -l → listening  
+    -p → show process (PID/name)  
+    -n → numeric  
+
+## `state listening`
+
+👉 filters ONLY listening ports  
+👉 replaces `grep LISTEN`
+
+## 🔁 Mapping
+
+| netstat | ss |
+|--------|----|
+| -tulpn | -tulpn |
+| grep LISTEN | state listening |
+
+## 🔁 Memory Hook
+
+    ss = socket statistics (modern netstat)
+
+## 🔁 1-Line Recall
+
+    Use `ss -tulpn state listening` as the modern equivalent of `netstat -tulpn | grep LISTEN`.
+
 </details>
 
 ---
@@ -877,5 +1095,24 @@ Uncomment the below line in it and update to 8.8.8.8: 8.8.8.8:
 - DNS=8.8.8.8 → set global DNS resolver
 - uncomment → enable configuration line
 - sudo vim → edit file with privileges
+
+> `/etc/systemd/` = configuration for **systemd (the system manager)**
+
+> systemd is the **core system manager** that controls:
+
+- services (sshd, nginx, etc.)
+- boot process
+- logging (journalctl)
+- networking pieces (like DNS via resolved)
+
+## 🧠 Mental Model
+
+    systemd = system controller
+
+👉 configuration files that tell systemd:
+
+- how services behave  
+- how networking behaves  
+- how DNS works (via resolved)
 
 </details>
