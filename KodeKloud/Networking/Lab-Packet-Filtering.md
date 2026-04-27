@@ -491,6 +491,33 @@ This is WHY CIDR exists:
 
     /24 already means the entire range
 
+> **Mask = the line that splits the network part from the host part**
+
+    IP address = network + host
+
+    mask = tells you where the split is
+
+## 🔍 Your Example
+
+    10.11.12.0/24
+
+## Means:
+
+    mask = 255.255.255.0
+
+## Interpretation
+
+    10.11.12 | .0
+    network  | hosts
+
+
+## 🧠 What the Mask Does
+
+> It says:
+
+👉 “these bits are the network”  
+👉 “these bits are for hosts”
+
 </details>
 
 ---
@@ -654,6 +681,91 @@ and:
     10.0.0.19
 
 is in there.
+
+
+## 🧠 Short Answer
+
+> `/24` means:
+
+**the first 24 bits are the network**
+
+## 🔍 Think in Bits (Not Just Numbers)
+
+An IP address = 32 bits total
+
+    10.0.0.0 = 32 bits
+
+## `/24` means:
+
+    24 bits → network  
+     8 bits → hosts  
+
+## 🧠 Mental Model
+
+    [ network ][ hosts ]
+    [  24 bits ][ 8 bits ]
+
+## 🔥 Why 24?
+
+Because:
+
+    24 bits = 3 full octets
+
+## So:
+
+    10.0.0 | .0
+    network | hosts
+
+## 🔍 Mask Equivalent
+
+    /24 = 255.255.255.0
+
+## 🧪 Host Count
+
+8 bits left → hosts:
+
+    2⁸ = 256 addresses
+
+    2 to the power of 8
+
+## 🔍 Written Clearly
+
+    2^8
+
+## Meaning
+
+    2 × 2 × 2 × 2 × 2 × 2 × 2 × 2
+
+=  
+
+    256
+
+## But usable:
+
+    254 hosts
+
+## 🧠 Why This Is Common
+
+`/24` is popular because:
+
+- simple  
+- small network  
+- easy to manage  
+
+## 🔁 Memory Hook
+
+    /24 = 3 numbers fixed, last one varies
+
+## 🔁 Visual
+
+    10.0.0.X
+
+X = hosts
+
+## 🔁 1-Line Recall
+
+    `/24` means the first 3 parts of the IP are the network, and the last part is for host addresses.
+
 
 ## 🔥 The Bug
 
