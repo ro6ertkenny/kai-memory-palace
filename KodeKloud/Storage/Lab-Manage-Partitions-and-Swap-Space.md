@@ -7,6 +7,8 @@ How do we display block devices such as disks or partitions?
 <details><summary>Answer</summary>
 Using lsblk command, we can display block devices.
 
+#### lsblk
+
 ### Explanation:
 - lsblk → list block devices
 - shows disks, partitions, mount points, and sizes
@@ -21,6 +23,8 @@ How do we format a partition as swap space?
 
 <details><summary>Answer</summary>
 We can format a partition as swap space using the sudo mkswap /dev/vdb3 command where /dev/vdb3 is the partition we want to format.
+
+#### sudo mkswap /dev/vdb3
 
 ### Explanation:
 - mkswap → create swap filesystem
@@ -62,6 +66,8 @@ Check:
 
 ## 2. See partitions
     sudo fdisk -l
+
+> `fdisk` = **fixed disk**
 
 ## 3. Check existing swaps
     swapon --show
@@ -131,6 +137,8 @@ And for persistence:
 
     /etc/fstab
 
+> `/etc/fstab` = **file system table**
+
 ## 🔁 1-Line Recall
 
     If it says swap partition → look at block devices in /dev
@@ -197,6 +205,83 @@ The file content should be:
 - MOUNTPOINT / → identifies root filesystem
 - vda1 → partition where root is mounted
 - vi → manually save value
+
+✅ YES — you identify root (`/`) by the **MOUNTPOINT column**
+
+## 🔍 Your Output (Reformatted)
+
+    NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+    vda    252:0   0  10G  0 disk
+    └─vda1 252:1   0  10G  0 part /
+    vdb    252:16  0   1G  0 disk
+    vdc    252:32  0   1G  0 disk
+
+## 🧠 How You Know Root
+
+Look at:
+
+    MOUNTPOINT
+
+## This line:
+
+    └─vda1 ... /
+
+👉 means:
+
+> `/` (root filesystem) is mounted on:
+
+    vda1
+
+
+> What does `0 disk` mean?
+
+### Column 1: `RM`
+
+    RM = removable
+
+## Value:
+
+    0 = NOT removable  
+    1 = removable (like USB)
+
+## 🔍 Column: `TYPE`
+
+    disk = whole disk  
+    part = partition  
+
+## 🧠 So:
+
+    vdb  252:16  0  1G  0  disk
+
+means:
+
+- `0` → not removable  
+- `disk` → whole disk (not partitioned or no partitions shown)
+
+## 🔥 Important Distinction
+
+## `vda`
+
+    disk → whole disk
+
+## `vda1`
+
+    part → partition on that disk
+
+## 🧠 Mental Model
+
+    disk = entire drive  
+    part = slice of drive  
+
+## 🔁 Memory Hook
+
+    RM 0 = fixed disk  
+    TYPE disk = whole device  
+    TYPE part = partition  
+
+## 🔁 1-Line Recall
+
+    `0` means “not removable,” and `disk` means it’s a whole drive (not a partition).
 
 </details>
 
@@ -326,12 +411,12 @@ If the user is not root, you need to use the command with sudo.
 
 Now, enter below given responses:
 
-Command (m for help): n
-Select (default p):  <just-leave-it-default-and-press-enter>
-Partition number (1-4, default 1): <just-leave-it-default-and-press-enter>
-First sector (2048-2097151, default 2048):  <just-leave-it-default-and-press-enter>
-Last sector, +sectors or +size{K,M,G,T,P} (2048-2097151, default 2097151): +10M
-Command (m for help): w
+    Command (m for help): n
+    Select (default p):  <just-leave-it-default-and-press-enter>
+    Partition number (1-4, default 1): <just-leave-it-default-and-press-enter>
+    First sector (2048-2097151, default 2048):  <just-leave-it-default-and-press-enter>
+    Last sector, +sectors or +size{K,M,G,T,P} (2048-2097151, default 2097151): +10M
+    Command (m for help): w
 
 You can follow these same steps for all three partitions.
 
@@ -558,8 +643,8 @@ If the user is not root, you need to use the command with sudo.
 
 You will see some details as below (it can vary from one system to another):
 
-Device             Boot                  Start            End        Sectors         Size        Id Type
->>  Free space                                2048          22527          20480          10M                             
+    Device             Boot                  Start            End        Sectors         Size        Id Type
+    Free space                                2048          22527          20480          10M                             
     /dev/vdd2                                22528          65535          43008          21M        83 Linux
     /dev/vdd3                                65536         108543          43008          15M        83 Linux
     Free space                              108544        2097151        1988608         971M
@@ -592,5 +677,6 @@ You can confirm your changes by listing the partitions using the lsblk command.
     fdisk  = command-line partition editor
 
     cfdisk = menu-driven partition editor
+> **c = console menu for fixed disk editor (visual)**
 
 </details>
