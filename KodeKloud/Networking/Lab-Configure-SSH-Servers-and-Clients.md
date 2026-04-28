@@ -11,6 +11,20 @@ We can edit the settings of our SSH server in /etc/ssh/sshd_config file.
 ### Explanation:
 - sshd_config → SSH server configuration file
 
+🏛️ Why that name exists (/etc)
+
+Back in early Unix days:
+
+/bin → binaries (programs)
+/usr → user files
+/lib → libraries
+
+And /etc was basically:
+
+“everything else that didn’t fit anywhere cleanly”
+
+👉 so they called it et cetera = “and the rest”
+
 </details>
 
 ---
@@ -467,10 +481,6 @@ Add the below line in the same file before the http_access deny all line:
 - acl vpn src → define source ACL
 - http_access allow vpn → permit that ACL
 
-## Yes — And **Where** You Insert It Is Everything
-
-## 🧠 Short Answer
-
 > YES — the existing:
 
     http_access deny all
@@ -655,9 +665,9 @@ AddressFamily inet
 
 means:
 
-inet = IPv4
-inet6 = IPv6
-any = both
+    inet = IPv4
+    inet6 = IPv6
+    any = both
 
 That is OpenSSH syntax.
 
