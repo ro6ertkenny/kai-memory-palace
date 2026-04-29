@@ -131,7 +131,48 @@ Add below given line in it:
 - 0 → dump setting
 - 2 → fsck order
 
-## 🧠 Mental Model
+Old backup tool:
+
+    dump
+    0 = ignore backups
+
+## 🔥 What is the `2` (fsck order)?
+
+Controls:
+
+> filesystem check order at boot
+
+## Values
+
+    0 → never check  
+    1 → check FIRST (root `/`)  
+    2 → check AFTER root
+
+## Are `0 2` Even Necessary Here?
+
+## 🧠 Short Answer
+
+> ❌ Not required for the task  
+> ✅ But REQUIRED for a valid `/etc/fstab` entry  
+
+## 🔥 Key Insight
+
+In `/etc/fstab`, EVERY line must have:
+
+    6 fields
+
+## Format
+
+    device  mountpoint  type  options  dump  fsck
+
+## So You MUST Include:
+
+    0 2
+
+👉 even if the task doesn’t care about them
+
+
+## 🧠 Mental Model (for the spaces vs commas):
 
 In `/etc/fstab`:
 
@@ -153,5 +194,7 @@ options inside one field are separated by:
     defaults,ro
 
 ✅ no space after comma
+
+
 
 </details>
