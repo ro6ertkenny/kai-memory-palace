@@ -12,6 +12,31 @@ We will need to edit /etc/fstab file to tell the Linux OS which filesystems it s
 - defines which filesystems mount at boot
 - contains device, mount point, type, and options
 
+## 🧠 Mental Model (this is here from searching my own OS and seeing the following directory)
+
+    /dev/sda1         = real device name  
+    /dev/disk/by-uuid = stable alias (points to it)
+
+## 🔍 Why `/dev/sda1` Is NOT Always Used
+
+Because:
+
+> device names can CHANGE on reboot
+
+Example:
+
+    today:  /dev/sda  
+    reboot: /dev/sdb
+
+😬 bad if used in `/etc/fstab`
+
+## 🔥 Why UUID Is Used
+
+    UUID = Universally Unique Identifier
+
+👉 never changes
+
+
 </details>
 
 ---
@@ -177,6 +202,9 @@ to test it.
 
     fstab entry    = persistent
 
+> ✅ `mount` = temporary (right now)  
+> ✅ `/etc/fstab` = persistent (on boot)
+
 ## ⚠️ One More Important Thing
 
 Usually you mount a filesystem/partition like:
@@ -225,6 +253,23 @@ If the user is not root, you need to use the command with sudo.
 - umount → detach filesystem
 - /mnt → mount point being unmounted
 
+> ✅ At any given moment → ONLY ONE filesystem can be mounted **on a specific mount point**
+
+## 🔥 What That Means
+
+    /mnt
+
+can only point to:
+
+    ONE mounted filesystem at a time
+
+## 🧠 Mental Model
+
+    mount point = doorway  
+    filesystem  = what’s behind it  
+
+👉 one doorway → one thing behind it
+
 </details>
 
 ---
@@ -267,6 +312,35 @@ Save and exit.
 - defaults → default mount options
 - 0 → dump setting
 - 2 → filesystem check order at boot
+
+Linux reads:
+
+    /etc/fstab
+
+👉 and mounts everything listed there — it will automatically mount at boot  
+👉 IF everything is correct
+
+## ⚠️ Requirements (IMPORTANT)
+
+For it to work:
+
+## 1️⃣ Mount point must exist
+
+    mkdir -p /test
+
+> ✅ `-p` = **parents**
+
+> create the directory AND any missing parent directories
+
+
+## 2️⃣ Device must have a filesystem
+
+    mkfs.ext4 /dev/vde
+
+
+## 3️⃣ Device must exist at boot
+
+👉 if it doesn’t → boot errors
 
 </details>
 
@@ -383,6 +457,17 @@ the last 0 means:
 
     skip fsck
 
+
+## Kai's response to why was the 'none' issued in the command to not mount on boot:
+
+## 🔥 Why `none`?
+
+Because:
+
+> swap is NOT something you mount like `/mnt`
+
+👉 it’s attached to memory, not a directory
+
 </details>
 
 ---
@@ -404,5 +489,19 @@ If the user is not root, you need to use the command with sudo.
 - xfs_admin → manage XFS filesystem parameters
 - -L "SwapFS" → set new label
 - /dev/vdd → target filesystem
+
+## You can't just use the same command and replace the xfs w/and ext4:
+
+## 🧠 Mental Model
+
+    XFS   → xfs_admin  
+    EXT4  → e2label / tune2fs  
+    SWAP - mkswap
+
+    each filesystem has its own tool
+
+# 🔁 1-Line Recall
+
+    You must use filesystem-specific tools: `xfs_admin` for XFS, `e2label/tune2fs` for ext4, and `mkswap` for swap.
 
 </details>
