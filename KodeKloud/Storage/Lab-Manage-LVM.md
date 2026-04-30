@@ -30,6 +30,24 @@ Note: Use sudo with the command in case of a non-root user.
 
 like turning several hard drives into adjustable storage you can grow later.
 
+## How To Find a Package When You Only Know the Concept
+
+    Use:
+
+    apt search <keyword>
+
+    apt search logical volume
+
+## See Available Package Versions (APT)
+
+> Use:
+
+    apt list -a <package>
+
+## 🔥 For Your Task (lvm)
+
+    apt list -a lvm2
+
 </details>
 
 ---
@@ -79,6 +97,8 @@ Look for the PSize of /dev/vde and save its value in the /root/pvsize file:
 - pvs → list physical volumes
 - PSize → size of physical volume
 - vi → manually save value
+
+> ✅ `pvs` = **Physical Volumes (show)**
 
 </details>
 
@@ -197,6 +217,8 @@ Look for the VSize of volume1 and save its value in the /root/volume1 file:
 - VSize → total size of VG
 - vi → manually save value
 
+> ✅ `vgs` = **Volume Groups (show)**
+
 </details>
 
 ---
@@ -225,6 +247,8 @@ Note: Use sudo with the command in case of a non-root user.
 - --size 0.5G → set size
 - --name smalldata → LV name
 - volume1 → volume group
+
+> “Create a logical volume inside an EXISTING volume group”
 
 </details>
 
