@@ -1,4 +1,4 @@
-# Lab - Remote File Systems: NFS **NFS = Network File System**
+# Lab - Remote File Systems: NFS | **NFS = Network File System**
 
 ## Task:
 
@@ -93,7 +93,7 @@ or:
 
 ## 🔁 1-Line Recall
 
-    /etc/exports = file listing NFS shares (exports)<details><summary>Answer</summary>
+    /etc/exports = file listing NFS shares (exports)
 
 </details>
 
@@ -106,11 +106,12 @@ Note: Make sure you reexport the configuration file using exportfs -r.
 Is "/home" shared in read-only mode for clients in the "10.0.0.0/24" CIDR range?
 
 <details><summary>Answer</summary>
-- Open the NFS server configuration file: vi /etc/exports
-- Add the following line: /home 10.0.0.0/24(ro)
-- Save the file and exit the text editor.
-- Once you edit /etc/exports file, export it using exportfs -r.
-- Restart the NFS server:
+    
+    - Open the NFS server configuration file: vi /etc/exports
+    - Add the following line: /home 10.0.0.0/24(ro)
+    - Save the file and exit the text editor.
+    - Once you edit /etc/exports file, export it using exportfs -r.
+    - Restart the NFS server:
 
 #### sudo exportfs -r
 
@@ -497,6 +498,31 @@ Note: You need to use sudo with the command if the user is not root.
 - 192.0.0.0/24(ro) → read-only network access
 - 127.0.0.10(rw,no_root_squash) → full access with root privileges preserved
 - exportfs -r → reload NFS exports
+
+## 🧠 Mental Model
+
+    /etc/exports = instructions  
+    exportfs -r  = apply instructions  
+
+## 🧪 Example
+
+You add:
+
+    /home 10.0.0.0/24(ro)
+
+Then run:
+
+    exportfs -r
+
+👉 now NFS starts sharing `/home` with that network
+
+## 🔁 Memory Hook
+
+    -r = re-read config
+
+## 🔁 1-Line Recall
+
+    `exportfs -r` reloads `/etc/exports` and applies the current NFS share configuration.
 
 </details>
 
