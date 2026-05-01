@@ -27,6 +27,8 @@ The /proc/mdstat file contains the summary status of the RAID arrays, so you can
 - cat → display file contents
 - shows RAID devices, sync status, and health
 
+> `proc` = **process**
+
 > `mdstat` =
 
     md   + stat
@@ -226,7 +228,6 @@ Execute the below command:
 #### setfacl --recursive --modify user:john:rwx collection/
 
 Note: You need to use sudo with the command in case of a non-root user.
-</details>
 
 ### Explanation:
 - setfacl → modify ACLs
@@ -317,6 +318,7 @@ not:
     `collection/` uses a trailing slash just to indicate the target is a directory; `--recursive` is what does the recursive work.
 
 
+</details>
 
 
 
