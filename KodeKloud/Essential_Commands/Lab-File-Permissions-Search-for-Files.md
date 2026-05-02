@@ -473,6 +473,10 @@ Sticky bit replaces:
 | setgid    | inherit GROUP |
 | sticky    | protect FILE deletion |
 
+> `g+s` (setgid) on a directory means:
+
+👉 **new files inherit the directory’s group**
+
 ---
 
 ## Exam Patterns
@@ -1015,6 +1019,25 @@ Examples:
 
 > the task didn’t ask for the files…  
 > it asked for the COUNT of the files
+
+## 🧠 Mental Model
+
+    | only passes real results  
+    errors are ignored  
+
+## 🔥 How To Include Errors (If You Wanted)
+
+    find /var -type f -size 20M 2>&1 | wc -l
+
+## Now:
+
+    stderr → redirected to stdout
+
+👉 everything gets counted
+
+## 🔥 How To Suppress Errors (Cleaner Way)
+
+    find /var -type f -size 20M 2>/dev/null | wc -l
 
 </details>
 
