@@ -84,7 +84,7 @@ Common name is set as kodekloud.com ?
 <details><summary>Answer</summary>
 You can use the below command to generate a key and self-signed certificate.
 
-#### openssl req -x509 -noenc -days 365 -keyout priv.key -out kodekloud.crt
+#### openssl req -x509 -nodes -days 365 -keyout priv.key -out kodekloud.crt
 
 Enter kodekloud.com for common name
 
@@ -92,7 +92,7 @@ Enter kodekloud.com for common name
 - openssl → cryptography tool
 - req → certificate request utility
 - -x509 → generate a self-signed certificate
-- -noenc → do not encrypt the private key
+- -nodes → do not encrypt the private key
 - -days 365 → certificate validity period
 - -keyout priv.key → output private key file
 - -out kodekloud.crt → output certificate file
