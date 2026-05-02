@@ -1,5 +1,111 @@
 # Lab - File Content, Regular Expressions
 
+---
+
+> `sed` = **stream editor**
+
+## 🧠 What Is a “Stream”?
+
+> a flow of text (like from a file or pipe)
+
+## 🔥 What `sed` Does
+
+👉 edits text **as it flows through**
+
+- replace text  
+- delete lines  
+- modify content  
+
+    sed = edit text on the fly
+
+## 🧪 Example
+
+    sed 's/old/new/' file.txt
+
+👉 means:
+
+> replace “old” with “new”
+
+>   `s` = **substitute** (replace)
+>   '/' = delimiter 
+
+## 🔥 Important
+
+By default:
+
+    sed does NOT change the file ❌
+
+👉 it just prints the result
+
+
+## To edit file directly:
+
+    sed -i 's/old/new/' file.txt
+
+> ✅ `-i` = **in-place**
+
+> modify the file **directly**
+
+
+    sed = search + replace tool
+
+    `sed` is a stream editor used to modify text as it’s being processed.
+
+---
+
+## 🔥 `grep` = **search text and show matches**
+
+    grep "word" file.txt
+
+👉 shows lines that contain:
+
+    word
+
+    grep = filter lines
+
+## 🔍 What It Really Means (Optional Memory)
+
+    g = global  
+    re = regular expression  
+    p = print  
+
+👉 “search all lines and print matches”
+
+
+# 🧪 Example
+
+    grep "error" log.txt
+
+👉 shows all lines with:
+
+    error
+
+---
+
+🔥 `cut` = **extract specific columns from text**
+
+    cut -d ':' -f 1 file.txt
+
+👉 pulls out:
+
+    column 1
+
+    cut = slice columns
+
+## 🔍 Key Flags
+
+## `-d` (delimiter)
+    -d ':' 
+
+👉 tells `cut` what separates columns
+
+## `-f` (field)
+    -f 1
+
+👉 which column you want
+
+---
+
 ## Task:
 You have the following content in /home/bob/testfile (this is just an example file): a;b;c;d x;y;z How would you extract/print the b and the y?
 
@@ -948,14 +1054,22 @@ Example LFCS-style:
 Save the last 500 lines of the /home/bob/textfile file in the /home/bob/last file. Are the required lines saved in the "/home/bob/last" file?
 
 <details><summary>Answer</summary>
- tail -500 /home/bob/textfile > /home/bob/last
+ tail -n 500 /home/bob/textfile > /home/bob/last
 
 ### Explanation:
 - tail → output last part of a file
-- -500 → show last 500 lines
+- -n - specifies the number of lines
+- 500 → show last 500 lines
 - /home/bob/textfile → input file
 - '>' → redirect output to file
 - /home/bob/last → destination file
 
+Great catch! Yes, the problem is that tail -500 is interpreted as tail with an option -500, which isn't valid. The correct syntax is tail -n 500 to specify the number of lines.
+
+So, your command should be:
+
+tail -n 500 /home/bob/testfile > /home/bob/last
+
+This will correctly save the last 500 lines!
 
 </details>
