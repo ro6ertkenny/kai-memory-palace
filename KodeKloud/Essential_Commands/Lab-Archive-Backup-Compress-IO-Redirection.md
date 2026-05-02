@@ -47,6 +47,12 @@ This is useful if you want to extract the archive exactly where the files origin
 - logs.tar.gz → compressed archive filename
 - /var/log/ → source directory being archived
 
+❌ The leading hyphen (-) is NOT required in tar
+✅ Both of these are valid:
+    
+    tar -cvf logs.tar /var/log
+    tar cvf logs.tar /var/log
+
 </details>
 
 ---
@@ -214,8 +220,9 @@ This creates an archive of the contents in /path/to/directory without including 
 Execute the /home/bob/script.sh script and save all normal output (except errors/warnings) in the /home/bob/output_stdout.txt file
 
 <details><summary>Answer</summary>
-sudo ./script.sh > /home/bob/output_stdout.txt
----
+
+    sudo ./script.sh > /home/bob/output_stdout.txt
+
 The ./ before script.sh indicates that the script is located in the current directory. It's a way to tell the shell, "Run this script from the current directory," especially when the current directory isn't in the system's PATH.
 
 In your case, ./script.sh means you're executing the script.sh file in the directory you're currently in, rather than searching for it in the directories listed in PATH.
@@ -543,13 +550,23 @@ Is bzip2 created?
 bzip2 is created?
 
 <details><summary>Answer</summary>
-bzip2 --keep /home/bob/file.txt
+    
+    bzip2 --keep /home/bob/file.txt
 
 ### Explanation:
 - bzip2 → compress a file using bzip2
 - --keep → keep the original file after compression
 - /home/bob/file.txt → source file being compressed
 - result → original file remains and a .bz2 file is created
+
+    bzip2 --keep /home/bob/file.txt
+
+Produces:
+
+/home/bob/file.txt.bz2
+✅ Uses bzip compression
+✅ Keeps original
+✅ Matches expected output name
 
 </details>
 
@@ -684,7 +701,7 @@ Check contents.
 
 <details><summary>Answer</summary>
 
-    tar -cvf /home/bob/file.tar -C /home/bob file
+    tar -cf /home/bob/file.tar -C /home/bob file
 
 ## Explanation
 
@@ -790,7 +807,8 @@ Sort the contents of the /home/bob/values.conf file alphabetically and eliminate
 Verify the sorted output.
 
 <details><summary>Answer</summary>
-sort -du /home/bob/values.conf > /home/bob/values.sort
+
+sort -u /home/bob/values.conf > /home/bob/values.sort
 
 ### Explanation:
 - sort → sort lines from the file
@@ -799,6 +817,29 @@ sort -du /home/bob/values.conf > /home/bob/values.sort
 - /home/bob/values.conf → input file being sorted
 - '>' → redirect output into a file
 - /home/bob/values.sort → file receiving the sorted unique output
+
+    sort
+
+👉 arranges lines in order (A → Z by default)
+
+    -d
+
+👉 dictionary order
+
+ignores special characters
+compares only:
+letters (a–z)
+numbers (0–9)
+spaces
+
+✔ cleaner, human-style sorting
+
+    -u
+
+👉 unique
+
+removes duplicate lines
+only keeps one copy
 
 </details>
 
