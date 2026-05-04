@@ -36,6 +36,35 @@ Explanation:
 - graphical.target → graphical desktop environment
 - sudo → run with elevated privileges
 
+👉 .target = a group of services / system state
+
+“target” = what the system is trying to reach at boot
+
+A target is like a goal state
+
+Examples:
+
+“boot to terminal”
+“boot to desktop”
+“boot to rescue mode”
+
+Because systemd works like this:
+
+    boot process → start services → reach a TARGET
+
+👉 The system is literally “targeting” a final state
+
+🔥 Think of it like this:
+
+Target	Meaning
+multi-user.target	text-only (CLI)
+graphical.target	desktop (GUI)
+rescue.target	minimal repair mode
+
+.target → a bundle of services
+“target” → end goal of the system
+set-default → what to aim for at boot
+
 </details>
 
 ---
@@ -197,7 +226,7 @@ Add in it the code given below
 
 Make it executable:
 
-    chmod u+x /home/bob/script2.sh
+    chmod +x /home/bob/script2.sh
 
 Finally, execute the script:
 

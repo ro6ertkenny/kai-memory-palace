@@ -204,7 +204,11 @@ Execute the below command to identify the sshd process ID:
 
 Look for the PID value for the sshd process. Now, execute the below command:
 
-#### sudo renice 9 <PID>
+#### sudo renice 9 (Process ID # Here)
+
+Example: 
+
+#### sudo renice 9 1118 
 
 ### Explanation:
 - ps aux → list running processes in detailed format
@@ -279,6 +283,8 @@ Look for the correct IP in the /home/bob/ip.txt file.
 Execute the below command:
 
 #### sudo journalctl --unit=ssh.service -n 20 --no-pager
+or
+#### sudo journalctl -u ssh.service | grep Accepted
 
 And look for the logs entries like this:
 
@@ -442,7 +448,7 @@ Execute the below command and look for the Main PID:
 
 Send it a SIGHUP signal using the below command:
 
-#### sudo kill -SIGHUP <pid>
+#### sudo kill -SIGHUP (put process id here)
 
 ### Explanation:
 - systemctl status → show service status details
