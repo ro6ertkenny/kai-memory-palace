@@ -56,6 +56,8 @@ Which of the following commands would you use to set the virtual machine called 
 <details><summary>Answer</summary>
 You can use virsh autostart VM1 command to set the virtual machine called VM1 to automatically start up at boot.
 
+    virsh autostart VM1
+
 ### Explanation:
 - virsh → manage VMs
 - autostart → enable VM to start automatically at system boot
@@ -121,6 +123,12 @@ Execute the below command to run the docker container:
 - --name website → assign name to container
 - docker.io/library/nginx → image used
 
+Another task to:
+
+Pull docker.io/library/nginx image on this system.
+
+docker pull docker.io/library/nginx
+
 </details>
 
 ---
@@ -184,6 +192,35 @@ Delete the stopped/exited containers if any:
 - docker stop → stop running containers
 - docker rm → remove containers
 - 'container-id' → identifier for each container
+
+Docker needs container IDs (or names), not just a flag.
+
+👉 There is no single argument like --all for docker stop or docker rm
+
+👉 You must pass ALL container IDs
+
+✅ One-Liner (THIS is what you want)
+docker rm -f $(docker ps -aq)
+
+Inner command:
+
+    docker ps -aq
+
+-a → all containers (running + stopped)
+-q → only IDs
+
+👉 returns:
+
+    cbb4ee7d3846
+    abc123...
+    xyz789...
+
+Outer command:
+
+    docker rm -f
+
+rm → remove container
+-f → force (stop if running, then remove)
 
 </details>
 
@@ -472,6 +509,9 @@ Note: It will take some time for the process to be completed.
 Is virtual machine kk-ubuntu is in running state?
 
 <details><summary>Answer</summary>
+
+### The following was throwing errors ... needs to be corrected:
+
 virt-install \
     
     --name kk-ubuntu \
