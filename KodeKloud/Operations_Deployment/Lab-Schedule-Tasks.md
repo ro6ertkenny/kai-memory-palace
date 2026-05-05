@@ -51,6 +51,12 @@ When you see a cron line:
 
 > “At minute 30, hour 2, every day, every month, every week → run script.sh”
 
+Value	Meaning
+0	12:00 AM (midnight)
+12	12:00 PM (noon)
+23	11:00 PM
+❌ 24	INVALID
+
 ## ⚙️ SPECIAL SYMBOLS (YOU WILL SEE THESE)
 
 ### ⭐ `*` = “EVERY”
@@ -187,7 +193,7 @@ We're logged in as the user called alex. How do we see the crontab for the root 
 <details><summary>Answer</summary>
 Using the sudo crontab -l command, we can see the crontab for the root user.
 
-####    sudo crontabl -l
+####    sudo crontab -l
 
 ### Explanation:
 - sudo → run with elevated privileges
@@ -439,6 +445,8 @@ Is the required cron added?
 <details><summary>Answer</summary>
 Execute the sudo crontab -e command and add the code given below.
 
+#### sudo crontab -e
+
 #### 30 21 * * * /usr/bin/touch test_passed
 
 ### Explanation:
@@ -450,6 +458,51 @@ Execute the sudo crontab -e command and add the code given below.
 - * → every month
 - * → every day of week
 - /usr/bin/touch test_passed → command to run
+
+👉 crontab = “cron table”
+
+cron → time-based job scheduler
+tab → table
+
+👉 It’s literally a table of scheduled jobs
+
+Each line = one scheduled task
+
+Here's what the crontab should look like:
+# These replace cron's entries
+    1       5       cron.daily      run-parts --report /etc/cron.daily
+    7       10      cron.weekly     run-parts --report /etc/cron.weekly
+    10      5       db_cleanup      /usr/bin/touch /root/anacron_created_this
+
+@monthly        15      cron.monthly    run-parts --report /etc/cron.monthly
+
+The last line means:
+
+This is still an anacron-style job, not normal cron
+It’s using a nickname (@monthly) instead of a number
+
+🧠 SIMP Breakdown
+@monthly → run once per month
+15 → wait 15 minutes after boot
+cron.monthly → job ID
+run-parts --report /etc/cron.monthly → run all scripts in that directory
+
+🔥 What it actually does
+
+“Once per month (when the system is up), wait 15 minutes, then run all scripts in /etc/cron.monthly”
+
+🧠 What is run-parts?
+
+👉 It runs every executable file in a directory
+
+So:
+
+run-parts /etc/cron.monthly
+
+👉 executes:
+
+all monthly maintenance scripts
+backups, cleanup, updates, etc.
 
 </details>
 
@@ -867,6 +920,26 @@ Execute the crontab -e command and add the code given below.
 - 0 → Sunday
 - sudo /usr/bin/systemctl restart nginx → command to run
 - restart nginx → restart the nginx service
+
+🧠 The Key Concept (LOCK THIS IN)
+
+crontab -e edits the cron for the current user
+
+🔍 So how do you target bob?
+✅ Option 1 (MOST EXPLICIT — exam safe)
+sudo crontab -u bob -e
+
+👉 This clearly means:
+
+“Edit bob’s cron”
+
+⚠️ Option 2 (context-based)
+
+If you are already logged in as bob:
+
+crontab -e
+
+👉 That edits bob’s cron
 
 
 ## Cron Line
