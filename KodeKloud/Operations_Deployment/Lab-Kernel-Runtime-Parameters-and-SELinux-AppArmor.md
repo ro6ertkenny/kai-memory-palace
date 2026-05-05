@@ -72,6 +72,24 @@ For example, if the context is system_u:system_r:initrc_t:s0, then the file cont
 
 > 🗣️ “Z shows security zoning”
 
+🧠 What is SELinux?
+
+👉 SELinux = Security-Enhanced Linux
+
+SELinux = extra security layer that controls what processes are ALLOWED to do
+
+Even if permissions say “yes” → SELinux can still say “NO”
+
+Linux permissions = who owns the file
+
+SELinux = what the process is allowed to do
+
+🔥 Two layers of control
+
+Layer	Controls
+Permissions (chmod)	users & groups
+SELinux	process behavior
+
 </details>
 
 ---
