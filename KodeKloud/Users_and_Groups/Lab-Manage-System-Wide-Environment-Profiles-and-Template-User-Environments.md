@@ -438,7 +438,7 @@ Edit the /etc/environment file:
 
 Add the below line at the end of the file:
 
-#### LFCS=Welcome to the KodeKloud LFCS Labs!
+#### LFCS="Welcome to the KodeKloud LFCS Labs!"
 
 ### Explanation:
 - /etc/environment → global environment file
