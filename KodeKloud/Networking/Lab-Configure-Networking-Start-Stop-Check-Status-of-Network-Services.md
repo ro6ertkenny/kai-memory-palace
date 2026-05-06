@@ -714,14 +714,14 @@ Create a file with name and copy the content provided.
 
 Paste the following content in the file.
 
-network:
-  version: 2
-  ethernets:
-    enp6s0:
-      dhcp4: false
-      dhcp6: false
-      addresses:
-        - 10.0.10.5/24
+    network:
+      version: 2
+      ethernets:
+        enp6s0:
+          dhcp4: false
+          dhcp6: false
+          addresses:
+            - 10.0.10.5/24
 
 Change permissions using the below command.
 
@@ -834,14 +834,14 @@ Is the configuration updated and applied as follows?
 <details><summary>Answer</summary>
 Update the file /etc/netplan/99-custom.yaml created in the previous step using the vim command shown below.
 
-network:
-  version: 2
-  ethernets:
-    enp6s0:
-      dhcp4: false
-      dhcp6: false
-      addresses:
-        - 192.168.10.10/24
+    network:
+      version: 2
+      ethernets:
+        enp6s0:
+          dhcp4: false
+          dhcp6: false
+          addresses:
+            - 192.168.10.10/24
 
 You can apply the configuration by two commands as follows.
 
@@ -1086,7 +1086,7 @@ Edit the /etc/systemd/resolved.conf file.
 
 #### sudo vim /etc/systemd/resolved.conf
 
-Uncomment the below line in it and update to 8.8.8.8: 8.8.8.8:
+Uncomment the below line in it and update to 8.8.8.8
 
 #### #DNS --> DNS=8.8.8.8
 
