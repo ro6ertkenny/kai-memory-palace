@@ -142,6 +142,26 @@ Note: You need to use sudo with the command in case of a non-root user.
 - --raid-devices=2 → number of disks
 - /dev/vdd /dev/vde → source disks
 
+🧠 What does mdadm mean?
+
+👉 mdadm
+
+🔥 Short Answer (what the letters stand for)
+
+👉 mdadm = “Multiple Disk Admin”
+
+🧠 Break it down (memory-friendly)
+    md → multiple devices (Linux software RAID driver)
+    adm → administration / manage
+
+👉 So:
+
+    mdadm = manage multiple disk devices
+
+🧠 SIMP Definition
+
+    mdadm = tool to create and manage RAID arrays
+
 </details>
 
 ---
