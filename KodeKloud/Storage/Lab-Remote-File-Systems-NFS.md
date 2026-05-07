@@ -463,6 +463,47 @@ The two clients are separated by:
 
 NOT comma.
 
+
+👉 Yes — it’s “reversed” conceptually
+
+    /etc/exports = server view
+    /etc/fstab (NFS mount) = client view
+
+🧠 Compare Them Side-by-Side
+🟢 Server (/etc/exports)
+
+    /home 10.0.0.5(ro) 10.0.0.6(ro)
+
+👉 Read as:
+
+“I (server) share /home with these clients”
+
+🔵 Client (/etc/fstab)
+    
+10.0.0.1:/home /mnt nfs defaults 0 0
+
+👉 Read as:
+
+“I (client) mount /home from server 10.0.0.1”
+
+🧠 Mental Model (THIS is the key)
+    File	        Perspective	    First thing listed
+    /etc/exports	server	        local directory
+    /etc/fstab	    client	        remote source
+
+🔥 Why it feels reversed
+
+Because:
+
+Server says:
+👉 “Here’s what I’m sharing”
+Client says:
+👉 “Here’s what I’m pulling”
+
+🧠 SIMP
+exports → share OUT
+fstab → mount IN
+
 </details>
 
 ---
