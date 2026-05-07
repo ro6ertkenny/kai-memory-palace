@@ -490,6 +490,12 @@ If the user is not root, you need to use the command with sudo.
 - -L "SwapFS" → set new label
 - /dev/vdd → target filesystem
 
+🔥 Best Way - first to show the current FSTYPE & LABEL: 
+
+✅ Use lsblk -f
+
+    lsblk -f
+
 ## You can't just use the same command and replace the xfs w/and ext4:
 
 ## 🧠 Mental Model
