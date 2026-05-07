@@ -432,6 +432,18 @@ Further, you can verify the created partitions using the below command:
 - w → write changes
 - lsblk → verify partitions
 
+🧠 Mental Model
+
+    Step	            Tool
+    divide disk 	    fdisk
+    format partition	mkfs
+    mount it	        mount
+
+fdisk = “slice the pie”
+mkfs = “prepare the slice to use”
+
+“create partition” → fdisk
+
 ## So:
 
     fdisk
@@ -574,6 +586,27 @@ In `fdisk`:
 
 ---
 
+## Task: 
+
+Delete the 10MB partition.
+
+<details><summary>Answer</summary>
+
+    sudo fdisk /dev/vdd
+
+    Command (m for help): d
+    Partition number (1-3, default 3): 1
+    Command (m for help): p
+    Command (m for help): w
+
+Explanation:
+
+    p → print (show current state)
+
+</details>
+
+--- 
+
 ## Task:
 
 Format the 21MB partition as swap. Next, make it active, and tell Linux to start using it as swap memory.
@@ -597,6 +630,36 @@ If the user is not root, you need to use the commands with sudo.
 - swapon → enable swap
 - /dev/vdd2 → target partition
 - swapon --show → verify active swap
+
+🧠 Mental Model
+
+Swap = not one thing
+You can have multiple swap devices
+
+Linux uses both:
+
+/swapfile (bigger)
+/dev/vdd2 (smaller)
+
+Based on:
+
+PRIO
+
+🔍 Your priorities
+/swapfile   PRIO -2
+/dev/vdd2   PRIO -3
+
+👉 Higher number (less negative) = higher priority
+
+So:
+
+/swapfile used first
+/dev/vdd2 used after
+
+🧠 SIMP
+swapfile = big
+swap partition = small
+both can exist together
 
 </details>
 
